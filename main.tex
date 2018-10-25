@@ -9,6 +9,24 @@
 % binom macro
 \usepackage{amsmath}
 
+% Apply paragraph spacing
+\setlength{\parskip}{1em}
+
+% Put all formulae in display style for fractions, binomial coefficients, etc.
+\everymath{\displaystyle}
+
+%Some quick defs
+\newcommand{\nonneg}{\mathbb{N}}
+\newcommand{\integer}{\mathbb{Z}}
+\newcommand{\real}{\mathbb{R}}
+\newcommand{\singleton}{\mathbbm{1}}
+\newcommand{\binary}{\mathbbm{2}}
+\newcommand{\unifdist}{\mathcal{U}nif}
+\newcommand{\binomdist}{\mathcal{B}inom}
+\newcommand{\berdist}{\mathcal{B}er}
+\newcommand{\coin}{\mathcal{B}er}
+\newcommand{\iid}{\,\textsc{IID}}
+
 \title{Uniroma1(2018-19) - Social and Behavioural Networks}
 \author{Andrea Proietto}
 \date{October 2018}
@@ -40,7 +58,7 @@
 
 
 
-\chapter{Intro}
+\chapter{Introductive pills}
 	
 	%Note: "pick" and "sample" are used interchangeably
 	
@@ -52,45 +70,29 @@
 	
 	\
 	
-	New notion: Markov inequality
+\subsection{Markov inequality}
 	
-	Let X be a nonnegative RV, and an outcome $a$, then:
+	Let X be a nonnegative RV in $\Omega$, and an outcome $a \in \Omega$, then:
 	
-	$\displaystyle \Pr(X>x) \leq \frac{E(X)}{x}$
+	\begin{equation}
+	\Pr(X \geq a) \leq \frac{E(X)}{a}
+	\end{equation}
 	
-	In words, the probability of an outcome by a RV is lesser than the RV's expected value over the outcome itself
+	Proof: $ E(X) = \int_{0}^{\infty}x\Pr(X=x)dx \geq \int_{a}^{\infty}x\Pr(X = x)dx \geq \int_{a}^{\infty}a\Pr(X = x)dx = a\Pr(X \geq a)$
 	
-	Proof: $\displaystyle E(X) = \int_{0}^{\infty}x\Pr(X=x)dx \geq \int_{a}^{\infty}x\Pr(X=x)dx$
-	
-	$\displaystyle \int_{a}^{\infty}x\Pr(X=x)dx \geq \int_{a}^{\infty}a\Pr(X=x)dx = a\Pr(X\geq a)$
-	
-	\
-	
-	New argument: Moment generating functions:
+\subsection{Moment generating functions}
 	
 	A moment in a mathematical-analytical sense, are "quantitative measures" that describe characteristic of a shape. E.g.: a generic function's first moment is its slope (first derivative), 
-	
 	Given a a random variable X, then its moment generating function is the function $M_X(t) = e^{tX}, t \in \mathbb{R}$
 	
 	To be continued...
 	
-	Reminder! Power series of the $e^x$ function:
-	
-	$\displaystyle e^x = \sum_{i=0}^{\infty}\frac{x^n}{n!}$
+	Reminder! Power series of the $e^x$ function: $\displaystyle e^x = \sum_{i=0}^{\infty}\frac{x^n}{n!}$
 	
 	
-	\subsection{Chernoff bound}
+\section{Chernoff bound}
 	
-	Let $X_1, \dots, X_n $ be IID RVs s.t. : $X_i \sim Coin(p) \forall i$
-	(Call them "n coin throws (of the same coin)")
-	
-	\
-	
-	Then define X as $\sum_{i=1}^{n}(X_i)$
-	
-	X is essentially a binomial RV: $X \in \mathcal{B}inom(\mathbbm{2}^n, p)$, thus $E(X)=p\cdot n$
-	
-	\
+	Let $X_1, \dots, X_n \in \coin(p) \iid$, or in other words, n independent coin throws of the same coin; then define X as $\sum_{i=1}^{n}(X_i)$. X is essentially a binomial RV: $X \in \binomdist(\binary^n, p)$, thus $E(X)=p\cdot n$
 	
 	So, given an error limit $\varepsilon$, we define the Chernoff bound as:
 	
@@ -100,27 +102,22 @@
 	Which translates, in the binomial case to:
 	
 	$\displaystyle \Pr(|\sum_{i=1}^{n}(X_i) - p \cdot n| > t) = \Pr(|\frac{1}{n}\sum_{i=1}^{n}(X_i) - p| > \frac{t}{n})$
-	
-	\
 
 	%Custom
 	Then, by defining $t := \varepsilon n$
 	
 	$\Pr(|\frac{1}{n}\sum_{i=1}^{n}(X_i) - p| > \varepsilon) \leq 2e^{-2n^3\varepsilon^2}$
 	
-	\chapter{Hashing}
+\chapter{Locality Sensitive Hashing}
 	
-	Goal of hashing technique: reduce a big "object" to a small "signature" or "fingerprint"
+	\par
+	The goal of hashing techniques is to reduce a big "object" to a small "signature" or "fingerprint".	In general, what happens is to have some notion of similarity, and then define a "scheme" which computes it. The process of creating a scheme usually involves some sort of preprocessing step, and a function family which, by choosing one according a probability distribution, classifies the objects in the same way as the similarity function does.
+	Loose definition for Locality Sensitive Hashing: Similar objects hash to similar values
 	
-	In general, what happens is to have some notion of distance, and then define a "scheme", composed by some sort of preprocessing step, combined with a function that is essentially isometric to the similarity, in a probabilistic POV
+	\par
+	Here are some common similarities:
 	
-	Hashing functions =: "Schemes"
-	
-	\section{Locality Sensitive Hashing}
-	
-	Loose definition: Similar objects hash to similar values
-	
-	\subsection{Jaccard similarity}
+\subsubsection{Jaccard similarity}
 	
 	Given two sets of objects A and B, their Jaccard similarity is defined as follows:
 	
@@ -128,41 +125,37 @@
 	\displaystyle J(A, B) = \frac{|A\cap B|}{|A\cup B|}
 	\end{equation}
 	
-	\subsection{Hamming distance}
+\subsubsection{Hamming similarity}
 	
-	Given two sets of objects A and B taken from a universal set U, their Hamming distance is defined as follows:
+	Given two sets of objects A and B taken from a universal set U, their Hamming similarity is defined as follows:
 	
 	\begin{equation}
 	\displaystyle J(A, B) = \frac{|A\cap B| + |\complement_U(A\cup B)|}{|U|}
 	\end{equation}
 	
-	\section{Examples}
+\section{A case study: Web-page indexing}
 	
-	Use case: Search engines
+	A search engine crawls periodically the Internet and stores valuable information in its own index for search optimization purposes.
 	
-	A search engine crawls periodically the Internet and stores valuable information in its own index. An observation to make is the following: some kinds of documents, that are very similar to each other, are stored sparsely through the net; to save storage space, only one of a kind of document's info is stored in the index, whereas all others are linked to the first one because of their similarity.
+	An observation to make is the following: some kinds of documents, that are very similar to each other, are stored sparsely through the net; to save storage space, only one of a kind of document's info is stored in the index, whereas all others are linked to the first one, because of their similarity.
 	
-	To find a useful hashing scheme, A.Broder comes to the rescue: "Let's simplify things..."
-	
-	Treat web pages as strings
-	
-	\
+	To find a useful hashing scheme, A. Broder came up with an idea. First off, treat web pages as strings:
 	
 	$T_1: "The\ black\ board\ is\ black"$
 	
 	$T_2: "The\ white\ board\ is\ white"$
 	
-	\
+	Then, let $distinct(T)$ returns the set of distinct words appearing in a string (Ref. Bag of Words model)
 	
-	$distinct(T)$: returns the set of distinct words appearing in a string (*Bag of Words model)
+	So for example, by using the Jaccard similarity:
+    
+    \begin{equation}
+    \displaystyle J(distinct(T_1), distinct(T_2))= \frac{3}{5}
+    \end{equation}
 	
-	So: $\displaystyle J(distinct(T_1), distinct(T_2))= \frac{3}{5}$
+	Over a half: they look close; if we used the Hamming distance instead, we would (almost always) get a number very close to 1, because we're using a minuscule part of the universe set (in our case, the English dictionary)
 	
-	Over a half: they look close; if we used the Hamming distance instead, we would (almost always) get a number very close to 1, because we're using a minuscule part of the universe set (in our case, the english dictionary)
-	
-	\
-	
-	OBJECTIVE: Construct a scheme over webpages that implement the Jaccard similarity
+	OBJECTIVE: Construct a scheme over web-pages that implement the Jaccard similarity
 	
 	\
 	
@@ -221,7 +214,8 @@
 	
 	%HAMMING!!
 	
-	\section{Generalizing LSH, and the problem of scheme existence}
+\section{Generalizing LSH, and the problem of scheme existence}
+
 	
 	(Our) Formal definition: Let $U$ be a set, and $S \in U^2 \to [0, 1]$ a symmetric function; then $S$ is called a similarity over $U$.
 	
