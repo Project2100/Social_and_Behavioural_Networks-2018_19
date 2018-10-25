@@ -1,0 +1,923 @@
+\documentclass{report}
+
+% mathbb command, complement symbol and others
+\usepackage{amssymb}
+
+% More blackboard symbols
+\usepackage{bbm}
+
+% binom macro
+\usepackage{amsmath}
+
+\title{Uniroma1(2018-19) - Social and Behavioural Networks}
+\author{Andrea Proietto}
+\date{October 2018}
+
+%Questions:
+% - Revise Chernoff-Hoeffding, can't get a definitive formula
+
+\begin{document}
+
+\maketitle
+
+%\chapter{Preamble}
+%Questi appunti utilizzano una notazione personale che sto portando avanti da anni, con l'obiettivo di essere il meno ambiguo possibile. Un caso comune è il seguente: per definire una funzione, utilizzo questa sintassi:
+
+%\begin{equation}
+%f \in A \to B : a \mapsto f(a)
+%\end{equation}
+
+%dove $f$ è la funzione, $A \to B$ è il \textbf{tipo} di funzione, specificato dal dominio $A$ e dal codominio $B$, ed è trattato come insieme di tutte le funzioni da $A$ a $B$, giustificando l'uso dell'operatore di appartenenza. La parte che segue i due punti definisce la funzione attraverso la notazione di mappatura.
+%Ad esempio, l'espressione seguente:
+
+%\begin{equation}
+%d \in \mathbb{N} \to \mathbb{N} : n \mapsto 2\cdot n
+%\end{equation}
+
+%si leggerebbe: "$d$ è una funzione che va dai naturail ai naturali tale che ad n associa 2n"
+
+
+
+
+
+\chapter{Intro}
+	
+	%Note: "pick" and "sample" are used interchangeably
+	
+	%About E(X): It is called the "expected value" because it means the midpoint where all outcomes, compounded with their weight, contribute to the equilibrium
+	
+	%\textit{Question: Can we still talk about expected value when the outcomes are not numeric? What could be a good bijection between a generic Omega and N?}
+	
+	%Union bound: $\displaystyle \Pr(\bigcup_{i=0}^n E_i) \leq \sum_{i=0}^{n}(\Pr(E_i))$ ; if the events are mutually disjoint, then the equality is strict
+	
+	\
+	
+	New notion: Markov inequality
+	
+	Let X be a nonnegative RV, and an outcome $a$, then:
+	
+	$\displaystyle \Pr(X>x) \leq \frac{E(X)}{x}$
+	
+	In words, the probability of an outcome by a RV is lesser than the RV's expected value over the outcome itself
+	
+	Proof: $\displaystyle E(X) = \int_{0}^{\infty}x\Pr(X=x)dx \geq \int_{a}^{\infty}x\Pr(X=x)dx$
+	
+	$\displaystyle \int_{a}^{\infty}x\Pr(X=x)dx \geq \int_{a}^{\infty}a\Pr(X=x)dx = a\Pr(X\geq a)$
+	
+	\
+	
+	New argument: Moment generating functions:
+	
+	A moment in a mathematical-analytical sense, are "quantitative measures" that describe characteristic of a shape. E.g.: a generic function's first moment is its slope (first derivative), 
+	
+	Given a a random variable X, then its moment generating function is the function $M_X(t) = e^{tX}, t \in \mathbb{R}$
+	
+	To be continued...
+	
+	Reminder! Power series of the $e^x$ function:
+	
+	$\displaystyle e^x = \sum_{i=0}^{\infty}\frac{x^n}{n!}$
+	
+	
+	\subsection{Chernoff bound}
+	
+	Let $X_1, \dots, X_n $ be IID RVs s.t. : $X_i \sim Coin(p) \forall i$
+	(Call them "n coin throws (of the same coin)")
+	
+	\
+	
+	Then define X as $\sum_{i=1}^{n}(X_i)$
+	
+	X is essentially a binomial RV: $X \in \mathcal{B}inom(\mathbbm{2}^n, p)$, thus $E(X)=p\cdot n$
+	
+	\
+	
+	So, given an error limit $\varepsilon$, we define the Chernoff bound as:
+	
+	%True definition
+	$\displaystyle \Pr(X-E(X) \geq t)\leq e^{-2nt^2}$
+	
+	Which translates, in the binomial case to:
+	
+	$\displaystyle \Pr(|\sum_{i=1}^{n}(X_i) - p \cdot n| > t) = \Pr(|\frac{1}{n}\sum_{i=1}^{n}(X_i) - p| > \frac{t}{n})$
+	
+	\
+
+	%Custom
+	Then, by defining $t := \varepsilon n$
+	
+	$\Pr(|\frac{1}{n}\sum_{i=1}^{n}(X_i) - p| > \varepsilon) \leq 2e^{-2n^3\varepsilon^2}$
+	
+	\chapter{Hashing}
+	
+	Goal of hashing technique: reduce a big "object" to a small "signature" or "fingerprint"
+	
+	In general, what happens is to have some notion of distance, and then define a "scheme", composed by some sort of preprocessing step, combined with a function that is essentially isometric to the similarity, in a probabilistic POV
+	
+	Hashing functions =: "Schemes"
+	
+	\section{Locality Sensitive Hashing}
+	
+	Loose definition: Similar objects hash to similar values
+	
+	\subsection{Jaccard similarity}
+	
+	Given two sets of objects A and B, their Jaccard similarity is defined as follows:
+	
+	\begin{equation}
+	\displaystyle J(A, B) = \frac{|A\cap B|}{|A\cup B|}
+	\end{equation}
+	
+	\subsection{Hamming distance}
+	
+	Given two sets of objects A and B taken from a universal set U, their Hamming distance is defined as follows:
+	
+	\begin{equation}
+	\displaystyle J(A, B) = \frac{|A\cap B| + |\complement_U(A\cup B)|}{|U|}
+	\end{equation}
+	
+	\section{Examples}
+	
+	Use case: Search engines
+	
+	A search engine crawls periodically the Internet and stores valuable information in its own index. An observation to make is the following: some kinds of documents, that are very similar to each other, are stored sparsely through the net; to save storage space, only one of a kind of document's info is stored in the index, whereas all others are linked to the first one because of their similarity.
+	
+	To find a useful hashing scheme, A.Broder comes to the rescue: "Let's simplify things..."
+	
+	Treat web pages as strings
+	
+	\
+	
+	$T_1: "The\ black\ board\ is\ black"$
+	
+	$T_2: "The\ white\ board\ is\ white"$
+	
+	\
+	
+	$distinct(T)$: returns the set of distinct words appearing in a string (*Bag of Words model)
+	
+	So: $\displaystyle J(distinct(T_1), distinct(T_2))= \frac{3}{5}$
+	
+	Over a half: they look close; if we used the Hamming distance instead, we would (almost always) get a number very close to 1, because we're using a minuscule part of the universe set (in our case, the english dictionary)
+	
+	\
+	
+	OBJECTIVE: Construct a scheme over webpages that implement the Jaccard similarity
+	
+	\
+	
+	Preprocessing step: Choose UAR a permutation/total-ordering $\pi$ over $A\cup B =: u$
+	Algorithm (using u):
+	
+	\begin{verbatim}
+	pi: empty sequence
+	while u is not empty:
+		pick a word w from u UAR and remove it from u
+		append w to pi
+	end
+	return pi
+	\end{verbatim}
+	
+	Proof of correctness: $\Pr(X = \pi) = \frac{1}{|u|}\cdot\frac{1}{|u|-1}\cdot\dots\cdot 1 = \frac{1}{|u|!} \Rightarrow X \in \mathcal{U}nif(\mathcal{P}erm_u)$
+	
+	\
+	
+	From $\pi$, define the hashing function: $h_{\pi} \in \mathcal{P}(U) \to U : h_{\pi}(A) = min_{\pi}(A)$, meaning we take the minimum in A according to the ordering specified by $\pi$
+	
+	Observation: $\forall A \in U \Rightarrow h_{\pi}(A) \in A$
+	
+	\
+	
+	E.g.: $\pi := (black, the, is, white, board), C:=\{black, board\} \Rightarrow h_{\pi}(C) = black$
+	
+	\
+	
+	Thus, we declare that A is similar to B iff $h_{\pi}(A)=h_{\pi}(B)$ (Remember that $A$ and $B$ are fixed, $\pi$ is the main factor of this definition)
+	
+	\
+	
+	So: $\Pr(h_{pi}(A)=h_{pi}(B)) = ?$ Looking at a corresponding Venn diagram:
+	
+	\begin{itemize}
+	\item $A\cap B = \emptyset \Rightarrow \Pr(...)= 0$, no words in common, so their hashes must be different independently of pi
+	\item $A = B \Rightarrow \Pr(...)= 1$, all words in common, so their hashes must coincide independently of pi
+	\item Otherwise, since pi is chosen UAR, the probability that the hashes are equal has the same meaning of the probability of finding the lowest element of A and B in the intersection with respect of the union...  which, by its very definition, is the Jaccard similarity of A and B: $\Pr(h_{\pi}(A)=h_{\pi}(B)) = J(A, B)$
+	\end{itemize}
+	
+	\
+	
+	Possible question: Why not respect to the universal set? because A and B will have hashes, which do not live outside the union, i.e. the union is our true set of outcomes when hashing A or B (remember the observation)
+	
+	\
+	
+	Now, if $h_{\pi}$ is evaluated only once over a given permutation, only a binary response can be obtained. In order to obtain the probability value without resorting to compute unions and intersections, we can repeat evaluation over different permutations; this can be regulated by the Chernoff-Hoeffding bound:
+	
+	Let $A, B \in \mathcal{P}(U)$, and $X_{1 \dots n}$ be iid coins each defined over a distinct element of $\Pi \subseteq \mathcal{P}erm_U$ such that $X_i \mapsto 1 \Leftrightarrow A \sim_{\pi_i} B, 0\ otherwise$, then:
+	
+	%TODO
+	\begin{equation}
+	\displaystyle \Pr\left(\left|avg_{i=1}^{n}(X_i) - \frac{\sum E(X)}{n}\right|<\varepsilon\right) = 
+	\end{equation}
+	
+	%HAMMING!!
+	
+	\section{Generalizing LSH, and the problem of scheme existence}
+	
+	(Our) Formal definition: Let $U$ be a set, and $S \in U^2 \to [0, 1]$ a symmetric function; then $S$ is called a similarity over $U$.
+	
+	Tidbit: Let $f \in A^n \to B$, then f is \textbf{symmetric} iff \textit{argument order does not change the image} % COMMUTATIVITY? Kinda...
+	
+	% A scheme-similarity defines a partition over U
+	A LSH scheme over U is a probability distribution over U's partitions
+	
+	%%%%%%%%%%%%%%%%%%%%
+	
+	Intuitive: a hash function's purpose is to map arguments that are very similar to the same value
+	
+	Hash function: $h \in U \to (*)A$ such that A's representation is 'sensibly smaller' than U (h is NOT injective by this intuition - not true, injective functions are used as hash functions in pathological cases...)
+	
+	Insight: A hash function seems to complicate definitions more than a simple equivalence relation, but it models programs/algorithms more effectively, which is our focus here
+	
+	%Given a similarity $\phi$, a LSH scheme is a family of hash functions $H$, coupled with a prob. distribution $D$ over $H$ "such that, chosen a function $h$ from the family $H$ according to the prob.dist., satisfies the property $\Pr(h(a)=h(b)) = \phi(a,b) \forall a,b in U$"
+	
+	%Rewritten
+	Let $S \in U^2 \to [0, 1]$ be a similarity, and H be a RV over a family of hash functions over U, then H is a LSH scheme iff $\Pr(H(a)=H(b)) = S(a,b) \forall a,b in U$
+	
+	Brainlamp: I can extend the domain of H to the whole hashfunction class by setting the outsiders' probability to 0...
+	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+	
+	
+	Note: some partitions will never be a result of a hash function 
+	
+	Other note: some form of transitivity must hold. (So yeah, we're dealing with an equivalence relation in the guise of a function with arbitrary codomain)
+	
+	\
+	
+	INSIGHT: Preprocess \& hash function (aka a scheme) determine the similarity function (most people attempt to do the reverse)
+	
+	\
+	
+	MAJOR INSIGHT: In the previous webpage example, we're not dealing with a single hashing function, but with a family of functions each built with its own word permutation: the scheme distributes over the permutations of the union!
+	
+	\
+	
+	Wrapup: A LSH scheme for a similarity S is a prob dist over U's partitions such that $\forall A, B \in  U \Rightarrow \Pr_\pi(A\sim_\pi B) = S(A, B) = \Pr_h(h(A)=h(B))$
+	
+	Challenge: Can we find a LSH scheme for an arbitrary S function? NO
+	
+	E.g. $U = \{a, b, c\}$
+	$S \in U^2 \rightarrow [0, 1] : S(a, b) \mapsto 1, S(b, c) \mapsto 1, S(a, c) \mapsto 0$ % We're violating transitivity
+	
+	Translating into probabilities and using equality's transitivity, we obtain: $\Pr(h(a), h(c))=1$, which contradicts the third mapping.
+	
+	 
+	
+	
+	\chapter{Next}
+	
+	More distances:
+	
+	Dice similarity
+	\begin{equation}
+	\displaystyle D(A, B) = \frac{|A\cap B|}{|A\cap B| + \frac{1}{2}|A\vartriangle B|}
+	\end{equation}
+	
+	Anderberg similarity
+	\begin{equation}
+	\displaystyle D(A, B) = \frac{|A\cap B|}{|A\cap B| + 2|A\vartriangle B|}
+	\end{equation}
+	
+	Generalizing Jaccard, Dice and Anderberg: 
+	\begin{equation}
+	\displaystyle S_\gamma(A, B) = \frac{|A\cap B|}{|A\cap B| + \gamma|A\vartriangle B|}
+	\end{equation}
+	
+	\
+	
+	Important lemma (Charikar): if a similarity S admits a (LSH) scheme, then $1-(S)$ must satisfy the triangular inequality (trineq)
+	
+	Proof: %TODO SEE NOTES
+	
+	Afterthought: Similarities are actually defined in most cases as the inverses of measures, which in turn give (oh so surprisingly!) a notion of distance
+	\
+	
+	By Charikar's lemma, we can prove that Dice's similarity cannot admit a LSH scheme
+	
+	Proof by counterexample: Assume $A=\{1\}, B=\{2\}, C=\{1, 2\}$, then use the trineq over the distances; %\textreferencemark
+	
+	Parameterizing this counterexample with $S_\gamma$, we obtain a bounds for gamma: $1 \leq \frac{2\gamma}{1 + \gamma} \Rightarrow \gamma \geq 1$
+	
+	\
+	
+	\subsection{Probability generating functions}
+	
+	Intuition: A probability generating function (PGF) is a \textbf{power series representation} of a given probability distribution
+	
+	Definition: Given a (discrete) RV X, its PGF is the function:
+	
+	$\displaystyle \mathcal{G}en_X(\alpha)= \sum_{x=0}^{|\Omega|}\Pr(X=x)\alpha^x$ (note that all outcomes appear by their probability)
+	
+	How to get back to pmf: $\displaystyle \Pr(X=x) = \frac{\mathcal{D}^x(\mathcal{G}en_X(0))}{x!}$
+	
+	\
+	
+	Theorem: If a similarity S admits a LSH and a given function f is a PGF, then f(S) admits a LSH
+	
+	Afterthought: Are we "applying" a probability distribution over a similarity (which in turn, since it is lshable, means it has a probdist over a subset of hashfunctions)?
+	
+	Proof: see below
+	
+	Consequence: Applying the theorem to the Jaccard similarity:
+	
+	%Our PGF is $\displaystyle f_\gamma(x) = \frac{x}{x+\gamma(1-x)} = $ %WRONG???
+	
+	Start with $\displaystyle f_\gamma(\alpha) = \sum_{x=1}^{\infty}\frac{(1-\frac{1}{\gamma})^x}{\gamma -1}\alpha^x$
+	
+	We have to demonstrate that the coefficients represent a probability distribution: $\displaystyle \sum_{i=1}^{\infty}\frac{(1-\frac{1}{\gamma})^i}{\gamma -1}=1 \Rightarrow \sum_{i=1}^{\infty}(1-\frac{1}{\gamma})^i=\gamma -1$
+	
+	Now: $\displaystyle \sum_{i=1}^{\infty}(1 - \frac{1}{\gamma})^i = (1 - \frac{1}{\gamma})\sum_{i=0}^{\infty}(1 - \frac{1}{\gamma})^i = (1 - \frac{1}{\gamma}) \frac{1}{1 - (1 - \frac{1}{\gamma})} = \frac{\gamma -1 }{\gamma}\frac{1}{1/\gamma} = \gamma -1$
+	
+	
+	Apply PGF to Jaccard: $f_\gamma (J(A, B)) = $ ...algebretta insiemistica... $= \frac{\cap}{\cap + \gamma\vartriangle} = S_\gamma(A, B)$, which in turn is LSH-able
+	
+	
+	\
+	
+	\section{181008}
+	
+	
+	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%181008
+	
+	%% So it actually matches the previous wikipedian def
+	Recap: Given a universe U, a function $S \in U^2 \to [0, 1]$ is said to be a LSH-able similarity iff exists prob distr over (a family/subset of) the hash functions in U, such that: 
+	\begin{equation}
+	\forall X, Y \in U\ \ \Pr_h(h(X)=h(Y)) = S(X, Y)
+	\end{equation}
+	
+	
+	Reprise: If a similarity S is LSHable and f is a PGF, then f(S) is LSHable
+	
+	Equivalent statement:
+	\begin{equation}
+	f(S) := T \in U^2 \to [0, 1] : \forall A, B \in U\ \ T(A, B) = f(S(A, B))
+	\end{equation}
+	
+	%Afterthought: could we just demonstrate that probability distributions are composable? lshability could be just a carried-over property...
+	
+	
+	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+	
+	\
+	
+	Lemma (1): The similarity $O \in U^2 \to [0, 1] : (A, B) \mapsto 1$ admits a LSH
+	Proof: Give prob. 1 to a constant function (duh!): $h \in U \to \mathbbm{1} A \mapsto 0 \forall A in U$
+	
+	Purpose: This will be the base case for theorem proof...
+	
+	%%%%%%%%
+	
+	\
+	
+	Lemma(2): If S and T similarities over U have a scheme, then $S \cdot T : (S \cdot T)(A, B) = S(A, B)\cdot T(A, B)$ has a scheme
+	
+	(I.E:). LSHability is preserved upon composition/multiplication
+	
+	Proof by construction (Algorithm): 
+	
+	sample hash functions for $S \cdot T$ as follows
+	
+	first, sample $h_S$ for S;
+	then sample $h_T$ independently for T
+	return the function $h : A \mapsto (h_S(A), h_T(A))$
+	
+	$\Pr_h(h(A)=h(B)) = \Pr_{h_S}(h_S(A)=h_S(B)) \cdot \Pr_{h_T}(h_T(A)=h_T(B)) = S(A, B) \cdot T(A, B) (\forall \{A, B\} \in \mathcal{P}_2(U))$by independency
+	
+	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+	
+	Lemma(3): if S is LSHable then $\forall i \in \mathbb{N}$ $S^i$ is lshable
+	
+	proof by induction:
+	
+	base (Lemma1): i=0 and $S^0$=O OK
+	
+	ind: Use lemma 2 on $S^i$ and $S$ to obtain $S^{i+1}$; S has a scheme by def, $S^i$ has a scheme by induction hypothesis
+	
+	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+	
+	lemma(4): if $p_0, ..., p_i, ... : \sum_{i=0}^{\infty}p_i=1 , and p_i\geq 0 \forall i$, and $S_0, ..., S_i, ...$ are lshable similarities, then $\sum_{i=0}^{\infty}p_iS_i$ is lshable
+	
+	scheme: first pick(sample, they are synonyms) i* at random from $\mathbb{N}$ with probability $p_0, ..., p_i, ...$
+	then, sample h from the hash functions of $S_{i*}$
+	
+	$\Pr(h(A)=h(B))=\sum_{i=0}^{\infty}(p_i S_i(A, B))$
+	
+	$\Pr(h(A)=h(B))=\sum_{i=0}^{\infty}(\Pr(i=i*)\Pr_h(h(A)=h(B) | i=i*))$, $\Pr(i=i*) = p_i$, $hahb|i=i* \to S_i(A, B)$
+	
+	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+	
+	Final proof: sum of $p_iS^i$ has a scheme
+	
+	L3: $S^i$ has a scheme
+	
+	L4: the sum is lshable, proven
+	
+	%%%%%%%%%%%%%%%%%%%%%%%
+	
+	Example of a pgf: $sum(2^-1 times x^i)$
+	
+	
+	----------------------------------------------------------------??sorensen dice??cosine similarity?? inner product??johnson-lindenstrauss??
+	
+	a sketch is n instance of a pgf which can be used to implement other similarities NONONONONOO
+	
+	
+	%%%%%%%%%%%J
+	
+	PGF is an approach for making schemes for similarities from other schemes
+	
+	\section{181010}
+	
+	Let f a PGF, $\alpha \in [0, 1]$, ...?
+	
+	%&
+	$\alpha f = \alpha f(S)\ |\ (1 - \alpha)T$
+	%&
+	
+	$T \in U^2 \to [0, 1] : \forall {t, t'} \in \mathcal{P}_2(U) T(t, t') = 0$
+	
+	for the 1 case we wanted a nbanal partition, now with 0 we want a punctual partition, so we need a hash function that assigns a distinct value to each argument. (You can actually use the identity)
+	
+	Not a good scheme, because we're not shrinking data
+	
+	GOTO %&
+	
+	\subsubsection{Approximation examples}
+	
+	Consider $S_\gamma$: $\gamma \geq 1 \Leftrightarrow S_\gamma$ is LSH-able
+	
+	Focus on $\gamma < 1$
+	
+	Definition: "Distortion of a similarity"
+	
+	Let S be a similarity, then its distortion is "the minimum*(meaning inferior extremum) delta geq 1 : exists LSHABLE S' (forall {A, B} in P2U, $1/\delta \cdot S(A, B) \leq S'(A, B) \leq S(A, B)$)"
+	
+	delta tends to 1 -> S is lshable
+	
+	using jaccard to approximate sgamma we wold obtain 1/gamma
+	
+	delta is the approximation factor
+	
+	%%%%%%%%%%%%%%%%%%
+	
+	Centerlemma: Let S be a LSHable similarity $ : \exists \chi \subseteq U : \forall \{x, x'\} \in \mathcal{P}_2(\chi) S(x, x')=0$, then
+	
+	$\forall y \in U avg_{x \in \chi}(S(X, Y) \leq) \frac{1}{|\chi|}$; (it trivially follows that $\exists x* \in \chi : S(x*, Y \leq \frac{1}{|\chi|})$)
+	
+	Proof: (Fix $y \in U$) If the hash function h has positive probability in the (chosen) lsh for S, then $\forall {x, x'} \in \mathcal{P}_2(\chi) (h(x)\neq h(x'))$
+	
+	[$\chi$ is actually a (possibly incomplete) section of the partition of U induced by h]
+	
+	thus, forall hash functions with positive probability, there can exist at most one x in calx st hx=hy (transitivity of equality)
+	
+	$\sum_{x \in \chi}S(x, y) = \sum_{x \in \chi}\Pr_h(h(x)=h(y)) = \sum_{x \in \chi}\sum_{h}\Pr(h\ is\ chosen)[h(x)=h(y)]$
+	
+	IMPORTANT: The brackets here are a boolean evaluation operator
+	
+	$= \sum pr h is chosen \sum eval hx = hy \leq \sum_h \Pr(h\ is\ chosen) \leq 1$
+	
+	Thus, $\sum_{x \in \chi}S(x, y) \leq 1 \Rightarrow avg(S(X, Y)) \leq \frac{1}{|\chi|}$, proven
+	
+	
+	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+	
+	
+	$S:= S_\gamma , 0 < \gamma < 1, U=2^{[n]}={S|S\subseteq [n]}$ %insieme delle parti?
+	
+	$\chi := \mathcal{P}_1([n])$
+	$y = [n]$
+	
+	 - let us assume that T finitely distorts sgamma, and T is lshable
+	then $T({},{}) = 0 forall {i, j} in P_2(mathbbm(n))$
+	
+	 - $\exists \{i\} in \chi : T(\{i\}, [n]) \leq \frac{1}{|\chi|} = \frac{1}{n}$
+	 
+	 $S_\gamma(\{i\}, [n]) = \frac{1}{1 + \gamma(n-1)} = \frac{1}{\gamma n + (1-\gamma)}$
+	 
+	 ...
+	 zenterlemma application
+	 ...
+	
+	
+	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+	
+	$ U = {}$
+	
+	
+	\chapter{181015}
+	
+	First lesson reprise - Flow of memes
+	
+	spread of memes/viruses from a website to another
+	
+	so, we get traces
+	
+	goal is to reconstruct graph from traces
+	
+	Trace spreading model (from virology)
+	
+	source chosen UAR and edge traversal time chosen by (usually) Exp(lambda)
+	trace starts from source
+	
+	obs. the first two nodes of a trace are connected
+	
+	pr a source is chosen: 1/n
+	pr the edge's other endpoint: 1/deg(source) because of how traces work
+	
+	n numero di tracce: $pr = (1-1/deltan)^(3deltanlogn) = e^(-3lnn) simeq 1/n^3$
+	
+	
+	\subsection{another information spreading process}
+	
+	NPR chain letter
+	
+	important observations: first name is fake, the others are plausibly real
+	
+	asks to add own's name, and then forward to all friends
+	
+	%%%%%%%%%%%%%%%%%
+	
+	someone breaks the rules, and decides to publish their copy of the mail
+	
+	those published mails reveal a subtree of the whole chainletter tree
+	
+	revealed tree MUCH smaller, and extended in-depth
+	
+	%%%%%%%%%%%%%%%%%
+	
+	Let T be a tree, each node has a chance of being "exposed" by a probability p, and if so, reveals all ancestors
+	
+	estimate the size of the tree
+	
+	ALGO
+	throw a coin on all the nodes of the chain tree, don't throw if node is parent of a revealed node (no need) := special nodes
+	
+	special nodes are all iid from exposed ones; delta = n of special nodes/special nodes; revealed nodes = delta dot n (it's the expected value!!) -> from there estimate n
+	
+	delta is the actual exposure probability
+	
+	the two estimates can go wrong...
+	
+	examples in nature suggest some bounds
+	
+	%%%%%%%%%%%%%%%%%%%%%%%
+	
+	Theorem: the algorithm correctly estimates n if $n > omega(max(1/delta^2, k/delta))$
+	
+		
+		IMPORTANT: Estimates can be redone, but reconstructing another revealed tree is impractical, so we're estimating a characteristic of  a tree by observing a sample revealed one and making estimates
+	
+	%%%%%%%%%%%%%%%%%%%%%%%
+	Single-child fraction
+	
+	Fix a bound: a node's maximum degree must be lesser than k
+	
+	partition unknown tree into subforests, each subforest has 1/delta nodes and median height $omega(log_(k-1)^delta^-1)$
+	
+	by exposing a node in a subforest's lower half, we're exposing a number of nodes equal to the sf's median height
+	
+	
+	
+	%%181017%%%%%%%%%%%%%%%%%%
+	
+	Insight: $\delta$ is unknown too
+	
+	Recap of revealed subtrees
+	
+	Exposure prob: $\delta > 0$
+	
+	$E(\# exposed nodes) = \delta n$
+	
+	\
+	
+	Let $x \in RV$ be the set of nodes of the revealed tree. Let $Y \in Coin(p)$, where $Y_v = 1$ if v is exposed, 0 otherwise.
+	
+	$E(Y_v) = \delta$
+	
+	Let $ Y = \sum_{v \in X} Y_v \Rightarrow E(Y)= \delta |X|$
+	
+	OUTPUT: $\hat\delta = \frac{Y}{|X|}$
+	
+	Chernoff bound is applicable, the Ys are IID
+	
+	Note: we can do the first substitution because of linearity (?)
+	
+	"Multiplicative approximation": $\displaystyle \Pr(|\hat\delta - \delta| \geq \varepsilon \delta) = \Pr(|\frac{Y}{|X|} - \delta| \geq \varepsilon \delta) = \Pr(|Y - \delta |X|| \geq \varepsilon \delta |X|) = \Pr(|Y - E(Y)| \geq \varepsilon E(Y)) \leq 2e^{-\frac{\varepsilon^2}{3}E(Y)}, \forall \varepsilon \in (0, 1)$
+	
+	This is the Multiplicative Chernoff Bound: Let y1 ... yn IID Coins, then (see above, last inequality)
+	
+	we need E(y) to be large in order to obtain a useful bound, for E close to 1, the bound itself goes over 1, becoming useless
+	
+	$\displaystyle 2e^{-\frac{\varepsilon^2}{3}E(Y)} = 2e^{-\frac{\varepsilon^2}{3}\delta|X|}$
+	
+	If $\displaystyle |X| \geq \frac{3}{\varepsilon^2\delta}\ln2/\eta$, then $\displaystyle 2e^{-\frac{\varepsilon^2}{3}\delta|X|} \leq 2e^{-\ln2/\eta} = 2\eta/2 = \eta$
+	
+	$Y' = \sum_{v \in T}Y_v \Rightarrow E(Y') = \delta n$
+	
+	$\Pr(Chernoff\ on\ Y') \leq 2e^{-\frac{\varepsilon^2}{3}\delta n}$
+	
+	Using the bound over $|X|$, then $\leq \eta$
+	
+	Final output: $\displaystyle \frac{Y'}{\mathaccent 1 \delta } (\leq  \frac{(1 + \varepsilon)\delta n}{(1 - \varepsilon)\delta} = (1+O(\varepsilon))n )$
+	
+	Lower bound inverts the sign of bigOepsilon
+	
+	Insight: $\displaystyle \frac{Y'}{\mathaccent 1 \delta } = \frac{Y'}{Y}|X|$
+	
+	
+	
+	"An additive approximation is useless"
+	
+	
+	goodnes sof alogrithm:
+	
+	 - nodes of unknown tree less than delta: revealed tree =0 almost surely
+	 - tree is a star -> almost surely get a bad approximation
+	 
+	what characteristics should the unknown tree have?
+	
+	Claim: If the number of internal nodes of the revealed tree is at least 3/(epsilonSQRdelta)ln(2/eta) then our guess \^n is going to satisfy (1-oe)n <= \^n <= (1+oe)n with probability at least 1-2eta
+	
+	the three greek letters can change the goodness of our result
+	
+	Next goal: find the probability that a node of the unknown tree will be an internal node of the revealed tree
+	
+	Assumption: The unknown tree is such that none of its nodes has more than K children.
+	%That actually has lots of applications! makes much sense
+	
+	Let $v$ be a node of the unknown tree with K children, then $\Pr($at least 1 children in K is exposed$) \geq 1-\varepsilon^{-1}min(1, \delta K_v)$
+	
+	$K_v$: expected number of children revealed
+	
+	Let $Z_v \in Coin(p)$ where it is 1 if at least one child of v is exposed
+	
+	$\displaystyle E(Z_v) = 1 - (1 - \delta)^{K_v} = 1 - ((1 - \delta)^{1/\delta})^\delta{K_v}$
+	
+	%using e's limit definition
+	$\lim\limits_{\varepsilon \to 0^+}(1-\varepsilon)^{1/\varepsilon} = 1/e$
+	
+	$1 - ((1 - \delta)^{1/\delta})^\delta{K_v} \geq 1- e^{-\delta K_v}$
+	
+	
+	\begin{itemize}
+		\item if deltakv geq 1 then E(Zv) geq 1-1/e
+		\item else , geometric intuition... ?????????? ... E(Zv) geq 1-ePOW(-deltakv) geq deltakv(1 - 1/e)
+	\end{itemize}
+	Lemma is proven
+	
+	
+	\
+	
+	Former insight: for revelation we care about children, not all of the descendants
+	
+	By summing all children of all nodes, we get all the edges -> n-1
+	% THis is used elsewhere...
+	
+	\
+	
+	Lemma: Let Z be the set of nodes of which at least 1 child is exposed; then $\Pr(|Z| \geq 1/2(1-1/e)\min(K^{-1}, \delta)(n-1))\geq 1-e^{-\Theta(n\min(1/K, \delta))}$
+	
+	Proof: Let I be the set of internal nodes of T; Let D subset I contain nodes with at least 1/delta children; $E(|Z|) = \sum_{v \in I}E(Z_v) \geq (1 - 1/e)\min(1, K_v\delta) = (...)(|D| + \delta\sum_{v \in I-D}K_v)$
+
+	obs1: sumkvforvinI = n-1
+	
+	obs2: $|D| \geq \frac{\sum_{v \in D}K_v}{|K|}$
+	
+	then : $(1 - 1/e)(|D| + \delta\sum_{v \in I-D}K_v) \geq (1 - 1/e)(\sum K_v/K + \delta\sum_{v \in I-D}K_v) \geq (...)min(1/K, \delta)\sum = (...)min(...)(n-1)$
+	
+	Proven
+	
+	\
+	
+	see emergency notes!!
+	
+	\section{181022}
+	
+	-combinatoric optimization-
+	
+	graph independent set - impractical example
+	
+	An implicit opt problem.
+	
+	unknown - partly known function, exp in the codomain
+	
+	ex: describe SAT by means of truth tables - rows are exponential in variable number
+	
+	"Modular set functions"
+	
+	given $X=[n] f \in 2^X \to \mathbb{R}$
+	
+	$n=3, w_1 = 1, w_2 = 5, w_3 = 1, f(S)=\sum_{i \in S}$
+	
+	max  set: all domain
+	
+	max set w neg values: exclude neg values
+	
+	se ho un oracolo che mi calcola f(s), ed io non conosco f, posso interrogare l'oracolo sui singoletti, e poi applico le logiche precedenti
+	
+	(Matroid) Ex tutte parti con al più k elementi (a partire da U)
+	
+	"Ad placement"
+	arriva un utente sul sito tipo Google, scegli quali ad mostrare in modo da guadagnare il più possibile
+	
+	modello Independent Cascade Model
+	ogni ad rappresentata da una coppia $AD_i = (v_i, p_i)$ accordo tra pubblicità e Google, $v_i \in \$, p_i$ probobilità di click
+	
+	$Ad_{samsung} : (1\$, 0.1) \Rightarrow E[X_i] = 1 \cdot 0.1$
+	
+	Strategy: put highest expectation ads on top
+	
+	third value,: satisfaction factor (or the will to look other ads)
+	
+	how to optimize f in ordder to maximize it
+	
+	caso particolare "submodular set function" - analogo discreto delle funzioni convesse - can be misleading
+	
+	given X, f is submodular iff $\forall S, T \in X, f(S)+f(T) \geq f(S\cap T) + f(S\cup T)$
+	
+	modular is submodular: $\forall S, T \in X, f(S)+f(T) = f(S\cap T) + f(S\cup T)$
+
+	quanti bit servono per rappresentare tale funzione?
+	
+	LAPSE
+	
+	COVERAGE (function, submodular): $X=\{S_1, S_2...S_m\}, S_i \subseteq [n]$
+	
+	$Y\subseteq X : c(Y) = |\bigcup_{S_i \in Y}S_i|$
+	
+	
+	$s(Y) = \sum_{S_i \in Y} |S_i|$
+	
+	
+	proof that f (or c?) is submodular
+	base case n=1: couple S T can assume 4 combinations: $
+	case s, t = \{1\} \Rightarrow union an intersection f(\cdot)= 1	
+	1 in T, 1 not in S then 1 in union, 1 not in intersection
+	dual is dual
+	s, t = \emptyset
+	$
+	
+	induction: split a coverage function into two coverage functions: $c(Y) = |\bigcup_{S_i \in Y}S_i| = |(\bigcup_{S_i \in Y}S_i)-\{n+1\}| + |(\bigcup_{S_i \in Y}S_i) \cap \{n+1\}|$
+	
+	Nemauser-W
+	
+	If f is submodular nonnegative and monotone, it can be approx to $max_\{|S|=K\}(f(S))$ to a factor of $1- \frac{1}{e}$
+	
+	represent modulars as points of convex multidimensional functions
+	
+	
+	"maxcover" data una classe di sottoinsiemi di X,. S-1, si trovino k insiemiinX tail che , insieme, coprano il massinmo numero di elementi
+	
+	
+	Before proving, ALGORITHM (greedy), parameterized by f, X and k: trovare k sottoinsiemi di X che massimizzano f
+	
+	$
+	S_0 <- \emptyset
+	for i=1 -> k
+		let x_i = maximizer of f(\{x_i\} \cup S_{i-1})
+		S_i <- \{x_i\} \cup S_{i-1}		
+	return S_k
+	$
+	
+	again before proving, observation: diminishing returns (formalization)
+	
+	$\delta(x|S) = f(\{x\}\cup S) - f(S)$ %always positif if f is monotone
+	
+	let f be submodular, $B \subseteq A, x \notin B \Rightarrow \Delta(x|A) \geq \Delta(x|B)$ % an iff can be demonstrated
+	
+	submodular functions exhibit diminishing returns property
+	
+	Now: $S=A\cup\{x\}, T=B \Rightarrow f(A\cup\{x\})+f(B)\geq f(A)+f(B\cup\{x\}) \Rightarrow f(A\cup\{x\})-f(A)\geq f(B\cup\{x\})-f(B) \Rightarrow \Delta(x|A) \geq \Delta(x|B)$
+	
+	proof of approximation:
+	
+	take an optimal solution $S*=\{x_1^*, ..., x_k^*\}$
+	
+	$\forall i, f(S^*) \leq f(S^* \cup S_i)$ %per monotonia di f
+	
+	$ = ... f(S_i) + \sum_{j=1}^{k}\Delta(x_j^*|S_i\cup \{x_1^*, ..., x_{j-1}^*\}) \leq (bydiminishingreturns) f(S_i) + \sum_{j=1}^{k}\Delta(x_j^*|S_i) -> \leq (bygreediness) f(S_i) + \sum_{j=1}^{k}\Delta(x_{i+1}|S_i) = f(S_i) + k(f(S_i \cup \{x_{i+1}\})-f(S_i)) = kf(S_{i+1}) - (k-1)f(S_i)$
+	
+	
+	So: $f(S^*) - f(S_i) \leq k(f(S_{i+1} - f(S_i)))$
+	
+	Def: $\delta_i = f(S^*) - f(S_i)$
+	
+	Then: $\delta_i \leq k(\delta_i - \delta{i+1}) \Rightarrow k\delta_{i+1} \leq (k-1)\delta_i \Rightarrow \delta_{i+1} \leq (1-\frac{1}{k})\delta_i$
+	
+	$\delta_0 = f(S^*)-f(S_0) \leq f(S^*)$ %by nonnegativity
+	
+	
+	.
+	.
+	.
+	
+	going to definition of e by its limit form $(1-1/k)^k$
+	
+	
+	\section{181024}
+	
+	recap of yesterday:
+	
+	given a ground set, and $f \in 2^X \to \mathbb{}$, then f is modular iff $\forall S, T \subseteq X (f(S)+f(T) \geq f(s\cup t) + f(s \cap t))$
+	
+	E.g.: coverage functions, X is a set system $c(X) = \left| \bigcup_{S \in X} S \right|$
+
+	"given a subset of sets, the coverage value would be the cardinality of the union"
+	
+	claim: coverage function is submodular
+	proof: $c(S)+c(T) \geq c(s\cup t) + c(s \cap t)$
+	
+	proven case-by-case in the scope of where the elements are inside the subsets
+	
+	\
+	
+	if $f_1, ..., f_k \in 2^X \to \mathbb{R} are submodular, \alpha_1, ..., \alpha_k \geq 0 \Rightarrow \sum_{i=1}^{k}\alpha_i f_i is submodular$
+	
+	proof: the i-th case is easily proven, then sum up; nonnegativity is essential here
+	
+	\
+	
+	algorithm for optimization (?): $GREEDY_f(X, K)$:
+	$
+	S_0 <- \emptyset
+	for i=1 -> k
+		let x_i = maximizer of f(\{x_i\} \cup S_{i-1})
+		S_i <- \{x_i\} \cup S_{i-1}		
+	return S_k
+	$
+	
+	if f is submodular, nonnegative and monotone, then $\displaystyle f(S_K)\geq(1-1/e)max_{S \in \binom{X}{K}}f(S)$
+	
+	\
+	
+	another algorithm: $GREEDY_{\varepsilon, f}(X, K)$:
+	$
+	S_0 <- \emptyset
+	for i=1 -> k
+		%let x_i be : f(S_{i-1} \cup \{x_i\}) \geq (1-\varepsilon)max_{x \in X} f(S_{i-1} \cup \{x\}) %finding the maximizer
+		let x_i be : f(S_{i-1} \cup \{x_i\}) - f(S_{i-1}) \geq (1-\varepsilon)max_{x \in X} (f(S_{i-1} \cup \{x\}) - f(S_{i-1})) %finding the maximum marginal return
+		S_i <- \{x_i\} \cup S_{i-1}		
+	return S_k
+	$
+	
+	the difference is: we don't need to find the exact maximizer, but something (1-epsilon) close to it; and it may be MUCH easier to find such something instead of the actual maximizer.
+	
+	\
+	
+	the core of the discussion is approximating a (usually impracticable to compute) function to a (polynomial) one
+	
+	Tidbit: proving correctness of this algorithm proves the previous one
+	
+	Trail: KKT model
+	
+	Hint(!): We don't need to find the maximum in this algorithm (otherwise, we are actually in the former case, why not use it directly?)
+	
+	\
+	
+	Theorem: ($\forall \varepsilon \in [0, 1)$), if f is submodular, nonnegative and monotone, then $f(S_k) \geq (1-\varepsilon)(1-1/e)max_{S \in \binom{X}{K}}f(S)$
+
+	Proof: $S^* = argmax\ f(S), S \in \binom{X}{K}$
+	
+	$\forall i \in \mathbbm{k}$
+	
+	$f(S^*) \leq f(S_i) + \sum_{j=1}^{k}(f(S_i \cup\{x_1^*, ..., x_j^*\})-f(S_i \cup\{x_1^*, ..., x_{j-1}^*\}))$
+	
+	[defining diminishing returns (or marginal increase of {1} having {2})]
+	
+	$\to = f(S_i)+ \sum_{j=1}^{k}\Delta(x_j^* | S_i \cup \{x_1^*, ..., x_{j-1}^*\})$
+	
+	Because of submodularity, $\to \leq \sum_{j=1}^{k}\Delta(x_j^* | S_i)$
+	
+	-brainlapse-
+	
+	...at the end of the day $f(S^*) - f (S_i) \leq \frac{k}{1-\varepsilon}\Delta(x_{i+1}| S_i)$
+	
+	def $\delta_i = f(S^*) - f(S_i)$
+	
+	$\delta_{i+1} \leq \delta_i(1-\frac{1-\varepsilon}{k})$
+	
+	-SIGSEGV-
+	
+	see previous day to get all deltas from 0 to k
+	
+	then $f(S_k) \geq (1-(1-\frac{1-\varepsilon}{k})^k)f(S^*)=(1-((1-\frac{1-\varepsilon}{k})^{\frac{k}{1-\varepsilon}})^{1-\varepsilon})f(S^*) \geq (1-(1/e)^{1-\varepsilon})f(S^*)$
+	
+	more algebretta, use exponential convexity, get $f(S_k) \geq (1-e^{\varepsilon-1})f(S^*)$, over and out
+	
+	\
+	
+	Application: Kempe-Kleinberg-Tardos
+	
+	
+
+
+\end{document}
