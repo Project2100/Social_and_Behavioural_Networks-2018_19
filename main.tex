@@ -1,3 +1,6 @@
+% !TEX TS-program = xelatex
+% !TEX spellcheck = en-US
+
 \documentclass{report}
 
 % mathbb command, complement symbol and others
@@ -24,8 +27,15 @@
 \newcommand{\unifdist}{\mathcal{U}nif}
 \newcommand{\binomdist}{\mathcal{B}inom}
 \newcommand{\berdist}{\mathcal{B}er}
-\newcommand{\coin}{\mathcal{B}er}
 \newcommand{\iid}{\,\textsc{IID}}
+\newcommand{\uar}{\,\textsc{UAR}}
+\newcommand{\jaccsim}{\mathcal{J}acc}
+\newcommand{\hammsim}{\mathcal{H}amm}
+\newcommand{\permut}{\mathcal{P}erm}
+
+% Some redundant names
+\newcommand{\coin}{\berdist}
+\newcommand{\order}{\permut}
 
 \title{Uniroma1(2018-19) - Social and Behavioural Networks}
 \author{Andrea Proietto}
@@ -110,28 +120,25 @@
 	
 \chapter{Locality Sensitive Hashing}
 	
-	\par
 	The goal of hashing techniques is to reduce a big "object" to a small "signature" or "fingerprint".	In general, what happens is to have some notion of similarity, and then define a "scheme" which computes it. The process of creating a scheme usually involves some sort of preprocessing step, and a function family which, by choosing one according a probability distribution, classifies the objects in the same way as the similarity function does.
 	Loose definition for Locality Sensitive Hashing: Similar objects hash to similar values
 	
-	\par
 	Here are some common similarities:
+	\begin{itemize}
 	
-\subsubsection{Jaccard similarity}
-	
-	Given two sets of objects A and B, their Jaccard similarity is defined as follows:
-	
-	\begin{equation}
-	\displaystyle J(A, B) = \frac{|A\cap B|}{|A\cup B|}
-	\end{equation}
-	
-\subsubsection{Hamming similarity}
-	
-	Given two sets of objects A and B taken from a universal set U, their Hamming similarity is defined as follows:
+\item \textbf{Jaccard similarity}: Given two sets of objects A and B, their Jaccard similarity is defined as follows:
 	
 	\begin{equation}
-	\displaystyle J(A, B) = \frac{|A\cap B| + |\complement_U(A\cup B)|}{|U|}
+	\jaccsim(A, B) = \frac{|A\cap B|}{|A\cup B|}
 	\end{equation}
+	
+\item \textbf{Hamming similarity}: Given two sets of objects A and B taken from a universal set U, their Hamming similarity is defined as follows:
+	
+	\begin{equation}
+	\hammsim(A, B) = \frac{|A\cap B| + |\complement_U(A\cup B)|}{|U|}
+	\end{equation}
+	
+	\end{itemize}
 	
 \section{A case study: Web-page indexing}
 	
@@ -139,29 +146,31 @@
 	
 	An observation to make is the following: some kinds of documents, that are very similar to each other, are stored sparsely through the net; to save storage space, only one of a kind of document's info is stored in the index, whereas all others are linked to the first one, because of their similarity.
 	
-	To find a useful hashing scheme, A. Broder came up with an idea. First off, treat web pages as strings:
+	To find a useful hashing scheme, A. Broder came up with an idea. First off, let us fix some definitions:
+	\begin{itemize}
+	\item $U$: the set of all words, i.e. the English vocabulary
+	\item $U*$: the set of all strings composed of english words
+	\end{itemize}
 	
-	$T_1: "The\ black\ board\ is\ black"$
+	The starting point is to treat web pages as strings:
 	
-	$T_2: "The\ white\ board\ is\ white"$
+	$T_1:$ \textit{``The black board is black''}
+	
+	$T_2:$ \textit{``The white board is white''}
 	
 	Then, let $distinct(T)$ returns the set of distinct words appearing in a string (Ref. Bag of Words model)
 	
 	So for example, by using the Jaccard similarity:
     
     \begin{equation}
-    \displaystyle J(distinct(T_1), distinct(T_2))= \frac{3}{5}
+    \jaccsim(distinct(T_1), distinct(T_2))= \frac{3}{5}
     \end{equation}
 	
-	Over a half: they look close; if we used the Hamming distance instead, we would (almost always) get a number very close to 1, because we're using a minuscule part of the universe set (in our case, the English dictionary)
+	Over a half: they look close. If we used the Hamming distance instead, we would (almost always) get a number very close to 1, because we're using a minuscule part of the universe set (in our case, the English dictionary), thus (almost) all words are absent from the sets.
 	
-	OBJECTIVE: Construct a scheme over web-pages that implement the Jaccard similarity
+	Now, our objective is to construct a scheme over web-pages that implement the Jaccard similarity. Our pre-processing step: Choose a permutation (or total ordering) $p \in \order(A \cup B) \uar$. To construct said order is a simple task:
 	
-	\
-	
-	Preprocessing step: Choose UAR a permutation/total-ordering $\pi$ over $A\cup B =: u$
 	Algorithm (using u):
-	
 	\begin{verbatim}
 	pi: empty sequence
 	while u is not empty:
@@ -171,41 +180,35 @@
 	return pi
 	\end{verbatim}
 	
-	Proof of correctness: $\Pr(X = \pi) = \frac{1}{|u|}\cdot\frac{1}{|u|-1}\cdot\dots\cdot 1 = \frac{1}{|u|!} \Rightarrow X \in \mathcal{U}nif(\mathcal{P}erm_u)$
+	Proof of uniform choice: $\Pr(X = \pi) = \frac{1}{|u|}\cdot\frac{1}{|u|-1}\cdot\dots\cdot 1 = \frac{1}{|u|!} \Rightarrow X \in \unifdist(\permut(A \cup B))$
 	
-	\
+	From $p$, we define the hashing function as:
 	
-	From $\pi$, define the hashing function: $h_{\pi} \in \mathcal{P}(U) \to U : h_{\pi}(A) = min_{\pi}(A)$, meaning we take the minimum in A according to the ordering specified by $\pi$
+	\begin{equation}
+	h_p \in \mathcal{P}(U) \to U : h_p(A) = min_p(A)
+	\end{equation}
 	
-	Observation: $\forall A \in U \Rightarrow h_{\pi}(A) \in A$
+	In other words, we take the ``minimum'' in A according to the ordering specified by $p$. A simple but useful observation would be:
 	
-	\
+	\begin{equation}
+	\forall A \subseteq U \Rightarrow h_p(A) \in A
+	\end{equation}
 	
-	E.g.: $\pi := (black, the, is, white, board), C:=\{black, board\} \Rightarrow h_{\pi}(C) = black$
+	E.g.: $p = (black, the, is, white, board) \wedge A = \{black, board\} \Rightarrow h_p(A) = black$
 	
-	\
-	
-	Thus, we declare that A is similar to B iff $h_{\pi}(A)=h_{\pi}(B)$ (Remember that $A$ and $B$ are fixed, $\pi$ is the main factor of this definition)
-	
-	\
-	
-	So: $\Pr(h_{pi}(A)=h_{pi}(B)) = ?$ Looking at a corresponding Venn diagram:
+	Thus, we can say that $A$ is similar to $B$ iff $h_p(A)=h_p(B)$. Recall that $A$ and $B$ are fixed, $p$ is the focus of this definition. What can be said about $\Pr(h_p(A)=h_p(B))$ ? Looking at a corresponding Venn diagram:
 	
 	\begin{itemize}
-	\item $A\cap B = \emptyset \Rightarrow \Pr(...)= 0$, no words in common, so their hashes must be different independently of pi
-	\item $A = B \Rightarrow \Pr(...)= 1$, all words in common, so their hashes must coincide independently of pi
-	\item Otherwise, since pi is chosen UAR, the probability that the hashes are equal has the same meaning of the probability of finding the lowest element of A and B in the intersection with respect of the union...  which, by its very definition, is the Jaccard similarity of A and B: $\Pr(h_{\pi}(A)=h_{\pi}(B)) = J(A, B)$
+	\item $A \cap B = \emptyset \Rightarrow \Pr(h_p(A)=h_p(B)) = 0$; they have no words in common, so their hashes must be different, independently of the chosen order;
+	\item $A = B \Rightarrow \Pr(h_p(A)=h_p(B)) = 1$; this time, all words are in common, so their hashes must coincide, again, independently of the chosen order
+	\item Otherwise, since $p$ is chosen $\uar$, the probability that the hashes are equal has the same meaning of the probability of finding the lowest element of A and B in the intersection with respect of the union (and not in $U$ as a whole, as our previous observation suggests) which is the Jaccard similarity of A and B by its very definition: $\Pr(h_p(A)=h_p(B)) = \jaccsim(A, B)$
 	\end{itemize}
 	
-	\
+	Possible question about third point: Why not respect to the universal set? because A and B will have hashes which, as we observed earlier, do not live outside the union: the union between A and B is our true set of outcomes when hashing either A or B.
 	
-	Possible question: Why not respect to the universal set? because A and B will have hashes, which do not live outside the union, i.e. the union is our true set of outcomes when hashing A or B (remember the observation)
+	Now, if $h_p$ is evaluated only once over a given permutation, only a binary response can be obtained. In order to obtain the probability value without resorting to compute unions and intersections, we can repeat evaluation over different permutations; this can be regulated by the Chernoff-Hoeffding bound:
 	
-	\
-	
-	Now, if $h_{\pi}$ is evaluated only once over a given permutation, only a binary response can be obtained. In order to obtain the probability value without resorting to compute unions and intersections, we can repeat evaluation over different permutations; this can be regulated by the Chernoff-Hoeffding bound:
-	
-	Let $A, B \in \mathcal{P}(U)$, and $X_{1 \dots n}$ be iid coins each defined over a distinct element of $\Pi \subseteq \mathcal{P}erm_U$ such that $X_i \mapsto 1 \Leftrightarrow A \sim_{\pi_i} B, 0\ otherwise$, then:
+	Let $A, B \subseteq U$, and $X_{1 \dots n} \in \coin(p) \iid$, each defined over a distinct element of $\Pi \subseteq \mathcal{P}erm(U)$ such that $X_i \mapsto 1 \Leftrightarrow A \sim_{\pi_i} B, 0\ otherwise$, then:
 	
 	%TODO
 	\begin{equation}
@@ -214,10 +217,9 @@
 	
 	%HAMMING!!
 	
-\section{Generalizing LSH, and the problem of scheme existence}
+\section{LSH formalization}
 
-	
-	(Our) Formal definition: Let $U$ be a set, and $S \in U^2 \to [0, 1]$ a symmetric function; then $S$ is called a similarity over $U$.
+    (Our) Formal definition: Let $U$ be a set, and $S \in U^2 \to [0, 1]$ a symmetric function; then $S$ is called a similarity over $U$.
 	
 	Tidbit: Let $f \in A^n \to B$, then f is \textbf{symmetric} iff \textit{argument order does not change the image} % COMMUTATIVITY? Kinda...
 	
@@ -228,7 +230,7 @@
 	
 	Intuitive: a hash function's purpose is to map arguments that are very similar to the same value
 	
-	Hash function: $h \in U \to (*)A$ such that A's representation is 'sensibly smaller' than U (h is NOT injective by this intuition - not true, injective functions are used as hash functions in pathological cases...)
+	Hash function: $h \in U \to (*)$ such that the domain's representation is 'sensibly smaller' than U (h is NOT injective by this intuition - not true, injective functions are used as hash functions in pathological cases...)
 	
 	Insight: A hash function seems to complicate definitions more than a simple equivalence relation, but it models programs/algorithms more effectively, which is our focus here
 	
