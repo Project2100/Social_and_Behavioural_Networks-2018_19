@@ -18,6 +18,9 @@
 % Put all formulae in display style for fractions, binomial coefficients, etc.
 \everymath{\displaystyle}
 
+% Theorem symbols
+\usepackage{amsthm}
+
 %Some quick defs
 \newcommand{\nonneg}{\mathbb{N}}
 \newcommand{\integer}{\mathbb{Z}}
@@ -120,8 +123,8 @@
 	
 \chapter{Locality Sensitive Hashing}
 	
-	The goal of hashing techniques is to reduce a big "object" to a small "signature" or "fingerprint".	In general, what happens is to have some notion of similarity, and then define a "scheme" which computes it. The process of creating a scheme usually involves some sort of preprocessing step, and a function family which, by choosing one according a probability distribution, classifies the objects in the same way as the similarity function does.
-	Loose definition for Locality Sensitive Hashing: Similar objects hash to similar values
+	The goal of hashing techniques is to reduce a big "object" to a small "signature" or "fingerprint". In general, what happens in locality sensitive hashing (or LSH) is to have some notion of similarity, and then define a "scheme" which computes it. The process of creating a scheme usually involves some sort of preprocessing step, and a function family which, by choosing one or another function according a probability distribution, statistically classifies the objects in the same way as the similarity function does.
+	The bottom line of LSH schemes is: similar objects hash to similar values.
 	
 	Here are some common similarities:
 	\begin{itemize}
@@ -218,6 +221,14 @@
 	%HAMMING!!
 	
 \section{LSH formalization}
+
+    First let us focus around the hash function as an object: its true purpose in a scheme is to classify objects based on how much they ``look like'', whatever this means in the chosen similarity's terms. Therefore, in our theoretical analysis, the codomain of a hash function is not that important; what is important is how the function partitions its own domain, $U$. In a sense, we're interested only in the partitions of $U$ themselves, not in the functions that generate them.
+    
+    Why then we dealt with functions back then? Moving from a purely mathematical perspective to a more computational one, what is usually done for detecting similarities is sampling some object's characteristics, and observe how ``distant'', or else ``similar'' they are, all by means of some program; and programs are (oh so) easily associated with functions. The computational approach gives a more intuitive vision of the problem we're confronting ourselves with.
+    
+    Still, what could happen, is to have a couple of functions that map values into wildly different codomains, but partition $U$ in exactly the same way! And in our journey, we're just interested in classifying objects; so these kind of ``duplicate'' functions are, well, useless (unless we delve in complexity studies, but that's out of the scope).
+    
+    So, 
 
     (Our) Formal definition: Let $U$ be a set, and $S \in U^2 \to [0, 1]$ a symmetric function; then $S$ is called a similarity over $U$.
 	
