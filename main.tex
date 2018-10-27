@@ -21,20 +21,26 @@
 % Theorem symbols
 \usepackage{amsthm}
 
-%Some quick defs
+%Some quick defs - sets
 \newcommand{\nonneg}{\mathbb{N}}
 \newcommand{\integer}{\mathbb{Z}}
 \newcommand{\real}{\mathbb{R}}
 \newcommand{\singleton}{\mathbbm{1}}
 \newcommand{\binary}{\mathbbm{2}}
+%Some quick defs - prob distributions
+\newcommand{\probdist}{\mathcal{R}and}
 \newcommand{\unifdist}{\mathcal{U}nif}
 \newcommand{\binomdist}{\mathcal{B}inom}
 \newcommand{\berdist}{\mathcal{B}er}
+%Some quick defs - abbreviations
 \newcommand{\iid}{\,\textsc{IID}}
 \newcommand{\uar}{\,\textsc{UAR}}
+%Some quick defs - similarities
 \newcommand{\jaccsim}{\mathcal{J}acc}
 \newcommand{\hammsim}{\mathcal{H}amm}
+%Some quick defs - other
 \newcommand{\permut}{\mathcal{P}erm}
+\newcommand{\indep}{\perp\!\!\!\perp}
 
 % Some redundant names
 \newcommand{\coin}{\berdist}
@@ -224,13 +230,16 @@
 
     First let us focus around the hash function as an object: its true purpose in a scheme is to classify objects based on how much they ``look like'', whatever this means in the chosen similarity's terms. Therefore, in our theoretical analysis, the codomain of a hash function is not that important; what is important is how the function partitions its own domain, $U$. In a sense, we're interested only in the partitions of $U$ themselves, not in the functions that generate them.
     
-    Why then we dealt with functions back then? Moving from a purely mathematical perspective to a more computational one, what is usually done for detecting similarities is sampling some object's characteristics, and observe how ``distant'', or else ``similar'' they are, all by means of some program; and programs are (oh so) easily associated with functions. The computational approach gives a more intuitive vision of the problem we're confronting ourselves with.
+	Why have we dealt with functions back then? Moving from a purely mathematical perspective to a more computational one, what is usually done for measuring similarities is sampling some object's characteristics, and observe how ``distant'', or else ``similar'' they are. This is done by means of some program; and programs are (oh so) easily associated with functions. The computational approach gives a more intuitive vision of the problem we're confronting ourselves with.
     
     Still, what could happen, is to have a couple of functions that map values into wildly different codomains, but partition $U$ in exactly the same way! And in our journey, we're just interested in classifying objects; so these kind of ``duplicate'' functions are, well, useless (unless we delve in complexity studies, but that's out of the scope).
     
-    So, 
-
-    (Our) Formal definition: Let $U$ be a set, and $S \in U^2 \to [0, 1]$ a symmetric function; then $S$ is called a similarity over $U$.
+	So, let us reform the foundations by taking as our core object a universe partition, instead of a universe-domained hash function. First, though, we need to formalize what a similarity is, and to get to a good definition, we have to carefully select them from their space $U^2 \to [0, 1]$. It should be noted that the codomain might very well be $\real$ itself, but to get some bearings we'll treat an image of 1 as a complete equivalence between two objects, and 0 for complete difference, with the interval expressing the degree of similarity.
+	
+	
+	
+	Let $U$ be a set, and $S \in U^2 \to [0, 1]$ a symmetric function; then $S$ is called a similarity over $U$.
+	% Still incomplete, need the trineq on 1-S
 	
 	Tidbit: Let $f \in A^n \to B$, then f is \textbf{symmetric} iff \textit{argument order does not change the image} % COMMUTATIVITY? Kinda...
 	
@@ -248,13 +257,13 @@
 	%Given a similarity $\phi$, a LSH scheme is a family of hash functions $H$, coupled with a prob. distribution $D$ over $H$ "such that, chosen a function $h$ from the family $H$ according to the prob.dist., satisfies the property $\Pr(h(a)=h(b)) = \phi(a,b) \forall a,b in U$"
 	
 	%Rewritten
-	Let $S \in U^2 \to [0, 1]$ be a similarity, and H be a RV over a family of hash functions over U, then H is a LSH scheme iff $\Pr(H(a)=H(b)) = S(a,b) \forall a,b in U$
+	%Let $S \in U^2 \to [0, 1]$ be a similarity, and H be a RV over a family of hash functions over U, then H is a LSH scheme iff $\Pr(H(a)=H(b)) = S(a,b) \forall a,b in U$
 	
 	Brainlamp: I can extend the domain of H to the whole hashfunction class by setting the outsiders' probability to 0...
 	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 	
 	
-	Note: some partitions will never be a result of a hash function 
+	Note: some partitions will never be a result of a hash function % Hah, not so sure...
 	
 	Other note: some form of transitivity must hold. (So yeah, we're dealing with an equivalence relation in the guise of a function with arbitrary codomain)
 	
