@@ -21,6 +21,17 @@
 % Theorem symbols
 \usepackage{amsthm}
 
+% link
+\usepackage{hyperref}
+
+\hypersetup{
+    colorlinks,
+    citecolor=black,
+    filecolor=black,
+    linkcolor=black,
+    urlcolor=black
+}
+
 %Some quick defs - sets
 \newcommand{\nonneg}{\mathbb{N}}
 \newcommand{\integer}{\mathbb{Z}}
@@ -52,12 +63,14 @@
 \author{Andrea Proietto}
 \date{October 2018}
 
-%Questions:
+% Questions:
 % - Revise Chernoff-Hoeffding, can't get a definitive formula
 
 \begin{document}
 
 \maketitle
+
+\tableofcontents
 
 %\chapter{Preamble}
 %Questi appunti utilizzano una notazione personale che sto portando avanti da anni, con l'obiettivo di essere il meno ambiguo possibile. Un caso comune è il seguente: per definire una funzione, utilizzo questa sintassi:
