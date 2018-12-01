@@ -3,6 +3,9 @@
 
 \documentclass{report}
 
+\usepackage[utf8]{inputenc}
+\usepackage[english]{babel}
+
 % mathbb command, complement symbol and others
 \usepackage{amssymb}
 
@@ -21,9 +24,19 @@
 % Theorem symbols
 \usepackage{amsthm}
 
-% link
-\usepackage{hyperref}
+% adds commands \abs and \norm (from https://tex.stackexchange.com/questions/43008/absolute-value-symbols)
+\usepackage{mathtools}
+\DeclarePairedDelimiter\abs{\lvert}{\rvert}%
+\DeclarePairedDelimiter\norm{\lVert}{\rVert}%
+\makeatletter
+\let\oldabs\abs
+\def\abs{\@ifstar{\oldabs}{\oldabs*}}
+\let\oldnorm\norm
+\def\norm{\@ifstar{\oldnorm}{\oldnorm*}}
+\makeatother
 
+% links
+\usepackage{hyperref}
 \hypersetup{
     colorlinks,
     citecolor=black,
@@ -31,6 +44,9 @@
     linkcolor=black,
     urlcolor=black
 }
+
+% listings style for pseudo-code and similiar
+\usepackage{listings}
 
 %Some quick defs - sets
 \newcommand{\nonneg}{\mathbb{N}}
@@ -56,6 +72,7 @@
 % Some redundant names
 \newcommand{\coin}{\berdist}
 \newcommand{\order}{\permut}
+\newcommand{\ex}{\emph{Example}: }
 
 \title{Uniroma1(2018-19) - Social and Behavioural Networks}
 \author{Andrea Proietto}
@@ -70,75 +87,118 @@
 
 \tableofcontents
 
-%\chapter{Preamble}
-%Questi appunti utilizzano una notazione personale che sto portando avanti da anni, con l'obiettivo di essere il meno ambiguo possibile. Un caso comune è il seguente: per definire una funzione, utilizzo questa sintassi:
+\chapter{Preamble}
+Questi appunti utilizzano una notazione personale che sto portando avanti da anni, con l'obiettivo di essere il meno ambiguo possibile. Un caso comune è il seguente: per definire una funzione, utilizzo questa sintassi:
 
-%\begin{equation}
-%f \in A \to B : a \mapsto f(a)
-%\end{equation}
+\begin{equation}
+f \in A \to B : a \mapsto f(a)
+\end{equation}
 
-%dove $f$ è la funzione, $A \to B$ è il \textbf{tipo} di funzione, specificato dal dominio $A$ e dal codominio $B$, ed è trattato come insieme di tutte le funzioni da $A$ a $B$, giustificando l'uso dell'operatore di appartenenza. La parte che segue i due punti definisce la funzione attraverso la notazione di mappatura.
-%Ad esempio, l'espressione seguente:
+dove $f$ è la funzione, $A \to B$ è il \textbf{tipo} di funzione, specificato dal dominio $A$ e dal codominio $B$, ed è trattato come insieme di tutte le funzioni da $A$ a $B$, giustificando l'uso dell'operatore di appartenenza. La parte che segue i due punti definisce la funzione attraverso la notazione di mappatura.
+Ad esempio, l'espressione seguente:
 
-%\begin{equation}
-%d \in \mathbb{N} \to \mathbb{N} : n \mapsto 2\cdot n
-%\end{equation}
+\begin{equation}
+d \in \mathbb{N} \to \mathbb{N} : n \mapsto 2\cdot n
+\end{equation}
 
-%si leggerebbe: "$d$ è una funzione che va dai naturail ai naturali tale che ad n associa 2n"
-
-
+si leggerebbe: "$d$ è una funzione che va dai naturail ai naturali tale che ad n associa 2n"
 
 
 
-\chapter{Introductive pills}
+\chapter{Introductory pills}
+
+\section{Basic ideas}
+
+	Note: "pick" and "sample" are used interchangeably.
+
+	About $E(X)$: It is called the "expected value" because it means the midpoint where all outcomes, compounded with their weight, contribute to the equilibrium.
 	
-	%Note: "pick" and "sample" are used interchangeably
+	\textit{Question: Can we still talk about expected value when the outcomes are not numeric? What could be a good bijection between a generic sample space $\Omega$ and $\nonneg$?}
 	
-	%About E(X): It is called the "expected value" because it means the midpoint where all outcomes, compounded with their weight, contribute to the equilibrium
+\subsection{Sampling}
+
+	\textit{Sampling} is a simple algorithmic approach used for abstracting and estimating the percentage of elements of a certain type in a large set.
 	
-	%\textit{Question: Can we still talk about expected value when the outcomes are not numeric? What could be a good bijection between a generic Omega and N?}
+	\ex If there is a huge number of black and white marbles in a (very big) bowl and you'd like to know the ratio of black marbles, you can't count all of them, so you extract a sample of marbles many times, until you have sufficient confidence in the obtained result.
+
+
+\subsection{Union bound}
 	
-	%Union bound: $\displaystyle \Pr(\bigcup_{i=0}^n E_i) \leq \sum_{i=0}^{n}(\Pr(E_i))$ ; if the events are mutually disjoint, then the equality is strict
-	
-	\
+	\begin{equation}
+	\Pr(\bigcup_{i=0}^n E_i) \leq \sum_{i=0}^{n}(\Pr(E_i))
+	\end{equation}
+	If the events are mutually disjoint, then the equality is strict.
+
 	
 \subsection{Markov inequality}
 	
-	Let X be a nonnegative RV in $\Omega$, and an outcome $a \in \Omega$, then:
+	Let $X$ be a non-negative random variable (RV) in a sample space $\Omega$, and $a$ an outcome in $\Omega$, then:
 	
 	\begin{equation}
-	\Pr(X \geq a) \leq \frac{E(X)}{a}
+	\Pr(X \geq a) \leq \frac{E[X]}{a}
 	\end{equation}
 	
-	Proof: $ E(X) = \int_{0}^{\infty}x\Pr(X=x)dx \geq \int_{a}^{\infty}x\Pr(X = x)dx \geq \int_{a}^{\infty}a\Pr(X = x)dx = a\Pr(X \geq a)$
-	
+	Proof:
+	\begin{align*}
+	E(X) &= \int_{0}^{\infty}x \Pr(X=x)dx \\
+		 &\geq \int_{a}^{\infty}x\Pr(X=x)dx \\
+		 &\geq \int_{a}^{\infty}a\Pr(X=x)dx \\
+		 &= a\Pr(X \geq a)
+	\end{align*}
+
+
 \subsection{Moment generating functions}
 	
-	A moment in a mathematical-analytical sense, are "quantitative measures" that describe characteristic of a shape. E.g.: a generic function's first moment is its slope (first derivative), 
-	Given a a random variable X, then its moment generating function is the function $M_X(t) = e^{tX}, t \in \mathbb{R}$
+	Moments, in a mathematical-analytical sense, are "quantitative measures" that describe characteristic of a shape. E.g.: a generic function's first moment is its slope (first derivative).\\
+	Given a random variable $X$, then its moment generating function is
+	\begin{equation}
+	M_X(t) = e^{tX}, t \in \mathbb{R}
+	\end{equation}
 	
-	To be continued...
+	To be continued... % TODO moment generating function
 	
 	Reminder! Power series of the $e^x$ function: $\displaystyle e^x = \sum_{i=0}^{\infty}\frac{x^n}{n!}$
 	
 	
 \section{Chernoff bound}
+
+	The Chernoff bound allows you to control how much a RV is close to its expected value.
+
+	Let $X_1, \dots, X_n \in \coin(p) \iid$, i.e. $X_1, \dots, X_n$ are $n$ RV such that\\
+	$\Pr(x_i=1)=p$ and $\Pr(x_i=0)=1-p$.\\
+	In other words, they are $n$ independent coin throws of the same coin.
 	
-	Let $X_1, \dots, X_n \in \coin(p) \iid$, or in other words, n independent coin throws of the same coin; then define X as $\sum_{i=1}^{n}(X_i)$. X is essentially a binomial RV: $X \in \binomdist(\binary^n, p)$, thus $E(X)=p\cdot n$
+	Let $X=\sum_{i=1}^{n}(X_i)$.
+	X is essentially a binomial RV: $X \in \binomdist(\binary^n, p)$, thus $E(X)=p\cdot n$.\\
+	It represents the number of times you get head with the aforesaid $n$ throws.
 	
 	So, given an error limit $\varepsilon$, we define the Chernoff bound as:
+	\begin{equation}\label{chernoff}   %True definition
+	\Pr(\abs{X-E[X]} \geq t)\leq e^{-2t^2/n}
+	\end{equation}
+	where $t := \varepsilon n$.
 	
-	%True definition
-	$\displaystyle \Pr(X-E(X) \geq t)\leq e^{-2nt^2}$
+	In the binomial case, [\ref{chernoff}] translates to:
+	\begin{equation*}
+	\Pr\left(\abs{\sum_{i=1}^{n}(X_i) - p \cdot n} > t \right) = \Pr\left(\abs{\frac{1}{n}\sum_{i=1}^{n}(X_i) - p} > \frac{t}{n} \right)
+	\end{equation*}
+	\\
+	Then, replacing $t$ with $\varepsilon n$, we get %Custom
+	\begin{equation}
+		\Pr\left(\abs{\frac{1}{n}\sum_{i=1}^{n}(X_i) - p} > \varepsilon \right) \leq 2e^{-2n^3\varepsilon^2}
+	\end{equation} % TODO check binomial c.b.
 	
-	Which translates, in the binomial case to:
+	\ex If you want to know how many Facebook users have more than 100 friends, you can't simply count, but you can obtain a good approximation sampling a reasonable number of profiles.
 	
-	$\displaystyle \Pr(|\sum_{i=1}^{n}(X_i) - p \cdot n| > t) = \Pr(|\frac{1}{n}\sum_{i=1}^{n}(X_i) - p| > \frac{t}{n})$
+	It's important to observe that the size of the sample we need in order to obtain a good approximation depends on the error we tolerate, not on the total population.
+	
+	There are many possible formulations of the Chernoff bound, another one that can be useful is the following:
+	\begin{equation}\label{chernoff2}
+	\Pr(\abs{X-E[X]} \geq \varepsilon \cdot n) \leq 2e^{-\frac{\varepsilon^{2}}{3}n}
+	\end{equation}
+	
+	\ex Let be $E[X]=\frac{50}{100}$ and $\varepsilon=\frac{1}{100}$, the probability that $X \geq \frac{51}{100}$ or $X \geq \frac{49}{100}$ is less then or equal to $2e^{-\frac{1}{30000}n}$.
 
-	%Custom
-	Then, by defining $t := \varepsilon n$
-	
-	$\Pr(|\frac{1}{n}\sum_{i=1}^{n}(X_i) - p| > \varepsilon) \leq 2e^{-2n^3\varepsilon^2}$
 	
 \chapter{Locality Sensitive Hashing}
 	
