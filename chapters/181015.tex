@@ -1,0 +1,403 @@
+\chapter{181015}
+	
+	First lesson reprise - Flow of memes
+	
+	spread of memes/viruses from a website to another
+	
+	so, we get traces
+	
+	goal is to reconstruct graph from traces
+	
+	Trace spreading model (from virology)
+	
+	source chosen UAR and edge traversal time chosen by (usually) Exp(lambda)
+	trace starts from source
+	
+	obs. the first two nodes of a trace are connected
+	
+	pr a source is chosen: 1/n
+	pr the edge's other endpoint: 1/deg(source) because of how traces work
+	
+	n numero di tracce: $pr = (1-1/deltan)^(3deltanlogn) = e^(-3lnn) simeq 1/n^3$
+	
+	
+\subsection{another information spreading process}
+	
+	NPR chain letter
+	
+	important observations: first name is fake, the others are plausibly real
+	
+	asks to add own's name, and then forward to all friends
+	
+	%%%%%%%%%%%%%%%%%
+	
+	someone breaks the rules, and decides to publish their copy of the mail
+	
+	those published mails reveal a subtree of the whole chainletter tree
+	
+	revealed tree MUCH smaller, and extended in-depth
+	
+	%%%%%%%%%%%%%%%%%
+	
+	Let T be a tree, each node has a chance of being "exposed" by a probability p, and if so, reveals all ancestors
+	
+	estimate the size of the tree
+	
+	ALGO
+	throw a coin on all the nodes of the chain tree, don't throw if node is parent of a revealed node (no need) := special nodes
+	
+	special nodes are all iid from exposed ones; delta = n of special nodes/special nodes; revealed nodes = delta dot n (it's the expected value!!) -> from there estimate n
+	
+	delta is the actual exposure probability
+	
+	the two estimates can go wrong...
+	
+	examples in nature suggest some bounds
+	
+	%%%%%%%%%%%%%%%%%%%%%%%
+	
+	Theorem: the algorithm correctly estimates n if $n > omega(max(1/delta^2, k/delta))$
+	
+		
+		IMPORTANT: Estimates can be redone, but reconstructing another revealed tree is impractical, so we're estimating a characteristic of  a tree by observing a sample revealed one and making estimates
+	
+	%%%%%%%%%%%%%%%%%%%%%%%
+	Single-child fraction
+	
+	Fix a bound: a node's maximum degree must be lesser than k
+	
+	partition unknown tree into subforests, each subforest has 1/delta nodes and median height $omega(log_(k-1)^delta^-1)$
+	
+	by exposing a node in a subforest's lower half, we're exposing a number of nodes equal to the sf's median height
+	
+	
+	
+	%%181017%%%%%%%%%%%%%%%%%%
+	
+	Insight: $\delta$ is unknown too
+	
+	Recap of revealed subtrees
+	
+	Exposure prob: $\delta > 0$
+	
+	$E(\# exposed nodes) = \delta n$
+	
+	\
+	
+	Let $x \in RV$ be the set of nodes of the revealed tree. Let $Y \in Coin(p)$, where $Y_v = 1$ if v is exposed, 0 otherwise.
+	
+	$E(Y_v) = \delta$
+	
+	Let $ Y = \sum_{v \in X} Y_v \Rightarrow E(Y)= \delta |X|$
+	
+	OUTPUT: $\hat\delta = \frac{Y}{|X|}$
+	
+	Chernoff bound is applicable, the Ys are IID
+	
+	Note: we can do the first substitution because of linearity (?)
+	
+	"Multiplicative approximation": $\displaystyle \Pr(|\hat\delta - \delta| \geq \varepsilon \delta) = \Pr(|\frac{Y}{|X|} - \delta| \geq \varepsilon \delta) = \Pr(|Y - \delta |X|| \geq \varepsilon \delta |X|) = \Pr(|Y - E(Y)| \geq \varepsilon E(Y)) \leq 2e^{-\frac{\varepsilon^2}{3}E(Y)}, \forall \varepsilon \in (0, 1)$
+	
+	This is the Multiplicative Chernoff Bound: Let y1 ... yn IID Coins, then (see above, last inequality)
+	
+	we need E(y) to be large in order to obtain a useful bound, for E close to 1, the bound itself goes over 1, becoming useless
+	
+	$\displaystyle 2e^{-\frac{\varepsilon^2}{3}E(Y)} = 2e^{-\frac{\varepsilon^2}{3}\delta|X|}$
+	
+	If $\displaystyle |X| \geq \frac{3}{\varepsilon^2\delta}\ln2/\eta$, then $\displaystyle 2e^{-\frac{\varepsilon^2}{3}\delta|X|} \leq 2e^{-\ln2/\eta} = 2\eta/2 = \eta$
+	
+	$Y' = \sum_{v \in T}Y_v \Rightarrow E(Y') = \delta n$
+	
+	$\Pr(Chernoff\ on\ Y') \leq 2e^{-\frac{\varepsilon^2}{3}\delta n}$
+	
+	Using the bound over $|X|$, then $\leq \eta$
+	
+	Final output: $\displaystyle \frac{Y'}{\mathaccent 1 \delta } (\leq  \frac{(1 + \varepsilon)\delta n}{(1 - \varepsilon)\delta} = (1+O(\varepsilon))n )$
+	
+	Lower bound inverts the sign of bigOepsilon
+	
+	Insight: $\displaystyle \frac{Y'}{\mathaccent 1 \delta } = \frac{Y'}{Y}|X|$
+	
+	
+	
+	"An additive approximation is useless"
+	
+	
+	goodnes sof alogrithm:
+	
+	 - nodes of unknown tree less than delta: revealed tree =0 almost surely
+	 - tree is a star -> almost surely get a bad approximation
+	 
+	what characteristics should the unknown tree have?
+	
+	Claim: If the number of internal nodes of the revealed tree is at least 3/(epsilonSQRdelta)ln(2/eta) then our guess \^n is going to satisfy (1-oe)n <= \^n <= (1+oe)n with probability at least 1-2eta
+	
+	the three greek letters can change the goodness of our result
+	
+	Next goal: find the probability that a node of the unknown tree will be an internal node of the revealed tree
+	
+	Assumption: The unknown tree is such that none of its nodes has more than K children.
+	%That actually has lots of applications! makes much sense
+	
+	Let $v$ be a node of the unknown tree with K children, then $\Pr($at least 1 children in K is exposed$) \geq 1-\varepsilon^{-1}min(1, \delta K_v)$
+	
+	$K_v$: expected number of children revealed
+	
+	Let $Z_v \in Coin(p)$ where it is 1 if at least one child of v is exposed
+	
+	$\displaystyle E(Z_v) = 1 - (1 - \delta)^{K_v} = 1 - ((1 - \delta)^{1/\delta})^\delta{K_v}$
+	
+	%using e's limit definition
+	$\lim\limits_{\varepsilon \to 0^+}(1-\varepsilon)^{1/\varepsilon} = 1/e$
+	
+	$1 - ((1 - \delta)^{1/\delta})^\delta{K_v} \geq 1- e^{-\delta K_v}$
+	
+	
+	\begin{itemize}
+		\item if deltakv geq 1 then E(Zv) geq 1-1/e
+		\item else , geometric intuition... ?????????? ... E(Zv) geq 1-ePOW(-deltakv) geq deltakv(1 - 1/e)
+	\end{itemize}
+	Lemma is proven
+	
+	
+	\
+	
+	Former insight: for revelation we care about children, not all of the descendants
+	
+	By summing all children of all nodes, we get all the edges -> n-1
+	% THis is used elsewhere...
+	
+	\
+	
+	Lemma: Let Z be the set of nodes of which at least 1 child is exposed; then $\Pr(|Z| \geq 1/2(1-1/e)\min(K^{-1}, \delta)(n-1))\geq 1-e^{-\Theta(n\min(1/K, \delta))}$
+	
+	Proof: Let I be the set of internal nodes of T; Let D subset I contain nodes with at least 1/delta children; $E(|Z|) = \sum_{v \in I}E(Z_v) \geq (1 - 1/e)\min(1, K_v\delta) = (...)(|D| + \delta\sum_{v \in I-D}K_v)$
+
+	obs1: sumkvforvinI = n-1
+	
+	obs2: $|D| \geq \frac{\sum_{v \in D}K_v}{|K|}$
+	
+	then : $(1 - 1/e)(|D| + \delta\sum_{v \in I-D}K_v) \geq (1 - 1/e)(\sum K_v/K + \delta\sum_{v \in I-D}K_v) \geq (...)min(1/K, \delta)\sum = (...)min(...)(n-1)$
+	
+	Proven
+	
+	\
+	
+	see emergency notes!!
+	
+\section{181022}
+	
+	-combinatoric optimization-
+	
+	graph independent set - impractical example
+	
+	An implicit opt problem.
+	
+	unknown - partly known function, exp in the codomain
+	
+	ex: describe SAT by means of truth tables - rows are exponential in variable number
+	
+	"Modular set functions"
+	
+	given $X=[n] f \in 2^X \to \mathbb{R}$
+	
+	$n=3, w_1 = 1, w_2 = 5, w_3 = 1, f(S)=\sum_{i \in S}$
+	
+	max  set: all domain
+	
+	max set w neg values: exclude neg values
+	
+	se ho un oracolo che mi calcola f(s), ed io non conosco f, posso interrogare l'oracolo sui singoletti, e poi applico le logiche precedenti
+	
+	(Matroid) Ex tutte parti con al più k elementi (a partire da U)
+	
+	"Ad placement"
+	arriva un utente sul sito tipo Google, scegli quali ad mostrare in modo da guadagnare il più possibile
+	
+	modello Independent Cascade Model
+	ogni ad rappresentata da una coppia $AD_i = (v_i, p_i)$ accordo tra pubblicità e Google, $v_i \in \$, p_i$ probobilità di click
+	
+	$Ad_{samsung} : (1\$, 0.1) \Rightarrow E[X_i] = 1 \cdot 0.1$
+	
+	Strategy: put highest expectation ads on top
+	
+	third value,: satisfaction factor (or the will to look other ads)
+	
+	how to optimize f in ordder to maximize it
+	
+	caso particolare "submodular set function" - analogo discreto delle funzioni convesse - can be misleading
+	
+	given X, f is submodular iff $\forall S, T \in X, f(S)+f(T) \geq f(S\cap T) + f(S\cup T)$
+	
+	modular is submodular: $\forall S, T \in X, f(S)+f(T) = f(S\cap T) + f(S\cup T)$
+
+	quanti bit servono per rappresentare tale funzione?
+	
+	LAPSE
+	
+	COVERAGE (function, submodular): $X=\{S_1, S_2...S_m\}, S_i \subseteq [n]$
+	
+	$Y\subseteq X : c(Y) = |\bigcup_{S_i \in Y}S_i|$
+	
+	
+	$s(Y) = \sum_{S_i \in Y} |S_i|$
+	
+	
+	proof that f (or c?) is submodular
+	base case n=1: couple S T can assume 4 combinations: $
+	case s, t = \{1\} \Rightarrow union an intersection f(\cdot)= 1	
+	1 in T, 1 not in S then 1 in union, 1 not in intersection
+	dual is dual
+	s, t = \emptyset
+	$
+	
+	induction: split a coverage function into two coverage functions: $c(Y) = |\bigcup_{S_i \in Y}S_i| = |(\bigcup_{S_i \in Y}S_i)-\{n+1\}| + |(\bigcup_{S_i \in Y}S_i) \cap \{n+1\}|$
+	
+	Nemauser-W
+	
+	If f is submodular nonnegative and monotone, it can be approx to $max_\{|S|=K\}(f(S))$ to a factor of $1- \frac{1}{e}$
+	
+	represent modulars as points of convex multidimensional functions
+	
+	
+	"maxcover" data una classe di sottoinsiemi di X,. S-1, si trovino k insiemiinX tail che , insieme, coprano il massinmo numero di elementi
+	
+	
+	Before proving, ALGORITHM (greedy), parameterized by f, X and k: trovare k sottoinsiemi di X che massimizzano f
+	
+	$
+	S_0 <- \emptyset
+	for i=1 -> k
+		let x_i = maximizer of f(\{x_i\} \cup S_{i-1})
+		S_i <- \{x_i\} \cup S_{i-1}		
+	return S_k
+	$
+	
+	again before proving, observation: diminishing returns (formalization)
+	
+	$\delta(x|S) = f(\{x\}\cup S) - f(S)$ %always positif if f is monotone
+	
+	let f be submodular, $B \subseteq A, x \notin B \Rightarrow \Delta(x|A) \geq \Delta(x|B)$ % an iff can be demonstrated
+	
+	submodular functions exhibit diminishing returns property
+	
+	Now: $S=A\cup\{x\}, T=B \Rightarrow f(A\cup\{x\})+f(B)\geq f(A)+f(B\cup\{x\}) \Rightarrow f(A\cup\{x\})-f(A)\geq f(B\cup\{x\})-f(B) \Rightarrow \Delta(x|A) \geq \Delta(x|B)$
+	
+	proof of approximation:
+	
+	take an optimal solution $S*=\{x_1^*, ..., x_k^*\}$
+	
+	$\forall i, f(S^*) \leq f(S^* \cup S_i)$ %per monotonia di f
+	
+	$ = ... f(S_i) + \sum_{j=1}^{k}\Delta(x_j^*|S_i\cup \{x_1^*, ..., x_{j-1}^*\}) \leq (bydiminishingreturns) f(S_i) + \sum_{j=1}^{k}\Delta(x_j^*|S_i) -> \leq (bygreediness) f(S_i) + \sum_{j=1}^{k}\Delta(x_{i+1}|S_i) = f(S_i) + k(f(S_i \cup \{x_{i+1}\})-f(S_i)) = kf(S_{i+1}) - (k-1)f(S_i)$
+	
+	
+	So: $f(S^*) - f(S_i) \leq k(f(S_{i+1} - f(S_i)))$
+	
+	Def: $\delta_i = f(S^*) - f(S_i)$
+	
+	Then: $\delta_i \leq k(\delta_i - \delta{i+1}) \Rightarrow k\delta_{i+1} \leq (k-1)\delta_i \Rightarrow \delta_{i+1} \leq (1-\frac{1}{k})\delta_i$
+	
+	$\delta_0 = f(S^*)-f(S_0) \leq f(S^*)$ %by nonnegativity
+	
+	
+	.
+	.
+	.
+	
+	going to definition of e by its limit form $(1-1/k)^k$
+	
+	
+\section{181024}
+	
+	recap of yesterday:
+	
+	given a ground set, and $f \in 2^X \to \mathbb{}$, then f is modular iff $\forall S, T \subseteq X (f(S)+f(T) \geq f(s\cup t) + f(s \cap t))$
+	
+	E.g.: coverage functions, X is a set system $c(X) = \left| \bigcup_{S \in X} S \right|$
+
+	"given a subset of sets, the coverage value would be the cardinality of the union"
+	
+	claim: coverage function is submodular
+	proof: $c(S)+c(T) \geq c(s\cup t) + c(s \cap t)$
+	
+	proven case-by-case in the scope of where the elements are inside the subsets
+	
+	\
+	
+	if $f_1, ..., f_k \in 2^X \to \mathbb{R} are submodular, \alpha_1, ..., \alpha_k \geq 0 \Rightarrow \sum_{i=1}^{k}\alpha_i f_i is submodular$
+	
+	proof: the i-th case is easily proven, then sum up; nonnegativity is essential here
+	
+	\
+	
+	algorithm for optimization (?): $GREEDY_f(X, K)$:
+	$
+	S_0 <- \emptyset
+	for i=1 -> k
+		let x_i = maximizer of f(\{x_i\} \cup S_{i-1})
+		S_i <- \{x_i\} \cup S_{i-1}		
+	return S_k
+	$
+	
+	if f is submodular, nonnegative and monotone, then $\displaystyle f(S_K)\geq(1-1/e)max_{S \in \binom{X}{K}}f(S)$
+	
+	\
+	
+	another algorithm: $GREEDY_{\varepsilon, f}(X, K)$:
+	$
+	S_0 <- \emptyset
+	for i=1 -> k
+		%let x_i be : f(S_{i-1} \cup \{x_i\}) \geq (1-\varepsilon)max_{x \in X} f(S_{i-1} \cup \{x\}) %finding the maximizer
+		let x_i be : f(S_{i-1} \cup \{x_i\}) - f(S_{i-1}) \geq (1-\varepsilon)max_{x \in X} (f(S_{i-1} \cup \{x\}) - f(S_{i-1})) %finding the maximum marginal return
+		S_i <- \{x_i\} \cup S_{i-1}		
+	return S_k
+	$
+	
+	the difference is: we don't need to find the exact maximizer, but something (1-epsilon) close to it; and it may be MUCH easier to find such something instead of the actual maximizer.
+	
+	\
+	
+	the core of the discussion is approximating a (usually impracticable to compute) function to a (polynomial) one
+	
+	Tidbit: proving correctness of this algorithm proves the previous one
+	
+	Trail: KKT model
+	
+	Hint(!): We don't need to find the maximum in this algorithm (otherwise, we are actually in the former case, why not use it directly?)
+	
+	\
+	
+	Theorem: ($\forall \varepsilon \in [0, 1)$), if f is submodular, nonnegative and monotone, then $f(S_k) \geq (1-\varepsilon)(1-1/e)max_{S \in \binom{X}{K}}f(S)$
+
+	Proof: $S^* = argmax\ f(S), S \in \binom{X}{K}$
+	
+	$\forall i \in \mathbbm{k}$
+	
+	$f(S^*) \leq f(S_i) + \sum_{j=1}^{k}(f(S_i \cup\{x_1^*, ..., x_j^*\})-f(S_i \cup\{x_1^*, ..., x_{j-1}^*\}))$
+	
+	[defining diminishing returns (or marginal increase of {1} having {2})]
+	
+	$\to = f(S_i)+ \sum_{j=1}^{k}\Delta(x_j^* | S_i \cup \{x_1^*, ..., x_{j-1}^*\})$
+	
+	Because of submodularity, $\to \leq \sum_{j=1}^{k}\Delta(x_j^* | S_i)$
+	
+	-brainlapse-
+	
+	...at the end of the day $f(S^*) - f (S_i) \leq \frac{k}{1-\varepsilon}\Delta(x_{i+1}| S_i)$
+	
+	def $\delta_i = f(S^*) - f(S_i)$
+	
+	$\delta_{i+1} \leq \delta_i(1-\frac{1-\varepsilon}{k})$
+	
+	-SIGSEGV-
+	
+	see previous day to get all deltas from 0 to k
+	
+	then $f(S_k) \geq (1-(1-\frac{1-\varepsilon}{k})^k)f(S^*)=(1-((1-\frac{1-\varepsilon}{k})^{\frac{k}{1-\varepsilon}})^{1-\varepsilon})f(S^*) \geq (1-(1/e)^{1-\varepsilon})f(S^*)$
+	
+	more algebretta, use exponential convexity, get $f(S_k) \geq (1-e^{\varepsilon-1})f(S^*)$, over and out
+	
+	\
+	
+	Application: Kempe-Kleinberg-Tardos

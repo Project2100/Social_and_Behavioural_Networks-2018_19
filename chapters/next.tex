@@ -1,0 +1,238 @@
+\chapter{Next}
+	
+	More distances:
+	
+	Dice similarity
+	\begin{equation}
+	\displaystyle D(A, B) = \frac{|A\cap B|}{|A\cap B| + \frac{1}{2}|A\vartriangle B|}
+	\end{equation}
+	
+	Anderberg similarity
+	\begin{equation}
+	\displaystyle D(A, B) = \frac{|A\cap B|}{|A\cap B| + 2|A\vartriangle B|}
+	\end{equation}
+	
+	Generalizing Jaccard, Dice and Anderberg: 
+	\begin{equation}
+	\displaystyle S_\gamma(A, B) = \frac{|A\cap B|}{|A\cap B| + \gamma|A\vartriangle B|}
+	\end{equation}
+	
+	\
+	
+	Important lemma (Charikar): if a similarity S admits a (LSH) scheme, then $1-(S)$ must satisfy the triangular inequality (trineq)
+	
+	Proof: %TODO SEE NOTES
+	
+	Afterthought: Similarities are actually defined in most cases as the inverses of measures, which in turn give (oh so surprisingly!) a notion of distance
+	\
+	
+	By Charikar's lemma, we can prove that Dice's similarity cannot admit a LSH scheme
+	
+	Proof by counterexample: Assume $A=\{1\}, B=\{2\}, C=\{1, 2\}$, then use the trineq over the distances; %\textreferencemark
+	
+	Parameterizing this counterexample with $S_\gamma$, we obtain a bounds for gamma: $1 \leq \frac{2\gamma}{1 + \gamma} \Rightarrow \gamma \geq 1$
+	
+	\
+	
+\subsection{Probability generating functions}
+	
+	Intuition: A probability generating function (PGF) is a \textbf{power series representation} of a given probability distribution
+	
+	Definition: Given a (discrete) RV X, its PGF is the function:
+	
+	$\displaystyle \mathcal{G}en_X(\alpha)= \sum_{x=0}^{|\Omega|}\Pr(X=x)\alpha^x$ (note that all outcomes appear by their probability)
+	
+	How to get back to pmf: $\displaystyle \Pr(X=x) = \frac{\mathcal{D}^x(\mathcal{G}en_X(0))}{x!}$
+	
+	\
+	
+	Theorem: If a similarity S admits a LSH and a given function f is a PGF, then f(S) admits a LSH
+	
+	Afterthought: Are we "applying" a probability distribution over a similarity (which in turn, since it is lshable, means it has a probdist over a subset of hashfunctions)?
+	
+	Proof: see below
+	
+	Consequence: Applying the theorem to the Jaccard similarity:
+	
+	%Our PGF is $\displaystyle f_\gamma(x) = \frac{x}{x+\gamma(1-x)} = $ %WRONG???
+	
+	Start with $\displaystyle f_\gamma(\alpha) = \sum_{x=1}^{\infty}\frac{(1-\frac{1}{\gamma})^x}{\gamma -1}\alpha^x$
+	
+	We have to demonstrate that the coefficients represent a probability distribution: $\displaystyle \sum_{i=1}^{\infty}\frac{(1-\frac{1}{\gamma})^i}{\gamma -1}=1 \Rightarrow \sum_{i=1}^{\infty}(1-\frac{1}{\gamma})^i=\gamma -1$
+	
+	Now: $\displaystyle \sum_{i=1}^{\infty}(1 - \frac{1}{\gamma})^i = (1 - \frac{1}{\gamma})\sum_{i=0}^{\infty}(1 - \frac{1}{\gamma})^i = (1 - \frac{1}{\gamma}) \frac{1}{1 - (1 - \frac{1}{\gamma})} = \frac{\gamma -1 }{\gamma}\frac{1}{1/\gamma} = \gamma -1$
+	
+	
+	Apply PGF to Jaccard: $f_\gamma (J(A, B)) = $ ...algebretta insiemistica... $= \frac{\cap}{\cap + \gamma\vartriangle} = S_\gamma(A, B)$, which in turn is LSH-able
+	
+	
+	\
+	
+\section{181008}
+	
+	
+	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%181008
+	
+	%% So it actually matches the previous wikipedian def
+	Recap: Given a universe U, a function $S \in U^2 \to [0, 1]$ is said to be a LSH-able similarity iff exists prob distr over (a family/subset of) the hash functions in U, such that: 
+	\begin{equation}
+	\forall X, Y \in U\ \ \Pr_h(h(X)=h(Y)) = S(X, Y)
+	\end{equation}
+	
+	
+	Reprise: If a similarity S is LSHable and f is a PGF, then f(S) is LSHable
+	
+	Equivalent statement:
+	\begin{equation}
+	f(S) := T \in U^2 \to [0, 1] : \forall A, B \in U\ \ T(A, B) = f(S(A, B))
+	\end{equation}
+	
+	%Afterthought: could we just demonstrate that probability distributions are composable? lshability could be just a carried-over property...
+	
+	
+	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+	
+	\
+	
+	Lemma (1): The similarity $O \in U^2 \to [0, 1] : (A, B) \mapsto 1$ admits a LSH
+	Proof: Give prob. 1 to a constant function (duh!): $h \in U \to \mathbbm{1} A \mapsto 0 \forall A in U$
+	
+	Purpose: This will be the base case for theorem proof...
+	
+	%%%%%%%%
+	
+	\
+	
+	Lemma(2): If S and T similarities over U have a scheme, then $S \cdot T : (S \cdot T)(A, B) = S(A, B)\cdot T(A, B)$ has a scheme
+	
+	(I.E:). LSHability is preserved upon composition/multiplication
+	
+	Proof by construction (Algorithm): 
+	
+	sample hash functions for $S \cdot T$ as follows
+	
+	first, sample $h_S$ for S;
+	then sample $h_T$ independently for T
+	return the function $h : A \mapsto (h_S(A), h_T(A))$
+	
+	$\Pr_h(h(A)=h(B)) = \Pr_{h_S}(h_S(A)=h_S(B)) \cdot \Pr_{h_T}(h_T(A)=h_T(B)) = S(A, B) \cdot T(A, B) (\forall \{A, B\} \in \mathcal{P}_2(U))$by independency
+	
+	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+	
+	Lemma(3): if S is LSHable then $\forall i \in \mathbb{N}$ $S^i$ is lshable
+	
+	proof by induction:
+	
+	base (Lemma1): i=0 and $S^0$=O OK
+	
+	ind: Use lemma 2 on $S^i$ and $S$ to obtain $S^{i+1}$; S has a scheme by def, $S^i$ has a scheme by induction hypothesis
+	
+	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+	
+	lemma(4): if $p_0, ..., p_i, ... : \sum_{i=0}^{\infty}p_i=1 , and p_i\geq 0 \forall i$, and $S_0, ..., S_i, ...$ are lshable similarities, then $\sum_{i=0}^{\infty}p_iS_i$ is lshable
+	
+	scheme: first pick(sample, they are synonyms) i* at random from $\mathbb{N}$ with probability $p_0, ..., p_i, ...$
+	then, sample h from the hash functions of $S_{i*}$
+	
+	$\Pr(h(A)=h(B))=\sum_{i=0}^{\infty}(p_i S_i(A, B))$
+	
+	$\Pr(h(A)=h(B))=\sum_{i=0}^{\infty}(\Pr(i=i*)\Pr_h(h(A)=h(B) | i=i*))$, $\Pr(i=i*) = p_i$, $hahb|i=i* \to S_i(A, B)$
+	
+	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+	
+	Final proof: sum of $p_iS^i$ has a scheme
+	
+	L3: $S^i$ has a scheme
+	
+	L4: the sum is lshable, proven
+	
+	%%%%%%%%%%%%%%%%%%%%%%%
+	
+	Example of a pgf: $sum(2^-1 times x^i)$
+	
+	
+	----------------------------------------------------------------??sorensen dice??cosine similarity?? inner product??johnson-lindenstrauss??
+	
+	a sketch is n instance of a pgf which can be used to implement other similarities NONONONONOO
+	
+	
+	%%%%%%%%%%%J
+	
+	PGF is an approach for making schemes for similarities from other schemes
+	
+\section{181010}
+	
+	Let f a PGF, $\alpha \in [0, 1]$, ...?
+	
+	%&
+	$\alpha f = \alpha f(S)\ |\ (1 - \alpha)T$
+	%&
+	
+	$T \in U^2 \to [0, 1] : \forall {t, t'} \in \mathcal{P}_2(U) T(t, t') = 0$
+	
+	for the 1 case we wanted a nbanal partition, now with 0 we want a punctual partition, so we need a hash function that assigns a distinct value to each argument. (You can actually use the identity)
+	
+	Not a good scheme, because we're not shrinking data
+	
+	GOTO %&
+	
+\subsubsection{Approximation examples}
+	
+	Consider $S_\gamma$: $\gamma \geq 1 \Leftrightarrow S_\gamma$ is LSH-able
+	
+	Focus on $\gamma < 1$
+	
+	Definition: "Distortion of a similarity"
+	
+	Let S be a similarity, then its distortion is "the minimum*(meaning inferior extremum) delta geq 1 : exists LSHABLE S' (forall {A, B} in P2U, $1/\delta \cdot S(A, B) \leq S'(A, B) \leq S(A, B)$)"
+	
+	delta tends to 1 -> S is lshable
+	
+	using jaccard to approximate sgamma we wold obtain 1/gamma
+	
+	delta is the approximation factor
+	
+	%%%%%%%%%%%%%%%%%%
+	
+	Centerlemma: Let S be a LSHable similarity $ : \exists \chi \subseteq U : \forall \{x, x'\} \in \mathcal{P}_2(\chi) S(x, x')=0$, then
+	
+	$\forall y \in U avg_{x \in \chi}(S(X, Y) \leq) \frac{1}{|\chi|}$; (it trivially follows that $\exists x* \in \chi : S(x*, Y \leq \frac{1}{|\chi|})$)
+	
+	Proof: (Fix $y \in U$) If the hash function h has positive probability in the (chosen) lsh for S, then $\forall {x, x'} \in \mathcal{P}_2(\chi) (h(x)\neq h(x'))$
+	
+	[$\chi$ is actually a (possibly incomplete) section of the partition of U induced by h]
+	
+	thus, forall hash functions with positive probability, there can exist at most one x in calx st hx=hy (transitivity of equality)
+	
+	$\sum_{x \in \chi}S(x, y) = \sum_{x \in \chi}\Pr_h(h(x)=h(y)) = \sum_{x \in \chi}\sum_{h}\Pr(h\ is\ chosen)[h(x)=h(y)]$
+	
+	IMPORTANT: The brackets here are a boolean evaluation operator
+	
+	$= \sum pr h is chosen \sum eval hx = hy \leq \sum_h \Pr(h\ is\ chosen) \leq 1$
+	
+	Thus, $\sum_{x \in \chi}S(x, y) \leq 1 \Rightarrow avg(S(X, Y)) \leq \frac{1}{|\chi|}$, proven
+	
+	
+	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+	
+	
+	$S:= S_\gamma , 0 < \gamma < 1, U=2^{[n]}={S|S\subseteq [n]}$ %insieme delle parti?
+	
+	$\chi := \mathcal{P}_1([n])$
+	$y = [n]$
+	
+	 - let us assume that T finitely distorts sgamma, and T is lshable
+	then $T({},{}) = 0 forall {i, j} in P_2(mathbbm(n))$
+	
+	 - $\exists \{i\} in \chi : T(\{i\}, [n]) \leq \frac{1}{|\chi|} = \frac{1}{n}$
+	 
+	 $S_\gamma(\{i\}, [n]) = \frac{1}{1 + \gamma(n-1)} = \frac{1}{\gamma n + (1-\gamma)}$
+	 
+	 ...
+	 zenterlemma application
+	 ...
+	
+	
+	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+	
+	$ U = {}$
