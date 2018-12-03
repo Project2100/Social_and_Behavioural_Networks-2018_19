@@ -1,0 +1,165 @@
+\chapter{Locality Sensitive Hashing}
+	
+	The goal of hashing techniques is to reduce a big "object" to a small "signature" or "fingerprint". In general, what happens in locality sensitive hashing (or LSH) is to have some notion of similarity, and then define a "scheme" which computes it. The process of creating a scheme usually involves some sort of preprocessing step, and a function family which, by choosing one or another function according a probability distribution, statistically classifies the objects in the same way as the similarity function does.
+	The bottom line of LSH schemes is: similar objects hash to similar values.
+	
+	Here are some common similarities:
+	\begin{itemize}
+	
+	\item \textbf{Jaccard similarity}: Given two sets of objects A and B, their Jaccard similarity is defined as follows:
+	
+	\begin{equation}
+	\jaccsim(A, B) = \frac{|A\cap B|}{|A\cup B|}
+	\end{equation}
+	
+	\item \textbf{Hamming similarity}: Given two sets of objects A and B taken from a universal set U, their Hamming similarity is defined as follows:
+	
+	\begin{equation}
+	\hammsim(A, B) = \frac{|A\cap B| + |\complement_U(A\cup B)|}{|U|}
+	\end{equation}
+	
+	\end{itemize}
+	
+\section{A case study: Web-page indexing}
+	
+	A search engine crawls periodically the Internet and stores valuable information in its own index for search optimization purposes.
+	
+	An observation to make is the following: some kinds of documents, that are very similar to each other, are stored sparsely through the net; to save storage space, only one of a kind of document's info is stored in the index, whereas all others are linked to the first one, because of their similarity.
+	
+	To find a useful hashing scheme, A. Broder came up with an idea. First off, let us fix some definitions:
+	\begin{itemize}
+	\item $U$: the set of all words, i.e. the English vocabulary
+	\item $U*$: the set of all strings composed of english words
+	\end{itemize}
+	
+	The starting point is to treat web pages as strings:
+	
+	$T_1:$ \textit{``The black board is black''}
+	
+	$T_2:$ \textit{``The white board is white''}
+	
+	Then, let $distinct(T)$ returns the set of distinct words appearing in a string (Ref. Bag of Words model)
+	
+	So for example, by using the Jaccard similarity:
+    
+    \begin{equation}
+    \jaccsim(distinct(T_1), distinct(T_2))= \frac{3}{5}
+    \end{equation}
+	
+	Over a half: they look close. If we used the Hamming distance instead, we would (almost always) get a number very close to 1, because we're using a minuscule part of the universe set (in our case, the English dictionary), thus (almost) all words are absent from the sets.
+	
+	Now, our objective is to construct a scheme over web-pages that implement the Jaccard similarity. Our pre-processing step: Choose a permutation (or total ordering) $p \in \order(A \cup B)$ \uar. To construct said order is a simple task:
+	
+	Algorithm (using u):
+	
+	\begin{lstlisting}[language=Pascal]
+	pi: empty sequence
+	while u is not empty:
+		pick a word w from u UAR and remove it from u
+		append w to pi
+	end
+	return pi
+	\end{lstlisting}
+	
+	Proof of uniform choice: $\Pr(X = \pi) = \frac{1}{|u|}\cdot\frac{1}{|u|-1}\cdot\dots\cdot 1 = \frac{1}{|u|!} \Rightarrow X \in \unifdist(\permut(A \cup B))$
+	
+	From $p$, we define the hashing function as:
+	
+	\begin{equation}
+	h_p \in \mathcal{P}(U) \to U : h_p(A) = min_p(A)
+	\end{equation}
+	
+	In other words, we take the ``minimum'' in A according to the ordering specified by $p$. A simple but useful observation would be:
+	
+	\begin{equation}
+	\forall A \subseteq U \Rightarrow h_p(A) \in A
+	\end{equation}
+	
+	E.g.: $p = (black, the, is, white, board) \wedge A = \{black, board\} \Rightarrow h_p(A) = black$
+	
+	Thus, we can say that $A$ is similar to $B$ iff $h_p(A)=h_p(B)$. Recall that $A$ and $B$ are fixed, $p$ is the focus of this definition. What can be said about $\Pr(h_p(A)=h_p(B))$ ? Looking at a corresponding Venn diagram:
+	
+	\begin{itemize}
+	\item $A \cap B = \emptyset \Rightarrow \Pr(h_p(A)=h_p(B)) = 0$; they have no words in common, so their hashes must be different, independently of the chosen order;
+	\item $A = B \Rightarrow \Pr(h_p(A)=h_p(B)) = 1$; this time, all words are in common, so their hashes must coincide, again, independently of the chosen order
+	\item Otherwise, since $p$ is chosen \uar, the probability that the hashes are equal has the same meaning of the probability of finding the lowest element of A and B in the intersection with respect of the union (and not in $U$ as a whole, as our previous observation suggests) which is the Jaccard similarity of A and B by its very definition: $\Pr(h_p(A)=h_p(B)) = \jaccsim(A, B)$
+	\end{itemize}
+	
+	Possible question about third point: Why not respect to the universal set? because A and B will have hashes which, as we observed earlier, do not live outside the union: the union between A and B is our true set of outcomes when hashing either A or B.
+	
+	Now, if $h_p$ is evaluated only once over a given permutation, only a binary response can be obtained. In order to obtain the probability value without resorting to compute unions and intersections, we can repeat evaluation over different permutations; this can be regulated by the Chernoff-Hoeffding bound:
+	
+	Let $A, B \subseteq U$, and $X_{1 \dots n} \in \coin(p)$ \iid, each defined over a distinct element of $\Pi \subseteq \mathcal{P}erm(U)$ such that $X_i \mapsto 1 \Leftrightarrow A \sim_{\pi_i} B, 0\ otherwise$, then:
+	
+	%TODO
+	\begin{equation}
+	\displaystyle \Pr\left(\left|avg_{i=1}^{n}(X_i) - \frac{\sum E(X)}{n}\right|<\varepsilon\right) = 
+	\end{equation}
+	
+	%HAMMING!!
+	
+\section{LSH formalization}
+
+    First let us focus around the hash function as an object: its true purpose in a scheme is to classify objects based on how much they ``look like'', whatever this means in the chosen similarity's terms. Therefore, in our theoretical analysis, the codomain of a hash function is not that important; what is important is how the function partitions its own domain, $U$. In a sense, we're interested only in the partitions of $U$ themselves, not in the functions that generate them.
+    
+	Why have we dealt with functions back then? Moving from a purely mathematical perspective to a more computational one, what is usually done for measuring similarities is sampling some object's characteristics, and observe how ``distant'', or else ``similar'' they are. This is done by means of some program; and programs are (oh so) easily associated with functions. The computational approach gives a more intuitive vision of the problem we're confronting ourselves with.
+    
+    Still, what could happen, is to have a couple of functions that map values into wildly different codomains, but partition $U$ in exactly the same way! And in our journey, we're just interested in classifying objects; so these kind of ``duplicate'' functions are, well, useless (unless we delve in complexity studies, but that's out of the scope).
+    
+	So, let us reform the foundations by taking as our core object a universe partition, instead of a universe-domained hash function. First, though, we need to formalize what a similarity is, and to get to a good definition, we have to carefully select them from their space $U^2 \to [0, 1]$. It should be noted that the codomain might very well be $\real$ itself, but to get some bearings we'll treat an image of 1 as a complete equivalence between two objects, and 0 for complete difference, with the interval expressing the degree of similarity.
+	
+	
+	
+	Let $U$ be a set, and $S \in U^2 \to [0, 1]$ a symmetric function; then $S$ is called a similarity over $U$.
+	% Still incomplete, need the trineq on 1-S
+	
+	Tidbit: Let $f \in A^n \to B$, then f is \textbf{symmetric} iff \textit{argument order does not change the image} % COMMUTATIVITY? Kinda...
+	
+	% A scheme-similarity defines a partition over U
+	A LSH scheme over U is a probability distribution over U's partitions
+	
+	%%%%%%%%%%%%%%%%%%%%
+	
+	% Intuitive: a hash function's purpose is to map arguments that are very similar to the same value
+	
+	% Hash function: $h \in U \to (*)$ such that the domain's representation is 'sensibly smaller' than U (h is NOT injective by this intuition - not true, injective functions are used as hash functions in pathological cases...)
+	
+	% Insight: A hash function seems to complicate definitions more than a simple equivalence relation, but it models programs/algorithms more effectively, which is our focus here
+	
+	%Given a similarity $\phi$, a LSH scheme is a family of hash functions $H$, coupled with a prob. distribution $D$ over $H$ "such that, chosen a function $h$ from the family $H$ according to the prob.dist., satisfies the property $\Pr(h(a)=h(b)) = \phi(a,b) \forall a,b in U$"
+	
+	%Rewritten
+	%Let $S \in U^2 \to [0, 1]$ be a similarity, and H be a RV over a family of hash functions over U, then H is a LSH scheme iff $\Pr(H(a)=H(b)) = S(a,b) \forall a,b in U$
+	
+	% Brainlamp: I can extend the domain of H to the whole hashfunction class by setting the outsiders' probability to 0...
+	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+	
+	
+	% Note: some partitions will never be a result of a hash function % Hah, not so sure...
+	
+	% Other note: some form of transitivity must hold. (So yeah, we're dealing with an equivalence relation in the guise of a function with arbitrary codomain)
+	
+	%\
+	
+	% INSIGHT: Preprocess \& hash function (aka a scheme) determine the similarity function (most people attempt to do the reverse)
+	
+	%\
+	
+	% MAJOR INSIGHT: In the previous webpage example, we're not dealing with a single hashing function, but with a family of functions each built with its own word permutation: the scheme distributes over the permutations of the union!
+	% Now, do all permutations induce unique partitions?
+	
+	%\
+	
+	%Wrapup: A LSH scheme for a similarity S is a prob dist over U's partitions such that $\forall A, B \in  U \Rightarrow \Pr_\pi(A\sim_\pi B) = S(A, B) = \Pr_h(h(A)=h(B))$
+	
+	Formal definition: Given $s \in U^2 \to [0,1]$ a similarity. Then we define $X$ to be a LSH scheme for $s$ as the following:
+	\begin{equation}
+	X \in \probdist(\powerset(U)) : \forall A, B \in U \implies \expect(A\sim_X B) = S(A, B)
+	\end{equation}
+	
+	Challenge: Can we find a LSH scheme for an arbitrary S function? NO
+	
+	E.g. $U = \{a, b, c\}$
+	$S \in U^2 \rightarrow [0, 1] : S(a, b) \mapsto 1, S(b, c) \mapsto 1, S(a, c) \mapsto 0$ % We're violating transitivity
+	
+	Translating into probabilities and using equality's transitivity, we obtain: $\Pr(h(a), h(c))=1$, which contradicts the third mapping.
