@@ -48,17 +48,18 @@
 	
 	Over a half: they look close. If we used the Hamming distance instead, we would (almost always) get a number very close to 1, because we're using a minuscule part of the universe set (in our case, the English dictionary), thus (almost) all words are absent from the sets.
 	
-	Now, our objective is to construct a scheme over web-pages that implement the Jaccard similarity. Our pre-processing step: Choose a permutation (or total ordering) $p \in \order(A \cup B) \uar$. To construct said order is a simple task:
+	Now, our objective is to construct a scheme over web-pages that implement the Jaccard similarity. Our pre-processing step: Choose a permutation (or total ordering) $p \in \order(A \cup B)$ \uar. To construct said order is a simple task:
 	
 	Algorithm (using u):
-	\begin{verbatim}
+	
+	\begin{lstlisting}[language=Pascal]
 	pi: empty sequence
 	while u is not empty:
 		pick a word w from u UAR and remove it from u
 		append w to pi
 	end
 	return pi
-	\end{verbatim}
+	\end{lstlisting}
 	
 	Proof of uniform choice: $\Pr(X = \pi) = \frac{1}{|u|}\cdot\frac{1}{|u|-1}\cdot\dots\cdot 1 = \frac{1}{|u|!} \Rightarrow X \in \unifdist(\permut(A \cup B))$
 	
@@ -81,14 +82,14 @@
 	\begin{itemize}
 	\item $A \cap B = \emptyset \Rightarrow \Pr(h_p(A)=h_p(B)) = 0$; they have no words in common, so their hashes must be different, independently of the chosen order;
 	\item $A = B \Rightarrow \Pr(h_p(A)=h_p(B)) = 1$; this time, all words are in common, so their hashes must coincide, again, independently of the chosen order
-	\item Otherwise, since $p$ is chosen $\uar$, the probability that the hashes are equal has the same meaning of the probability of finding the lowest element of A and B in the intersection with respect of the union (and not in $U$ as a whole, as our previous observation suggests) which is the Jaccard similarity of A and B by its very definition: $\Pr(h_p(A)=h_p(B)) = \jaccsim(A, B)$
+	\item Otherwise, since $p$ is chosen \uar, the probability that the hashes are equal has the same meaning of the probability of finding the lowest element of A and B in the intersection with respect of the union (and not in $U$ as a whole, as our previous observation suggests) which is the Jaccard similarity of A and B by its very definition: $\Pr(h_p(A)=h_p(B)) = \jaccsim(A, B)$
 	\end{itemize}
 	
 	Possible question about third point: Why not respect to the universal set? because A and B will have hashes which, as we observed earlier, do not live outside the union: the union between A and B is our true set of outcomes when hashing either A or B.
 	
 	Now, if $h_p$ is evaluated only once over a given permutation, only a binary response can be obtained. In order to obtain the probability value without resorting to compute unions and intersections, we can repeat evaluation over different permutations; this can be regulated by the Chernoff-Hoeffding bound:
 	
-	Let $A, B \subseteq U$, and $X_{1 \dots n} \in \coin(p) \iid$, each defined over a distinct element of $\Pi \subseteq \mathcal{P}erm(U)$ such that $X_i \mapsto 1 \Leftrightarrow A \sim_{\pi_i} B, 0\ otherwise$, then:
+	Let $A, B \subseteq U$, and $X_{1 \dots n} \in \coin(p)$ \iid, each defined over a distinct element of $\Pi \subseteq \mathcal{P}erm(U)$ such that $X_i \mapsto 1 \Leftrightarrow A \sim_{\pi_i} B, 0\ otherwise$, then:
 	
 	%TODO
 	\begin{equation}
@@ -119,36 +120,42 @@
 	
 	%%%%%%%%%%%%%%%%%%%%
 	
-	Intuitive: a hash function's purpose is to map arguments that are very similar to the same value
+	% Intuitive: a hash function's purpose is to map arguments that are very similar to the same value
 	
-	Hash function: $h \in U \to (*)$ such that the domain's representation is 'sensibly smaller' than U (h is NOT injective by this intuition - not true, injective functions are used as hash functions in pathological cases...)
+	% Hash function: $h \in U \to (*)$ such that the domain's representation is 'sensibly smaller' than U (h is NOT injective by this intuition - not true, injective functions are used as hash functions in pathological cases...)
 	
-	Insight: A hash function seems to complicate definitions more than a simple equivalence relation, but it models programs/algorithms more effectively, which is our focus here
+	% Insight: A hash function seems to complicate definitions more than a simple equivalence relation, but it models programs/algorithms more effectively, which is our focus here
 	
 	%Given a similarity $\phi$, a LSH scheme is a family of hash functions $H$, coupled with a prob. distribution $D$ over $H$ "such that, chosen a function $h$ from the family $H$ according to the prob.dist., satisfies the property $\Pr(h(a)=h(b)) = \phi(a,b) \forall a,b in U$"
 	
 	%Rewritten
 	%Let $S \in U^2 \to [0, 1]$ be a similarity, and H be a RV over a family of hash functions over U, then H is a LSH scheme iff $\Pr(H(a)=H(b)) = S(a,b) \forall a,b in U$
 	
-	Brainlamp: I can extend the domain of H to the whole hashfunction class by setting the outsiders' probability to 0...
+	% Brainlamp: I can extend the domain of H to the whole hashfunction class by setting the outsiders' probability to 0...
 	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 	
 	
-	Note: some partitions will never be a result of a hash function % Hah, not so sure...
+	% Note: some partitions will never be a result of a hash function % Hah, not so sure...
 	
-	Other note: some form of transitivity must hold. (So yeah, we're dealing with an equivalence relation in the guise of a function with arbitrary codomain)
+	% Other note: some form of transitivity must hold. (So yeah, we're dealing with an equivalence relation in the guise of a function with arbitrary codomain)
 	
-	\
+	%\
 	
-	INSIGHT: Preprocess \& hash function (aka a scheme) determine the similarity function (most people attempt to do the reverse)
+	% INSIGHT: Preprocess \& hash function (aka a scheme) determine the similarity function (most people attempt to do the reverse)
 	
-	\
+	%\
 	
-	MAJOR INSIGHT: In the previous webpage example, we're not dealing with a single hashing function, but with a family of functions each built with its own word permutation: the scheme distributes over the permutations of the union!
+	% MAJOR INSIGHT: In the previous webpage example, we're not dealing with a single hashing function, but with a family of functions each built with its own word permutation: the scheme distributes over the permutations of the union!
+	% Now, do all permutations induce unique partitions?
 	
-	\
+	%\
 	
-	Wrapup: A LSH scheme for a similarity S is a prob dist over U's partitions such that $\forall A, B \in  U \Rightarrow \Pr_\pi(A\sim_\pi B) = S(A, B) = \Pr_h(h(A)=h(B))$
+	%Wrapup: A LSH scheme for a similarity S is a prob dist over U's partitions such that $\forall A, B \in  U \Rightarrow \Pr_\pi(A\sim_\pi B) = S(A, B) = \Pr_h(h(A)=h(B))$
+	
+	Formal definition: Given $s \in U^2 \to [0,1]$ a similarity. Then we define $X$ to be a LSH scheme for $s$ as the following:
+	\begin{equation}
+	X \in \probdist(\powerset(U)) : \forall A, B \in U \implies \expect(A\sim_X B) = S(A, B)
+	\end{equation}
 	
 	Challenge: Can we find a LSH scheme for an arbitrary S function? NO
 	
