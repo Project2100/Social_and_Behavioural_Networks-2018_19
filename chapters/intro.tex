@@ -18,7 +18,7 @@
 \subsection{Union bound}
 	
 	\begin{equation}
-	\Pr(\bigcup_{i=0}^n E_i) \leq \sum_{i=0}^{n}(\Pr(E_i))
+	\Pr\left(\bigcup_{i=0}^n E_i\right) \leq \sum_{i=0}^{n}(\Pr(E_i))
 	\end{equation}
 	If the events are mutually disjoint, then the equality is strict.
 
@@ -38,6 +38,10 @@
 		 &\geq \int_{a}^{\infty}a\Pr(X=x)dx \\
 		 &= a\Pr(X \geq a)
 	\end{align*}
+	
+	Informally, the Markov inequality let us tell something about an extreme event in a probability distribution of which we know only the expectation: if $E[X]$ is small, then X is unlikely to be very large.
+	
+	More about this \href{https://youtu.be/vjYanZ1nsZg}{here} or \href{https://ocw.mit.edu/resources/res-6-012-introduction-to-probability-spring-2018/part-i-the-fundamentals/}{here}.
 
 
 \subsection{Moment generating functions}
@@ -58,12 +62,11 @@
 	The Chernoff bound allows you to control how much a RV is close to its expected value.
 
 	Let $X_1, \dots, X_n \in \coin(p)$ \iid, i.e. $X_1, \dots, X_n$ are $n$ RV such that\\
-	$\Pr(x_i=1)=p$ and $\Pr(x_i=0)=1-p$.\\
-	In other words, they are $n$ independent coin throws of the same coin.
+	$\Pr(X_i=1)=p$ and $\Pr(X_i=0)=1-p$.\\
+	In other words, they are $n$ independent throws of the same coin.
 	
 	Let $X=\sum_{i=1}^{n}(X_i)$.
-	X is essentially a binomial RV: $X \in \binomdist(\binary^n, p)$, thus $E(X)=p\cdot n$.\\
-	It represents the number of times you get head with the aforesaid $n$ throws.
+	X is essentially a binomial RV: $X \in \binomdist(\binary^n, p)$, thus $E[X]=p\cdot n$. It represents the number of times you get head with the aforesaid $n$ throws.
 	
 	So, given an error limit $\varepsilon$, we define the Chernoff bound as:
 	\begin{equation}\label{chernoff}   %True definition
@@ -90,4 +93,4 @@
 	\Pr(\abs{X-E[X]} \geq \varepsilon \cdot n) \leq 2e^{-\frac{\varepsilon^{2}}{3}n}
 	\end{equation}
 	
-	\ex Let be $E[X]=\frac{50}{100}$ and $\varepsilon=\frac{1}{100}$, the probability that $X \geq \frac{51}{100}$ or $X \geq \frac{49}{100}$ is less then or equal to $2e^{-\frac{1}{30000}n}$.
+	\ex Let be $E[X]=\frac{50}{100}$ and $\varepsilon=\frac{1}{100}$, the probability that $X \geq \frac{51}{100}$ or $X \leq \frac{49}{100}$ is less then or equal to $2e^{-\frac{1}{30000}n}$.
