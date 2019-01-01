@@ -1,3 +1,5 @@
+% !TEX spellcheck = en-US
+
 \chapter{Locality Sensitive Hashing}
 	
 	The goal of hashing techniques is to reduce a big "object" to a small "signature" or "fingerprint".\\
@@ -21,7 +23,7 @@
 	
 	\end{itemize}
 	
-\section{A case study: Web-page indexing}
+\section{A case study: Web-page indexing}\label{sec:web-page-indexing}
 	
 	A search engine crawls periodically the whole Internet and stores valuable information in its own index for search optimization purposes.
 	
@@ -140,7 +142,7 @@
 	$ h_i(A)=\begin{cases}
 		1 & \text{if}\ i \in A\\
 		0 & \text{otherwise}\\
-	\end{cases} $.
+	\end{cases} $. \label{hamming_hash}
 	
 	\ex We have two DNA sequences $A$ and $B$ such that \\$A:=$
 	\begin{tabular}{|c|c|c|c|c|c|c|c|}
@@ -170,19 +172,41 @@
     
 	Why have we dealt with functions back then? Moving from a purely mathematical perspective to a more computational one, what is usually done for measuring similarities is sampling some object's characteristics, and observe how ``distant'', or else ``similar'' they are. This is done by means of some program; and programs are (oh so) easily associated with functions. The computational approach gives a more intuitive vision of the problem we're confronting ourselves with.
     
-    Still, what could happen, is to have a couple of functions that map values into wildly different codomains, but partition $U$ in exactly the same way! And in our journey, we're just interested in classifying objects; so these kind of ``duplicate'' functions are, well, useless (unless we delve in complexity studies, but that's out of the scope).
+    Still, what could happen, is to have a couple of functions that map values into wildly different codomains, but partition $U$ in exactly the same way! And in our journey, we're just interested in classifying objects; so these kind of ``duplicate'' functions are, well, useless (unless we delve in complexity studies, but that's out of our scope).
     
 	So, let us reform the foundations by taking as our core object a universe partition, instead of a universe-domained hash function. First, though, we need to formalize what a similarity is, and to get to a good definition, we have to carefully select them from their space $U^2 \to [0, 1]$. It should be noted that the codomain might very well be $\real$ itself, but to get some bearings we'll treat an image of 1 as a complete equivalence between two objects, and 0 for complete difference, with the interval expressing the degree of similarity.
 	
+	Let $U$ be a set, and $S \in U^2 \to [0, 1]$ a symmetric function; then $S$ is called a \textbf{similarity} over $U$.
+	% TODO Still incomplete, need the trineq on 1-S
 	
+	Tidbit: Let $f \in A^n \to B$, then f is \textbf{symmetric} iff \textit{argument order does not change the image}. % COMMUTATIVITY? Kinda...
 	
-	Let $U$ be a set, and $S \in U^2 \to [0, 1]$ a symmetric function; then $S$ is called a similarity over $U$.
-	% Still incomplete, need the trineq on 1-S
-	
-	Tidbit: Let $f \in A^n \to B$, then f is \textbf{symmetric} iff \textit{argument order does not change the image} % COMMUTATIVITY? Kinda...
+	\ex \begin{align*}
+		& U=2^{[n]}=\left\lbrace A | A \subseteq [n] \right\rbrace \\
+		& S=\jaccsim \\
+		& S\left( \left\lbrace 1,2 \right\rbrace , \left\lbrace 2,3 \right\rbrace \right) =\frac{1}{3}
+	\end{align*}
 	
 	% A scheme-similarity defines a partition over U
-	A LSH scheme over U is a probability distribution over U's partitions
+	A \textbf{LSH scheme} over $U$ is a probability distribution over the partitions of $U$.
+	
+	\ex We can apply the min-hash scheme [\ref{lst:min_hash}] to the Jaccard Similarity. With $U=[3]$ and $\pi = 1<2<3$, the function maps each subset of $U$ to a hash as follows:
+	\begin{align*}
+		\emptyset &\mapsto \perp \text{(the hash of the empy set is a special symbol)} \\
+		\{1\}, \{2,1\}, \{1,3\}, \{1,2,3\} &\mapsto 1 \text{ (all sets containing 1 have hash 1)} \\
+		\{2\}, \{2,3\} &\mapsto 2 \text{ (all remaining sets containing 2 have hash 2)} \\
+		\{3\} &\mapsto 3 \text{ (all remaining sets containing 3 have hash 3)}
+	\end{align*}
+	thus defining 4 partitions over $U$.
+	
+	\ex Similarly, we can apply the function based on the Hamming Similarity we saw in [\ref{hamming_hash}] to the same set $U=[3]$ and see we get new partitions. We chhose $i = 2$ \uar, the function maps each subset of $U$ to a hash as follows:
+	\begin{align*}
+	\{2\}, \{2.1\}, \{2,3\}, \{1,2,3\} &\mapsto 1 \text{ (all sets containing $i$ have hash 1)} \\
+	\emptyset, \{1\}, \{3\}, \{1,3\} &\mapsto 0 \text{ (all remaining sets have hash 0)}
+	\end{align*}
+	thus defining 2 partitions over $U$.
+	
+	Let's make some other considerations about what we have just seen.
 	
 	%%%%%%%%%%%%%%%%%%%%
 	
@@ -192,10 +216,8 @@
 	
 	% Insight: A hash function seems to complicate definitions more than a simple equivalence relation, but it models programs/algorithms more effectively, which is our focus here
 	
-	%Given a similarity $\phi$, a LSH scheme is a family of hash functions $H$, coupled with a prob. distribution $D$ over $H$ "such that, chosen a function $h$ from the family $H$ according to the prob.dist., satisfies the property $\Pr(h(a)=h(b)) = \phi(a,b) \forall a,b in U$"
-	
-	%Rewritten
-	%Let $S \in U^2 \to [0, 1]$ be a similarity, and H be a RV over a family of hash functions over U, then H is a LSH scheme iff $\Pr(H(a)=H(b)) = S(a,b) \forall a,b in U$
+	\obs Given a similarity $\phi$, a LSH scheme is a family of hash functions $H$, coupled with a probability distribution $D$ over $H$ such that, chosen a function $h$ from the family $H$ according to $D$, $h$ satisfies the property $\Pr(h(a)=h(b)) = \phi(a,b) \forall a,b \in U$. \\
+	In other words, let $S \in U^2 \to [0, 1]$ be a similarity, and H be a RV over a family of hash functions over U, then H is a LSH scheme iff $\Pr(H(a)=H(b)) = S(a,b) \forall a,b in U$
 	
 	% Brainlamp: I can extend the domain of H to the whole hashfunction class by setting the outsiders' probability to 0...
 	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -207,25 +229,30 @@
 	
 	%\
 	
-	% INSIGHT: Preprocess \& hash function (aka a scheme) determine the similarity function (most people attempt to do the reverse)
+	% INSIGHT
+	\obs Preprocess and hash function (aka a scheme) determine the similarity function (most people attempt to do the reverse)
 	
-	%\
-	
-	% MAJOR INSIGHT: In the previous webpage example, we're not dealing with a single hashing function, but with a family of functions each built with its own word permutation: the scheme distributes over the permutations of the union!
+	% MAJOR INSIGHT:
+	\obs In the previous webpage example [\ref{sec:web-page-indexing}], we're not dealing with a single hashing function, but with a family of functions each built with its own word permutation: the scheme distributes over the permutations of the union!
 	% Now, do all permutations induce unique partitions?
 	
 	%\
 	
-	%Wrapup: A LSH scheme for a similarity S is a prob dist over U's partitions such that $\forall A, B \in  U \Rightarrow \Pr_\pi(A\sim_\pi B) = S(A, B) = \Pr_h(h(A)=h(B))$
+	% Wrapup:
+	Before going on, let's recap what we have discussed so far: \\
+	A LSH scheme for a similarity $S$ is a prob. dist. over $U$'s partitions such that 
+	\begin{equation}
+		\forall A, B \in  U \Rightarrow \Pr_p(A\sim_p B) = S(A, B) = \Pr_h(h(A)=h(B))
+	\end{equation}
+	where $p$ is a partitioning of $U$ and $\sim_p$ means $A$ and $B$ are in the same partition.
 	
-	Formal definition: Given $s \in U^2 \to [0,1]$ a similarity. Then we define $X$ to be a LSH scheme for $s$ as the following:
+	Another possible definition: Given $s \in U^2 \to [0,1]$ a similarity, then we define $X$ to be a LSH scheme for $s$ as the following:
 	\begin{equation}
 	X \in \probdist(\powerset(U)) : \forall A, B \in U \implies \expect(A\sim_X B) = S(A, B)
 	\end{equation}
 	
-	Challenge: Can we find a LSH scheme for an arbitrary S function? NO
+	\textit{Challenge}: Can we find a LSH scheme for an arbitrary S function? NO
 	
-	E.g. $U = \{a, b, c\}$
-	$S \in U^2 \rightarrow [0, 1] : S(a, b) \mapsto 1, S(b, c) \mapsto 1, S(a, c) \mapsto 0$ % We're violating transitivity
-	
+	\ex \label{ex:transitivity} Given a universe set $U = \{a, b, c\}$ and a similarity function $S$ s. t.	$S \in U^2 \rightarrow [0, 1] : S(a, b) \mapsto 1, S(b, c) \mapsto 1, S(a, c) \mapsto 0$ we don't have an LSH, since we're violating transitivity:
 	Translating into probabilities and using equality's transitivity, we obtain: $\Pr(h(a), h(c))=1$, which contradicts the third mapping.
+	

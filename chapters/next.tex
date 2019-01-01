@@ -1,40 +1,77 @@
-\chapter{Next}
-	
-	More distances:
-	
-	Dice similarity
+% !TEX spellcheck = en-US
+
+\section{More distances}
+	Let $A \vartriangle B = (A-B) \cup (B-A)$.
+
+	Dice similarity:
 	\begin{equation}
 	\displaystyle D(A, B) = \frac{|A\cap B|}{|A\cap B| + \frac{1}{2}|A\vartriangle B|}
 	\end{equation}
 	
-	Anderberg similarity
+	Anderberg similarity:
 	\begin{equation}
-	\displaystyle D(A, B) = \frac{|A\cap B|}{|A\cap B| + 2|A\vartriangle B|}
+	\displaystyle An(A, B) = \frac{|A\cap B|}{|A\cap B| + 2|A\vartriangle B|}
 	\end{equation}
 	
 	Generalizing Jaccard, Dice and Anderberg: 
 	\begin{equation}
 	\displaystyle S_\gamma(A, B) = \frac{|A\cap B|}{|A\cap B| + \gamma|A\vartriangle B|}
 	\end{equation}
+	By this third definition we can obtain $\jaccsim$ with $\gamma=1$, $D$ with $\gamma=\frac{1}{2}$, and $An$ with $\gamma=2$.
 	
-	\
+	\textit{Question}: for which values of $\gamma$ does an LSH exist for $S$? The next lemma helps us finding an answer.
 	
-	Important lemma (Charikar): if a similarity S admits a (LSH) scheme, then $1-(S)$ must satisfy the triangular inequality (trineq)
+	\lem (by Charikar) If a similarity $S$ admits an LSH, then the function $1-S$ must satisfy the triangular inequality, i.e. $\forall A,B,C \in U$ \\ $d(A,B) \leq d(A,C) + d(B,C)$, where the distance $d(A,B) = 1-S(A,B)$ is our function $1-S$.
 	
-	Proof: %TODO SEE NOTES
+	\newpage
+	Proof: Let $E_{XY}$ be the event "$h(X) \neq h(Y)$"; since $S$ admits a LSH, we have:
+	\begin{align*}
+		d(A,B) &= 1-S(A,B) = \Pr_h(E_{AB}) = p_1 + p_2 + p_3 + p_4 \\
+		d(A,C) &= 1-S(A,C) = \Pr_h(E_{AC}) = p_1 + p_3 + p_5 + p_7 \\
+		d(B,C) &= 1-S(B,C) = \Pr_h(E_{BC}) = p_1 + p_2 + p_5 + p_6
+	\end{align*}
+	with the probabilities $p_i$ defined as in the following table, where an $X$ under the "may exist" column means that the corresponding probability is $0$ (it happens because transitivity generates contradictions, see example [\ref{ex:transitivity}]): \\\\
+	\begin{tabular}{lllll}
+		& $E_{AB}$ & $E_{AC}$ & $E_{BC}$ & may exist             \\
+		$p_1$ & T         & T         & T         & $\checkmark$ \\
+		$p_2$ & T         & T         & F         & $\checkmark$ \\
+		$p_3$ & T         & F         & T         & $\checkmark$ \\
+		$p_4$ & T         & F         & F         & X            \\
+		$p_5$ & F         & T         & T         & $\checkmark$ \\
+		$p_6$ & F         & T         & F         & X            \\
+		$p_7$ & F         & F         & T         & X            \\
+		$p_8$ & F         & F         & F         & $\checkmark$
+	\end{tabular} \\\\
+	Hence we have
+	\begin{equation*}
+		d(A,C) + d(B,C) = 2p_1 + p_2 + p_3 + 2p_5 \geq p_1 + p_2 + p_3 = d(A,B)
+	\end{equation*}
+	and so $1-S$ doesn't comply with the triangular inequality, QED.
 	
-	Afterthought: Similarities are actually defined in most cases as the inverses of measures, which in turn give (oh so surprisingly!) a notion of distance
-	\
+	\obs Similarities are actually defined in most cases as the inverses of measures, which in turn give (oh so surprisingly!) a notion of distance.
 	
-	By Charikar's lemma, we can prove that Dice's similarity cannot admit a LSH scheme
+	\cor By Charikar's lemma, we can prove that Dice's similarity cannot admit a LSH scheme.
 	
-	Proof by counterexample: Assume $A=\{1\}, B=\{2\}, C=\{1, 2\}$, then use the trineq over the distances; %\textreferencemark
+	\textit{Proof} by counterexample: Assume $A=\{1\}, B=\{2\}, C=\{1, 2\}$, then use the triangular inequality over the distances: \\
+	$D(A,C)=\frac{2}{3},\ D(B,C)=\frac{2}{3},\ D(A,B)=0$
+	\begin{multline*}
+		d(A,B) = 1- D(A,B) = 1 > \\
+		\frac{2}{3} = (1-D(A,C)) + (1-D(B,C)) = d(A,C) + d(B,C)
+	\end{multline*}
+	hence it doesn't comply with the triangular inequality, QED.\\
+	(Note that $D$ stands for Dice similarity and $d$ for distance)
 	
-	Parameterizing this counterexample with $S_\gamma$, we obtain a bounds for gamma: $1 \leq \frac{2\gamma}{1 + \gamma} \Rightarrow \gamma \geq 1$
+	\obs Parameterizing this counterexample with $S_\gamma$, we obtain a bounds for $\gamma$: let $A=\{1\}, B=\{2\}, C=\{1, 2\}$ and \\
+	$S_\gamma(A,C)=\frac{1}{1+\gamma},\ S_\gamma(B,C)=\frac{1}{1+\gamma},\ S_\gamma(A,B)=0$, thus
+	\begin{multline*}
+		1=1-S_\gamma(A,B)=d(A,B) > d(A,C) + d(B,C) = \\
+		(1-S_\gamma(A,C)) + (1-S_\gamma(B,C)) = 2 \left( 1- \frac{1}{1+\gamma} \right) = \frac{2\gamma}{1 + \gamma}
+	\end{multline*}
+	from which we obtain
+	$1 > \frac{2\gamma}{1 + \gamma} \Rightarrow \gamma < 1$. \\
+	Hence, if $\gamma < 1$, the triangular inequality doesn't hold, so no LSH can exist, as in the case of the Dice similarity.
 	
-	\
-	
-\subsection{Probability generating functions}
+\section{Probability generating functions}
 	
 	Intuition: A probability generating function (PGF) is a \textbf{power series representation} of a given probability distribution
 	
