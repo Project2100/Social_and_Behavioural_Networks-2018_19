@@ -143,7 +143,7 @@
 	\forall \{X, Y\} \in \binom{U}{2}\ \ \Pr_h(h(X)=h(Y)) = S(X, Y)
 	\end{equation}
 	
-	\thm If a similarity $S$ is LSH-able and $f$ is a PGF, then $f(S)$ is LSHable.
+	\thm \label{t:pgf_1} If a similarity $S$ is LSH-able and $f$ is a PGF, then $f(S)$ is LSHable.
 	
 	\textit{Equivalent statement}:
 	\begin{equation}
@@ -153,73 +153,102 @@
 	% TODO check
 	%Afterthought: could we just demonstrate that probability distributions are composable? lshability could be just a carried-over property...
 	
-	Lemma (1): The similarity $O \in U^2 \to [0, 1] : (A, B) \mapsto 1$ admits a LSH
-	Proof: Give prob. 1 to a constant function (duh!): $h \in U \to \mathbbm{1} A \mapsto 0 \forall A in U$
+	\lem \label{l:pgf_1} (L1) The similarity $O \in U^2 \to [0, 1]$ s.t. $O(A, B) \mapsto 1 \ \forall \{A, B\} \in \binom{U}{2}$ admits a LSH.
 	
-	Purpose: This will be the base case for theorem proof...
+	\textit{Proof}: Give probability 1 to the constant hash function $h$: $h(A)=1 \ \forall A\in U$\\
+	$\Pr(h(A)=h(B))=1=O(A,B) \ \forall \{A, B\} \in \binom{U}{2}$.
 	
-	%%%%%%%%
+	% TODO mi sembra più chiaro così ^
+	% Give prob. 1 to a constant function (duh!): $h \in U \to \mathbbm{1} A \mapsto 0 \forall A in U$
+	
+	\textit{Purpose}: This will be the base case for theorem proof...
+	
+	\lem \label{l:pgf_2} (L2) If $S$ and $T$ similarities over $U$ have a scheme, then $S \cdot T : (S \cdot T)(A, B) = S(A, B)\cdot T(A, B)$ has a scheme. \\
+	I.e. LSHability is preserved upon composition/multiplication.
+	
+	\textit{Proof} by construction (Algorithm): 
+	\begin{itemize}
+		\item Sample hash functions for $S \cdot T$ as follows:
+		\begin{enumerate}
+			\item first, sample $h_S$ from the LSH for S;
+			\item then, sample $h_T$ independently from the LSH for T;
+		\end{enumerate}
+		\item Return the hash function $h$ s.t.
+		$H(A) = (h_S(A), h_T(A)) \ \forall A \in U$;
+		\item Thus, $\forall \{A, B\} \in \binom{U}{2}$, we have:
+		\begin{flalign*}
+			\Pr_h(h(A)=h(B))
+			&= \Pr_{h_S}(h_S(A)=h_S(B)) \cdot \Pr_{h_T}(h_T(A)=h_T(B)) &&\\
+			&= S(A, B) \cdot T(A, B) &&
+		\end{flalign*}
+		by independency.
+	\end{itemize}
+	
+	\lem \label{l:pgf_3} (L3) if $S$ is LSHable, then $S^i$ is LSHable, $\forall i \in \mathbb{N}$.
 	
 	\
 	
-	Lemma(2): If S and T similarities over U have a scheme, then $S \cdot T : (S \cdot T)(A, B) = S(A, B)\cdot T(A, B)$ has a scheme
+	\textit{Proof} by induction:
+	\begin{itemize}
+		\item Base: $i=0$ and $S^0=O$ \\
+			True for L1 [\ref{l:pgf_1}];
+		\item Inductive hypothesis: $S^i$ is LSHable;
+		\item Inductive step: $S^{i+1}$ is LSHable \\
+			True because $S^{i+1}= S \cdot S^i$ is LSHable by L2 [\ref{l:pgf_2}], since $S$ has a scheme by def and $S^i$ has a scheme by inductive hypothesis.
+	\end{itemize}
 	
-	(I.E:). LSHability is preserved upon composition/multiplication
+	\lem \label{l:pgf_4} (4) If $p_0, p_1, ..., p_i, ...$ is s.t. $\sum_{i=0}^{\infty}p_i=1$, $p_i\geq 0 \ \forall i$, and $S_0, S_1, ... , S_i, ...$ are lshable similarities, then $\sum_{i=0}^{\infty}p_iS_i$ is lshable.
 	
-	Proof by construction (Algorithm): 
+	\textit{Proof} by scheme:
+	\begin{enumerate}
+	\item First, sample $i*$ at random from $\mathbb{N}$ with probability $p_0, ..., p_i, ...$;
+	\item Then, sample $h$ from the hash functions (LSH) of $S_{i*}$ (that is, we are choosing which LSH to use);
+	\item Thus we have:
+	\begin{flalign*}
+		\Pr_h(h(A)=h(B))
+		&=\sum_{i=0}^{\infty}(p_i S_i(A, B)) &&\\
+		&=\sum_{i=0}^{\infty}(\underbrace{\Pr(i=i*)}_{p_i} \cdot \underbrace{\Pr_h(h(A)=h(B) | i=i*))}_{S_i(A,B)} &&\\
+	\end{flalign*}
+	\end{enumerate}
+
+	\obs This lemma is useful if we need a weighted average \\
+	$W(A,B) = \sum_{i=0}^{\infty}(p_i S_i(A, B))$.
 	
-	sample hash functions for $S \cdot T$ as follows
+	\textit{Proof} of the theorem [\ref{t:pgf_1}]:
+	\begin{itemize}
+	\item We want to prove that $\sum_{i=0}^{\infty}p_iS^i$ has a scheme (is LSHable);
+	\item By L3 [\ref{l:pgf_3}] we know $S^i$ has a scheme;
+	\item By L4 [\ref{l:pgf_4}] we know the sum is lshable;
+	\item Proven.
+	\end{itemize}
 	
-	first, sample $h_S$ for S;
-	then sample $h_T$ independently for T
-	return the function $h : A \mapsto (h_S(A), h_T(A))$
+	\obs This theorem tells us how to build a LSH: by concatenating the results of different hash functions, keeping the output small. \\ I.e. PGF is an approach for making schemes for similarities from other schemes.
+	\ex $\sum_{i=1}^{a}(2^{-i} \cdot x^i)$.
 	
-	$\Pr_h(h(A)=h(B)) = \Pr_{h_S}(h_S(A)=h_S(B)) \cdot \Pr_{h_T}(h_T(A)=h_T(B)) = S(A, B) \cdot T(A, B) (\forall \{A, B\} \in \mathcal{P}_2(U))$by independency
+	\section{A mention of the sketches}
 	
-	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+	Like LSH, they're a means for simplify the storage of data; they are slower than LSH but allow you to keep interesting information in a small space.
 	
-	Lemma(3): if S is LSHable then $\forall i \in \mathbb{N}$ $S^i$ is lshable
+	\textbf{Definition}: a sketch is a representation of big objects with small images. They can be used to retrieve interesting information about original objects without regain the whole original objects (i.e. they are not compression algorithms).
 	
-	proof by induction:
+	\ex It's possible to go back to $\abs{A \cap B}$ from only $|A|, |B|, h(A), h(B),$ $\jaccsim(A,B)\pm\varepsilon$. Note that $\jaccsim(A,B)\pm\varepsilon$ can be obtained from $h(A), h(B)$ by applying the Chernoff Bounf [\ref{chernoff}] and the other data need only few bits to be stored.
 	
-	base (Lemma1): i=0 and $S^0$=O OK
+	\ex It's possible to approximate $\frac{\abs{A \cap B}}{\abs{A \cap B} + \frac{1}{2}\abs{A \vartriangle B}}$ with \\
+	 $\frac{1}{2} \cdot \abs{A \cup B} + \frac{1}{2} \cdot \abs{A \cap B}$.
 	
-	ind: Use lemma 2 on $S^i$ and $S$ to obtain $S^{i+1}$; S has a scheme by def, $S^i$ has a scheme by induction hypothesis
+	% TODO check
+	% --------------------------------------------------------------
+	% ??sorensen dice??cosine similarity?? inner product??johnson-lindenstrauss??
 	
-	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-	
-	lemma(4): if $p_0, ..., p_i, ... : \sum_{i=0}^{\infty}p_i=1 , and p_i\geq 0 \forall i$, and $S_0, ..., S_i, ...$ are lshable similarities, then $\sum_{i=0}^{\infty}p_iS_i$ is lshable
-	
-	scheme: first pick(sample, they are synonyms) i* at random from $\mathbb{N}$ with probability $p_0, ..., p_i, ...$
-	then, sample h from the hash functions of $S_{i*}$
-	
-	$\Pr(h(A)=h(B))=\sum_{i=0}^{\infty}(p_i S_i(A, B))$
-	
-	$\Pr(h(A)=h(B))=\sum_{i=0}^{\infty}(\Pr(i=i*)\Pr_h(h(A)=h(B) | i=i*))$, $\Pr(i=i*) = p_i$, $hahb|i=i* \to S_i(A, B)$
-	
-	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-	
-	Final proof: sum of $p_iS^i$ has a scheme
-	
-	L3: $S^i$ has a scheme
-	
-	L4: the sum is lshable, proven
-	
-	%%%%%%%%%%%%%%%%%%%%%%%
-	
-	Example of a pgf: $sum(2^-1 times x^i)$
-	
-	
-	----------------------------------------------------------------??sorensen dice??cosine similarity?? inner product??johnson-lindenstrauss??
-	
-	a sketch is n instance of a pgf which can be used to implement other similarities NONONONONOO
+	%a sketch is n instance of a pgf which can be used to implement other similarities NONONONONOO
 	
 	
-	%%%%%%%%%%%J
 	
-	PGF is an approach for making schemes for similarities from other schemes
+\section{Approximation of non-LSHable functions}
+
+	What can we do if there is no LSH for the similarity we want/need to use? We can approximate a function without a LSH with an LSHable one.
 	
-\section{181010}
+	\ex We can approximate $S_\gamma$ with $\jaccsim$ with an error of $\frac{1}{\gamma}$.
 	
 	Let f a PGF, $\alpha \in [0, 1]$, ...?
 	
