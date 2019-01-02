@@ -37,17 +37,20 @@
 % links
 \usepackage{hyperref}
 \hypersetup{
-    colorlinks,
-    citecolor=black,
-    filecolor=black,
-    linkcolor=black,
-    urlcolor=black
+    colorlinks=false,
+    linkbordercolor={0 0 1},
+    citebordercolor={0 0 1},
+    urlbordercolor={0 0 1},
+    pdfborderstyle={/S/U/W 1}
 }
 
 % listings style for pseudo-code and similiar
 \usepackage{listings}
 \lstset{ 
-	basicstyle=\ttfamily
+	basicstyle=\ttfamily,
+	captionpos=b,
+	language=Pascal,
+	mathescape=true
 }
 
 \subimport{.}{definitions.tex}
