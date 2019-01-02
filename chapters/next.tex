@@ -73,63 +73,85 @@
 	
 \section{Probability generating functions}
 	
-	Intuition: A probability generating function (PGF) is a \textbf{power series representation} of a given probability distribution
+	\textit{Intuition}: A probability generating function (PGF) is a power series representation of a given probability distribution
 	
-	Definition: Given a (discrete) RV X, its PGF is the function:
+	\textbf{Definition}: Given a (discrete) RV $X$, its \textbf{PGF} is the function:
+	\begin{equation}
+		\mathcal{G}en_X(\alpha)= \sum_{x=0}^{\infty}\Pr(X=x)\alpha^x
+	\end{equation}
+	(note that all outcomes appear by their probability).
 	
-	$\displaystyle \mathcal{G}en_X(\alpha)= \sum_{x=0}^{|\Omega|}\Pr(X=x)\alpha^x$ (note that all outcomes appear by their probability)
+	How to get back to pmf: $\displaystyle \Pr(X=x) = \frac{\mathcal{D}^x(\mathcal{G}en_X(0))}{x!}$  % TODO chi è D? e pmf?
 	
-	How to get back to pmf: $\displaystyle \Pr(X=x) = \frac{\mathcal{D}^x(\mathcal{G}en_X(0))}{x!}$
+	In other terms, a PGF $f$ is a function:
+	\begin{equation}
+		f(x)= \sum_{x=0}^{\infty}\left( p_i x^i \right)
+	\end{equation}
+	s.t. $p_i\geq 0 \forall i$ and $\sum_{x=0}^{\infty} p_i = 1$.
 	
-	\
+	\thm: If a similarity $S$ admits a LSH and a given function $f$ is a PGF, then $f(S)$ admits a LSH.
+	\begin{equation*}
+		f(S(A,B))=(f(S)) (A,B) =: T(A,B)
+	\end{equation*}
 	
-	Theorem: If a similarity S admits a LSH and a given function f is a PGF, then f(S) admits a LSH
+	% TODO check
+	% Afterthought: Are we "applying" a probability distribution over a similarity (which in turn, since it is lshable, means it has a probdist over a subset of hashfunctions)?
 	
-	Afterthought: Are we "applying" a probability distribution over a similarity (which in turn, since it is lshable, means it has a probdist over a subset of hashfunctions)?
+	Before going into the proof of the theorem we show a consequence of it.
 	
-	Proof: see below
+	\obs Applying the theorem to the Jaccard similarity: \\
+	Our function is $f_\gamma$, with $\gamma > 1$, defined as
+	\begin{equation} \label{eq:pgf_jacc}
+		\displaystyle f_\gamma(x) = \frac{x}{x+\gamma(1-x)}
+	\end{equation} \\
+	In order to proof $f_\gamma$ is a PGF, we have to demonstrate that the coefficients represent a probability distribution: i.e., they are all positive and they sum to zero. \\
+	By applying the Taylor series expansion to [\ref{eq:pgf_jacc}], we get \\
+	$\displaystyle
+		f_\gamma(x) = \sum_{x=1}^{\infty}\left(\frac{\left(1-\frac{1}{\gamma}\right)^i}{\gamma -1}x^i\right)
+	$; now $f_\gamma$ is a power series, so all the coefficients are positive. \\
+	In order for the sum of the coefficients to be equal to 1, the numerator must be equal to the denominator: \\
+	$\displaystyle \sum_{i=1}^{\infty} \left(\frac{\left(1-\frac{1}{\gamma}\right)^i}{\gamma -1} \right) = 1 \Rightarrow \sum_{i=1}^{\infty} \left( \left(1-\frac{1}{\gamma}\right)^i \right) = \gamma -1$. \\
+	Indeed we have:
+	\begin{flalign*}
+		\sum_{i=1}^{\infty}\left(1 - \frac{1}{\gamma}\right)^i
+		&= \left(1 - \frac{1}{\gamma}\right)\sum_{i=0}^{\infty}\left(1 - \frac{1}{\gamma}\right)^i &&\\
+		&=^{\left(*\right)} \left(1 - \frac{1}{\gamma}\right) \frac{1}{1 - \left(1 - \frac{1}{\gamma}\right)} &&\\
+		&= \frac{\gamma -1 }{\gamma}\frac{1}{1/\gamma} = \gamma -1 &&
+	\end{flalign*}
+	where the step marked with $\left(*\right)$ is due to the equality $\sum_{i=0}^{\infty} \alpha^i = \frac{1}{1-\alpha}$. \\
+	And with this we proved that $f_\gamma$ is a PGF.
 	
-	Consequence: Applying the theorem to the Jaccard similarity:
+	Now we can apply PGF to a similarity $S_\gamma$:
+	\begin{align*}
+	f_\gamma (S_\gamma(A, B))
+	&= f_\gamma \left( \frac{\abs{A \cap B}}{\abs{A \cup B}} \right) \\
+	&= \frac{\frac{\abs{A \cap B}}{\abs{A \cup B}}}
+		{\frac{\abs{A \cap B}}{\abs{A \cup B}} +
+			\gamma \frac{\abs{A \cup B} -
+				\abs{A \cap B}}{\abs{A \cup B}}} \\
+	&= \frac{\abs{A \cap B}}
+		{\abs{A \cap B} + \gamma \abs{A \vartriangle B}}
+	 = S_\gamma(A, B)
+	\end{align*}
+	which in turn is LSH-able
 	
-	%Our PGF is $\displaystyle f_\gamma(x) = \frac{x}{x+\gamma(1-x)} = $ %WRONG???
-	
-	Start with $\displaystyle f_\gamma(\alpha) = \sum_{x=1}^{\infty}\frac{(1-\frac{1}{\gamma})^x}{\gamma -1}\alpha^x$
-	
-	We have to demonstrate that the coefficients represent a probability distribution: $\displaystyle \sum_{i=1}^{\infty}\frac{(1-\frac{1}{\gamma})^i}{\gamma -1}=1 \Rightarrow \sum_{i=1}^{\infty}(1-\frac{1}{\gamma})^i=\gamma -1$
-	
-	Now: $\displaystyle \sum_{i=1}^{\infty}(1 - \frac{1}{\gamma})^i = (1 - \frac{1}{\gamma})\sum_{i=0}^{\infty}(1 - \frac{1}{\gamma})^i = (1 - \frac{1}{\gamma}) \frac{1}{1 - (1 - \frac{1}{\gamma})} = \frac{\gamma -1 }{\gamma}\frac{1}{1/\gamma} = \gamma -1$
-	
-	
-	Apply PGF to Jaccard: $f_\gamma (J(A, B)) = $ ...algebretta insiemistica... $= \frac{\cap}{\cap + \gamma\vartriangle} = S_\gamma(A, B)$, which in turn is LSH-able
-	
-	
-	\
-	
-\section{181008}
-	
-	
-	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%181008
+\section{181008}  % TODO la lasciamo questa sezione?
 	
 	%% So it actually matches the previous wikipedian def
-	Recap: Given a universe U, a function $S \in U^2 \to [0, 1]$ is said to be a LSH-able similarity iff exists prob distr over (a family/subset of) the hash functions in U, such that: 
+	\textit{Recap}: Given a universe $U$, a function $S \in U^2 \to [0, 1]$ is said to be a \textbf{LSHable similarity} iff exists a prob. distr. over (a family/subset of) the hash functions in $U$, such that: 
 	\begin{equation}
-	\forall X, Y \in U\ \ \Pr_h(h(X)=h(Y)) = S(X, Y)
+	\forall \{X, Y\} \in \binom{U}{2}\ \ \Pr_h(h(X)=h(Y)) = S(X, Y)
 	\end{equation}
 	
+	\thm If a similarity $S$ is LSH-able and $f$ is a PGF, then $f(S)$ is LSHable.
 	
-	Reprise: If a similarity S is LSHable and f is a PGF, then f(S) is LSHable
-	
-	Equivalent statement:
+	\textit{Equivalent statement}:
 	\begin{equation}
-	f(S) := T \in U^2 \to [0, 1] : \forall A, B \in U\ \ T(A, B) = f(S(A, B))
+	f(S) := T \in U^2 \to [0, 1] \text{ s.t. } \forall \{A, B\} \in \binom{U}{2}\ \ T(A, B) = f(S(A, B))
 	\end{equation}
 	
+	% TODO check
 	%Afterthought: could we just demonstrate that probability distributions are composable? lshability could be just a carried-over property...
-	
-	
-	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-	
-	\
 	
 	Lemma (1): The similarity $O \in U^2 \to [0, 1] : (A, B) \mapsto 1$ admits a LSH
 	Proof: Give prob. 1 to a constant function (duh!): $h \in U \to \mathbbm{1} A \mapsto 0 \forall A in U$
