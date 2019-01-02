@@ -58,7 +58,7 @@
 	
 	%%%%%%%%%%%%%%%%%%%%%%%
 	
-	Theorem: the algorithm correctly estimates n if $n > omega(max(1/delta^2, k/delta))$
+	Theorem: the algorithm correctly estimates n if $n > \omega(\max(1/\delta^2, k/\delta))$
 	
 		
 		IMPORTANT: Estimates can be redone, but reconstructing another revealed tree is impractical, so we're estimating a characteristic of  a tree by observing a sample revealed one and making estimates
@@ -246,9 +246,11 @@
 	
 	
 	proof that f (or c?) is submodular
-	base case n=1: couple S T can assume 4 combinations: $
-	case s, t = \{1\} \Rightarrow union an intersection f(\cdot)= 1	
-	1 in T, 1 not in S then 1 in union, 1 not in intersection
+
+	base case n=1: couple S T can assume 4 combinations:
+	
+	$case s, t = \{1\} \Rightarrow union an intersection f(\cdot)= 1	
+	1 in T, 1 \notin S then 1 in union, 1 \notin intersection
 	dual is dual
 	s, t = \emptyset
 	$
@@ -262,10 +264,10 @@
 	represent modulars as points of convex multidimensional functions
 	
 	
-	"maxcover" data una classe di sottoinsiemi di X,. S-1, si trovino k insiemiinX tail che , insieme, coprano il massinmo numero di elementi
+	"maxcover" data una classe di sottoinsiemi di X,. S-1, si trovino k insiemi in X tail che , insieme, coprano il massinmo numero di elementi
 	
 	
-	Before proving, ALGORITHM (greedy), parameterized by f, X and k: trovare k sottoinsiemi di X che massimizzano f
+	Before proving, greedy algorithm, parameterized by f, X and k: trovare k sottoinsiemi di X che massimizzano f
 	
 	$
 	S_0 <- \emptyset
@@ -327,7 +329,7 @@
 	
 	\
 	
-	if $f_1, ..., f_k \in 2^X \to \mathbb{R} are submodular, \alpha_1, ..., \alpha_k \geq 0 \Rightarrow \sum_{i=1}^{k}\alpha_i f_i is submodular$
+	if $f_1, ..., f_k \in 2^X \to \mathbb{R} \text{ are submodular}, \alpha_1, ..., \alpha_k \geq 0 \Rightarrow \sum_{i=1}^{k}\alpha_i f_i \text{ is submodular }$
 	
 	proof: the i-th case is easily proven, then sum up; nonnegativity is essential here
 	
@@ -342,7 +344,10 @@
 	return S_k
 	$
 	
-	if f is submodular, nonnegative and monotone, then $\displaystyle f(S_K)\geq(1-1/e)max_{S \in \binom{X}{K}}f(S)$
+	if f is submodular, nonnegative and monotone, then:
+	\[
+		f(S_K)\geq(1-1/e)max_{S \in \binom{X}{K}}f(S)
+	\]
 	
 	\
 	
