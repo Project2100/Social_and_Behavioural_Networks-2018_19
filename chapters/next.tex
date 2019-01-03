@@ -30,7 +30,8 @@
 		d(A,C) &= 1-S(A,C) = \Pr_h(E_{AC}) = p_1 + p_3 + p_5 + p_7 \\
 		d(B,C) &= 1-S(B,C) = \Pr_h(E_{BC}) = p_1 + p_2 + p_5 + p_6
 	\end{align*}
-	with the probabilities $p_i$ defined as in the following table, where an $X$ under the "may exist" column means that the corresponding probability is $0$ (it happens because transitivity generates contradictions, see example [\ref{ex:transitivity}]): \\\\
+	with the probabilities $p_i$ defined as in the following table, where an $X$ under the "may exist" column means that the corresponding probability is $0$ (it happens because transitivity generates contradictions, see example [\ref{ex:transitivity}]):
+
 	\begin{tabular}{lllll}
 		& $E_{AB}$ & $E_{AC}$ & $E_{BC}$ & may exist             \\
 		$p_1$ & T         & T         & T         & $\checkmark$ \\
@@ -41,8 +42,9 @@
 		$p_6$ & F         & T         & F         & X            \\
 		$p_7$ & F         & F         & T         & X            \\
 		$p_8$ & F         & F         & F         & $\checkmark$
-	\end{tabular} \\\\
-	Hence we have
+	\end{tabular}
+
+	\noindent Hence we have
 	\begin{equation*}
 		d(A,C) + d(B,C) = 2p_1 + p_2 + p_3 + 2p_5 \geq p_1 + p_2 + p_3 = d(A,B)
 	\end{equation*}
@@ -197,7 +199,7 @@
 			True because $S^{i+1}= S \cdot S^i$ is LSHable by L2 [\ref{l:pgf_2}], since $S$ has a scheme by def and $S^i$ has a scheme by inductive hypothesis.
 	\end{itemize}
 	
-	\lem \label{l:pgf_4} (4) If $p_0, p_1, ..., p_i, ...$ is s.t. $\sum_{i=0}^{\infty}p_i=1$, $p_i\geq 0 \ \forall i$, and $S_0, S_1, ... , S_i, ...$ are lshable similarities, then $\sum_{i=0}^{\infty}p_iS_i$ is lshable.
+	\lem \label{l:pgf_4} (4) If $p_0, p_1, ..., p_i, ...$ is such that $\sum_{i=0}^{\infty}p_i=1$, $p_i\geq 0 \ \forall i$, and $S_0, S_1, ... , S_i, ...$ are lshable similarities, then $\sum_{i=0}^{\infty}p_iS_i$ is lshable.
 	
 	\textit{Proof} by scheme:
 	\begin{enumerate}
@@ -282,7 +284,12 @@
 	
 	%%%%%%%%%%%%%%%%%%
 	
-	Centerlemma: Let S be a LSHable similarity $ : \exists \chi \subseteq U : \forall \{x, x'\} \in \mathcal{P}_2(\chi) S(x, x')=0$, then
+	Centerlemma: Let S be a LSHable similarity:
+	\[
+		\exists \chi \subseteq U : \forall \{x, x'\} \in \mathcal{P}_2(\chi) S(x, x')=0
+	\]
+
+	Then:
 	
 	$\forall y \in U avg_{x \in \chi}(S(X, Y) \leq) \frac{1}{|\chi|}$; (it trivially follows that $\exists x* \in \chi : S(x*, Y \leq \frac{1}{|\chi|})$)
 	

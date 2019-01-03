@@ -52,7 +52,8 @@
 	
 	Over a half: they look close. If we used the Hamming distance instead, we would (almost always) get a number very close to 1, because we're using a minuscule part of the universe set (in our case, the English dictionary), thus (almost) all words are absent from the sets.
 	
-	Now, our objective is to construct a scheme over web-pages that implement the Jaccard similarity.\\
+	Now, our objective is to construct a scheme over web-pages that implement the Jaccard similarity.
+
 	Our pre-processing step: Choose a permutation (or total ordering) $\pi \in \order(A \cup B)$ \uar. To construct said order is a simple task, as we can see with the following algorithm.
 	
 	\newpage
@@ -68,7 +69,7 @@
 	        remove $i$ from $S$
 	    end
 	    // computing hash
-	    $h_\pi(A)$ := minimum element of A, accordig to $\pi$
+	    $h_\pi(A)$ := minimum element of A, according to $\pi$
 	    return $h_\pi(A)$
 	\end{lstlisting}
 	
@@ -160,8 +161,9 @@
 	Now we can see that the probability that two hashes are equal is the Hamming similarity:
 	\begin{align*}
 		\Pr(h_i(A)=h_i(B)) &= \frac{\Pr(A[i]=B[i])}{n} \\
-		&= \frac{\Pr((A[i] \text{ and } B[i] \text{ are both } 1) \vee (A[i] \text{ and } B[i] \text{ are both } 0 ))}{n} \\
-		&= \frac{\abs{A \cap B} + \overline{\abs{A \cup B}}}{n} = \hammsim(A,B)
+		&= \frac{\Pr((A[i] = B[i] = 1) \vee (A[i] = B[i] = 0 ))}{n} \\
+		&= \frac{\abs{A \cap B} + \overline{\abs{A \cup B}}}{n} \\
+		&= \hammsim(A,B)
 	\end{align*}
 	
 	It's possible to obtain a good estimate of the similarity by repeating the test an appropriate number of time, given by the Chernoff Bound.
