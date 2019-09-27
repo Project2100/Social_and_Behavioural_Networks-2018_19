@@ -3,9 +3,17 @@
 
 \documentclass{report}
 
+\usepackage[a4paper, margin=1in]{geometry}
 \usepackage{import}
 
-\usepackage{notation}
+% mathbb command, complement symbol and others
+\usepackage{amssymb}
+
+% More blackboard symbols
+\usepackage{bbm}
+
+% binom macro
+\usepackage{amsmath}
 
 % Apply paragraph spacing
 \setlength{\parskip}{1em}
@@ -15,6 +23,16 @@
 
 % Theorem symbols
 \usepackage{amsthm}
+\newtheorem{thm}{Theorem}[section]
+\newtheorem{cor}{Corollary}[thm]
+\newtheorem{lem}[thm]{Lemma}
+\newtheorem{defn}{Definition}[section]
+\theoremstyle{definition}
+\newtheorem{obs}{Observation}[section]
+\theoremstyle{remark}
+\newtheorem{ex}{Example}[section]
+\theoremstyle{remark}
+\newtheorem{qst}{Question}[section]
 
 % adds commands \abs and \norm (from https://tex.stackexchange.com/questions/43008/absolute-value-symbols)
 \usepackage{mathtools}
@@ -38,21 +56,32 @@
 }
 
 % listings style for pseudo-code and similiar
+\usepackage[table,xcdraw]{xcolor}
+\definecolor{backgray}{RGB}{238, 238, 238}
+\definecolor{commgray}{RGB}{124,124,124}
 \usepackage{listings}
 \lstset{ 
 	basicstyle=\ttfamily,
 	captionpos=b,
-	language=Pascal,
-	mathescape=true
+	language=Delphi,
+	mathescape=true,
+    backgroundcolor=\color{backgray},
+    commentstyle=\color{commgray}
 }
+
+% images
+\usepackage{graphicx}
+\usepackage{wrapfig}
+\graphicspath{ {./images/} }
+\usepackage{pgfplots}
 
 \subimport{.}{definitions.tex}
 
-\title{Uniroma1(2018-19) - Social and Behavioural Networks}
-\author{Original author: Andrea Proietto\\[3ex]
-Contributors: Giovanni Ficarra}
-
-\date{October 2018}
+\title{
+    Social and Behavioural Networks \\
+    \large Uniroma1 2018-19 and 2019-20
+}
+\author{Andrea Proietto, Giovanni ficarra}
 
 % Questions:
 % - Revise Chernoff-Hoeffding, can't get a definitive formula
@@ -66,6 +95,12 @@ Contributors: Giovanni Ficarra}
 \subimport{chapters/}{preamble.tex}
 
 \subimport{chapters/}{intro.tex}
+
+\subimport{chapters/}{graph-models.tex}
+
+\subimport{chapters/}{meme.tex}
+
+\subimport{chapters/}{chernoff.tex}
 	
 \subimport{chapters/}{lsh.tex}
 
@@ -74,5 +109,7 @@ Contributors: Giovanni Ficarra}
 \subimport{chapters/}{181015.tex}
 
 \subimport{chapters/}{181105.tex}
+
+% \subimport{chapters/}{prova.tex}
 
 \end{document}
