@@ -25,7 +25,7 @@
         \item We call \emph{node} an entity on the web that can be a blog, a website or a social network profile
         \item A useful property of logarithms:
             \begin{equation}\label{eq:log-prop}
-                x^{\ln x} = x
+                e^{\ln x} = x
             \end{equation}
         \item A recurrent inequality:
             \begin{equation}\label{eq:e-x}
@@ -33,7 +33,7 @@
             \end{equation}
         \item Let $E_i$ be mutually independent events, then
             \begin{equation}\label{eq:prob}
-                \Pr{\bigcap_{i=0}^n E_i} \leq \prod_{i=0}^{n}(\Pr{E_i}))
+                \Pr{\bigcap_{i=0}^n E_i} \leq \prod_{i=0}^{n}\Pr{E_i}
             \end{equation}
     \end{itemize}
     
@@ -83,15 +83,15 @@
 	\begin{defn}[Union Bound]
         Let $A$ and $B$ be two events, then
         \begin{equation}\label{eq:union-bound}
-            \Pr{(A \vee B) \leq \Pr(A) + \Pr(B)}
+            \Pr{A \vee B} \leq \Pr{A} + \Pr{B}
         \end{equation}
     \end{defn}
 
     \begin{proof}
-        The theorem directly follows from the fact that probabilities are non-negative and the following property:
-        \begin{equation*}
-            \Pr{(A \vee B) = \Pr(A) + \Pr(B)} - \Pr{(A \wedge B)}
-        \end{equation*}
+        The theorem directly follows from the fact that probabilities are non-negative and from the following property:
+        \begin{equation}\label{eq:prob-or}
+            \Pr{A \vee B} = \Pr{A} + \Pr{B} - \Pr{A \wedge B}
+        \end{equation}
     \end{proof}
     
 	\begin{defn}[Generalized Union Bound]
