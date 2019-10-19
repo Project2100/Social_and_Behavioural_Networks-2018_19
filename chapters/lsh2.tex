@@ -3,83 +3,104 @@
 \section{More distances}
 	Let $A \vartriangle B = (A-B) \cup (B-A)$.
 
-	Dice similarity:
-	\begin{equation}
-	\displaystyle D(A, B) = \frac{|A\cap B|}{|A\cap B| + \frac{1}{2}|A\vartriangle B|}
-	\end{equation}
+	\begin{defn}[Dice similarity]
+    	\begin{equation}
+    	\displaystyle D(A, B) = \frac{|A\cap B|}{|A\cap B| + \frac{1}{2}|A\vartriangle B|}
+    	\end{equation}
+    \end{defn}
 	
-	Anderberg similarity:
-	\begin{equation}
-	\displaystyle An(A, B) = \frac{|A\cap B|}{|A\cap B| + 2|A\vartriangle B|}
-	\end{equation}
+	\begin{defn}[Anderberg similarity]
+        \begin{equation}
+        \displaystyle An(A, B) = \frac{|A\cap B|}{|A\cap B| + 2|A\vartriangle B|}
+        \end{equation}
+    \end{defn}
 	
-	Generalizing Jaccard, Dice and Anderberg: 
-	\begin{equation}
-	\displaystyle S_\gamma(A, B) = \frac{|A\cap B|}{|A\cap B| + \gamma|A\vartriangle B|}
-	\end{equation}
+	\begin{defn}[Generalizing Jaccard, Dice and Anderberg]
+        \begin{equation}
+        \displaystyle S_\gamma(A, B) = \frac{|A\cap B|}{|A\cap B| + \gamma|A\vartriangle B|}
+        \end{equation}
+    \end{defn}
+	
 	By this third definition we can obtain $\jaccsim$ with $\gamma=1$, $D$ with $\gamma=\frac{1}{2}$, and $An$ with $\gamma=2$.
 	
-	\textit{Question}: for which values of $\gamma$ does an LSH exist for $S$? The next lemma helps us finding an answer.
+	\begin{qst}
+        for which values of $\gamma$ does an LSH exist for $S$? The next lemma helps us finding an answer.
+    \end{qst}
 	
-	\lem (by Charikar) If a similarity $S$ admits an LSH, then the function $1-S$ must satisfy the triangular inequality, i.e. $\forall A,B,C \in U$ \\ $d(A,B) \leq d(A,C) + d(B,C)$, where the distance $d(A,B) = 1-S(A,B)$ is our function $1-S$.
+	\begin{lem}[by Charikar]
+        If a similarity $S$ admits an LSH, then the function $1-S$ must satisfy the triangular inequality, i.e. $\forall A,B,C \in U$ \\ $d(A,B) \leq d(A,C) + d(B,C)$, where the distance $d(A,B) = 1-S(A,B)$ is our function $1-S$.
+    \end{lem}
 	
-	\newpage
-	Proof: Let $E_{XY}$ be the event ``$h(X) \neq h(Y)$"; since $S$ admits a LSH, we have:
-	\begin{align*}
-		d(A,B) &= 1-S(A,B) = \Prs_h{E_{AB}} = p_1 + p_2 + p_3 + p_4 \\
-		d(A,C) &= 1-S(A,C) = \Prs_h{E_{AC}} = p_1 + p_3 + p_5 + p_7 \\
-		d(B,C) &= 1-S(B,C) = \Prs_h{E_{BC}} = p_1 + p_2 + p_5 + p_6
-	\end{align*}
-	with the probabilities $p_i$ defined as in the following table, where an $X$ under the ``may exist" column means that the corresponding probability is $0$ (it happens because transitivity generates contradictions, see example [\ref{ex:transitivity}]): \\\\
-	\begin{tabular}{lllll}
-		& $E_{AB}$ & $E_{AC}$ & $E_{BC}$ & may exist             \\
-		$p_1$ & T         & T         & T         & $\checkmark$ \\
-		$p_2$ & T         & T         & F         & $\checkmark$ \\
-		$p_3$ & T         & F         & T         & $\checkmark$ \\
-		$p_4$ & T         & F         & F         & X            \\
-		$p_5$ & F         & T         & T         & $\checkmark$ \\
-		$p_6$ & F         & T         & F         & X            \\
-		$p_7$ & F         & F         & T         & X            \\
-		$p_8$ & F         & F         & F         & $\checkmark$
-	\end{tabular} \\\\
-	Hence we have
-	\begin{equation*}
-		d(A,C) + d(B,C) = 2p_1 + p_2 + p_3 + 2p_5 \geq p_1 + p_2 + p_3 = d(A,B)
-	\end{equation*}
-	and so $1-S$ doesn't comply with the triangular inequality, QED.
+    \begin{proof}
+        Let $E_{XY}$ be the event ``$h(X) \neq h(Y)$"; since $S$ admits a LSH, we have:
+    	\begin{align*}
+    		d(A,B) &= 1-S(A,B) = \Prs_h{E_{AB}} = p_1 + p_2 + p_3 + p_4 \\
+    		d(A,C) &= 1-S(A,C) = \Prs_h{E_{AC}} = p_1 + p_3 + p_5 + p_7 \\
+    		d(B,C) &= 1-S(B,C) = \Prs_h{E_{BC}} = p_1 + p_2 + p_5 + p_6
+    	\end{align*}
+    	with the probabilities $p_i$ defined as in the following table, where an $X$ under the ``may exist" column means that the corresponding probability is $0$ (it happens because transitivity generates contradictions, see example [\ref{ex:transitivity}]): \\\\
+    	\begin{tabular}{lllll}
+    		& $E_{AB}$ & $E_{AC}$ & $E_{BC}$ & may exist             \\
+    		$p_1$ & T         & T         & T         & $\checkmark$ \\
+    		$p_2$ & T         & T         & F         & $\checkmark$ \\
+    		$p_3$ & T         & F         & T         & $\checkmark$ \\
+    		$p_4$ & T         & F         & F         & X            \\
+    		$p_5$ & F         & T         & T         & $\checkmark$ \\
+    		$p_6$ & F         & T         & F         & X            \\
+    		$p_7$ & F         & F         & T         & X            \\
+    		$p_8$ & F         & F         & F         & $\checkmark$
+    	\end{tabular}
+    
+    	Hence we have
+    	\begin{equation*}
+    		d(A,C) + d(B,C) = 2p_1 + p_2 + p_3 + 2p_5 \geq p_1 + p_2 + p_3 = d(A,B)
+    	\end{equation*}
+    	and so $1-S$ doesn't comply with the triangular inequality, QED.
+    \end{proof}
 	
 	\obs Similarities are actually defined in most cases as the inverses of measures, which in turn give (oh so surprisingly!) a notion of distance.
 	
-	\cor By Charikar's lemma, we can prove that Dice's similarity cannot admit a LSH scheme.
+	\begin{cor}
+        By Charikar's lemma, we can prove that Dice's similarity cannot admit a LSH scheme.
+    \end{cor}
+    
+	\begin{proof}[Proof by counterexample]
+        Assume $A=\{1\}, B=\{2\}, C=\{1, 2\}$, then use the triangular inequality over the distances:
+        \begin{flalign*}
+            &D(A,C)=\frac{2}{3},\ D(B,C)=\frac{2}{3},\ D(A,B)=0&\\
+            &d(A,B) = 1- D(A,B) = 1 >
+            \frac{2}{3} = (1-D(A,C)) + (1-D(B,C)) = d(A,C) + d(B,C)&
+        \end{flalign*}
+        hence it doesn't comply with the triangular inequality.
+        
+        (Note that $D$ stands for Dice similarity and $d$ for distance)
+    \end{proof}
 	
-	\textit{Proof} by counterexample: Assume $A=\{1\}, B=\{2\}, C=\{1, 2\}$, then use the triangular inequality over the distances: \\
-	$D(A,C)=\frac{2}{3},\ D(B,C)=\frac{2}{3},\ D(A,B)=0$
-	\begin{multline*}
-		d(A,B) = 1- D(A,B) = 1 > \\
-		\frac{2}{3} = (1-D(A,C)) + (1-D(B,C)) = d(A,C) + d(B,C)
-	\end{multline*}
-	hence it doesn't comply with the triangular inequality, QED.\\
-	(Note that $D$ stands for Dice similarity and $d$ for distance)
-	
-	\obs Parameterizing this counterexample with $S_\gamma$, we obtain a bounds for $\gamma$: let $A=\{1\}, B=\{2\}, C=\{1, 2\}$ and \\
-	$S_\gamma(A,C)=\frac{1}{1+\gamma},\ S_\gamma(B,C)=\frac{1}{1+\gamma},\ S_\gamma(A,B)=0$, thus
-	\begin{multline*}
-		1=1-S_\gamma(A,B)=d(A,B) > d(A,C) + d(B,C) = \\
-		(1-S_\gamma(A,C)) + (1-S_\gamma(B,C)) = 2 \left( 1- \frac{1}{1+\gamma} \right) = \frac{2\gamma}{1 + \gamma}
-	\end{multline*}
-	from which we obtain
-	$1 > \frac{2\gamma}{1 + \gamma} \Rightarrow \gamma < 1$. \\
-	Hence, if $\gamma < 1$, the triangular inequality doesn't hold, so no LSH can exist, as in the case of the Dice similarity.
+	\begin{obs}
+        Parameterizing this counterexample with $S_\gamma$, we obtain a bounds for $\gamma$: let \\ $A=\{1\},\ B=\{2\},\ C=\{1, 2\}$ and
+        $S_\gamma(A,C)=\frac{1}{1+\gamma},\ S_\gamma(B,C)=\frac{1}{1+\gamma},\ S_\gamma(A,B)=0$, thus
+        \begin{flalign*}
+            &1=1-S_\gamma(A,B) = d(A,B) > d(A,C) + d(B,C) =&\\
+            &= (1-S_\gamma(A,C)) + (1-S_\gamma(B,C)) =&\\
+            &= 2 \left( 1- \frac{1}{1+\gamma} \right) = \frac{2\gamma}{1 + \gamma}
+        \end{flalign*}
+        from which we obtain
+        $1 > \frac{2\gamma}{1 + \gamma} \Rightarrow \gamma < 1$. \\
+        Hence, if $\gamma < 1$, the triangular inequality doesn't hold, so no LSH can exist, as in the case of the Dice similarity.
+    \end{obs}
+
 	
 \section{Probability generating functions}
 	
 	\textit{Intuition}: A probability generating function (PGF) is a power series representation of a given probability distribution
 	
-	\textbf{Definition}: Given a (discrete) RV $X$, its \textbf{PGF} is the function:
-	\begin{equation}
-		\mathcal{G}en_X(\alpha)= \sum_{x=0}^{\infty}\Pr{X=x}\alpha^x
-	\end{equation}
-	(note that all outcomes appear by their probability).
+	\begin{defn}
+        Given a (discrete) RV $X$, its \textbf{PGF} is the function:
+        \begin{equation}
+        \mathcal{G}en_X(\alpha)= \sum_{x=0}^{\infty}\Pr{X=x}\alpha^x
+        \end{equation}
+        (note that all outcomes appear by their probability).
+    \end{defn}
 	
 	How to get back to pmf: $\displaystyle \Pr{X=x} = \frac{\mathcal{D}^x(\mathcal{G}en_X(0))}{x!}$  % TODO chi è D? e pmf?
 	
@@ -89,11 +110,13 @@
 	\end{equation}
 	s.t. $p_i\geq 0 \forall i$ and $\sum_{x=0}^{\infty} p_i = 1$.
 	
-	\thm: If a similarity $S$ admits a LSH and a given function $f$ is a PGF, then $f(S)$ admits a LSH.
-	\begin{equation*}
-		f(S(A,B))=(f(S)) (A,B) =: T(A,B)
-	\end{equation*}
-	
+	\begin{thm}
+        If a similarity $S$ admits a LSH and a given function $f$ is a PGF, then $f(S)$ admits a LSH.
+        \begin{equation*}
+        f(S(A,B))=(f(S)) (A,B) =: T(A,B)
+        \end{equation*}
+    \end{thm}
+    
 	% TODO check
 	% Afterthought: Are we ``applying" a probability distribution over a similarity (which in turn, since it is lshable, means it has a probdist over a subset of hashfunctions)?
 	
@@ -153,87 +176,91 @@
 	% TODO check
 	%Afterthought: could we just demonstrate that probability distributions are composable? lshability could be just a carried-over property...
 	
-	\lem \label{l:pgf_1} (L1) The similarity $O \in U^2 \to [0, 1]$ s.t. $O(A, B) \mapsto 1 \ \forall \{A, B\} \in \binom{U}{2}$ admits a LSH.
+	\lem[L1] \label{l:pgf_1} The similarity $O \in U^2 \to [0, 1]$ s.t. $O(A, B) \mapsto 1 \ \forall \{A, B\} \in \binom{U}{2}$ admits a LSH.
 	
-	\textit{Proof}: Give probability 1 to the constant hash function $h$: $h(A)=1 \ \forall A\in U$\\
-	$\Pr{h(A)=h(B)}=1=O(A,B) \ \forall \{A, B\} \in \binom{U}{2}$.
-	
-	% TODO mi sembra più chiaro così ^
-	% Give prob. 1 to a constant function (duh!): $h \in U \to \mathbbm{1} A \mapsto 0 \forall A in U$
+	\begin{proof}
+        Give probability 1 to the constant hash function $h$: $h(A)=1 \ \forall A\in U$\\
+        $\Pr{h(A)=h(B)}=1=O(A,B) \ \forall \{A, B\} \in \binom{U}{2}$.
+        
+        % TODO mi sembra più chiaro così ^
+        % Give prob. 1 to a constant function (duh!): $h \in U \to \mathbbm{1} A \mapsto 0 \forall A in U$
+    \end{proof}
 	
 	\textit{Purpose}: This will be the base case for theorem proof...
 	
-	\lem \label{l:pgf_2} (L2) If $S$ and $T$ similarities over $U$ have a scheme, then $S \cdot T : (S \cdot T)(A, B) = S(A, B)\cdot T(A, B)$ has a scheme. \\
+	\lem[L2] \label{l:pgf_2} If $S$ and $T$ similarities over $U$ have a scheme, then $S \cdot T : (S \cdot T)(A, B) = S(A, B)\cdot T(A, B)$ has a scheme. \\
 	I.e. LSHability is preserved upon composition/multiplication.
 	
-	\textit{Proof} by construction (Algorithm): 
-	\begin{itemize}
-		\item Sample hash functions for $S \cdot T$ as follows:
-		\begin{enumerate}
-			\item first, sample $h_S$ from the LSH for S;
-			\item then, sample $h_T$ independently from the LSH for T;
-		\end{enumerate}
-		\item Return the hash function $h$ s.t.
-		$H(A) = (h_S(A), h_T(A)) \ \forall A \in U$;
-		\item Thus, $\forall \{A, B\} \in \binom{U}{2}$, we have:
-		\begin{flalign*}
-			\Prs_h{h(A)=h(B)}
-			&= \Prs_{h_S}{h_S(A)=h_S(B)} \cdot \Prs_{h_T}{h_T(A)=h_T(B)} &&\\
-			&= S(A, B) \cdot T(A, B) &&
-		\end{flalign*}
-		by independency.
-	\end{itemize}
+	\begin{proof}[Proof by construction (Algorithm)]\
+        \begin{itemize}
+            \item Sample hash functions for $S \cdot T$ as follows:
+            \begin{enumerate}
+                \item first, sample $h_S$ from the LSH for S;
+                \item then, sample $h_T$ independently from the LSH for T;
+            \end{enumerate}
+            \item Return the hash function $h$ s.t.
+            $H(A) = (h_S(A), h_T(A)) \ \forall A \in U$;
+            \item Thus, $\forall \{A, B\} \in \binom{U}{2}$, we have:
+            \begin{flalign*}
+            \Prs_h{h(A)=h(B)}
+            &= \Prs_{h_S}{h_S(A)=h_S(B)} \cdot \Prs_{h_T}{h_T(A)=h_T(B)} &&\\
+            &= S(A, B) \cdot T(A, B) &&
+            \end{flalign*}
+            by independency.
+        \end{itemize}
+    \end{proof}
 	
-	\lem \label{l:pgf_3} (L3) if $S$ is LSHable, then $S^i$ is LSHable, $\forall i \in \mathbb{N}$.
+	\lem[L3] \label{l:pgf_3} If $S$ is LSHable, then $S^i$ is LSHable, $\forall i \in \mathbb{N}$.
 	
-	\
+    \begin{proof}[Proof by induction]\
+        \begin{itemize}
+            \item Base: $i=0$ and $S^0=O$ \\
+            True for L1 [\ref{l:pgf_1}];
+            \item Inductive hypothesis: $S^i$ is LSHable;
+            \item Inductive step: $S^{i+1}$ is LSHable \\
+            True because $S^{i+1}= S \cdot S^i$ is LSHable by L2 [\ref{l:pgf_2}], since $S$ has a scheme by def and $S^i$ has a scheme by inductive hypothesis.
+        \end{itemize}
+    \end{proof}
 	
-	\textit{Proof} by induction:
-	\begin{itemize}
-		\item Base: $i=0$ and $S^0=O$ \\
-			True for L1 [\ref{l:pgf_1}];
-		\item Inductive hypothesis: $S^i$ is LSHable;
-		\item Inductive step: $S^{i+1}$ is LSHable \\
-			True because $S^{i+1}= S \cdot S^i$ is LSHable by L2 [\ref{l:pgf_2}], since $S$ has a scheme by def and $S^i$ has a scheme by inductive hypothesis.
-	\end{itemize}
+	\lem[L4] \label{l:pgf_4} If $p_0, p_1, ..., p_i, ...$ is s.t. $\sum_{i=0}^{\infty}p_i=1$, $p_i\geq 0 \ \forall i$, and $S_0, S_1, ... , S_i, ...$ are lshable similarities, then $\sum_{i=0}^{\infty}p_iS_i$ is lshable.
 	
-	\lem \label{l:pgf_4} (4) If $p_0, p_1, ..., p_i, ...$ is s.t. $\sum_{i=0}^{\infty}p_i=1$, $p_i\geq 0 \ \forall i$, and $S_0, S_1, ... , S_i, ...$ are lshable similarities, then $\sum_{i=0}^{\infty}p_iS_i$ is lshable.
-	
-	\textit{Proof} by scheme:
-	\begin{enumerate}
-	\item First, sample $i*$ at random from $\mathbb{N}$ with probability $p_0, ..., p_i, ...$;
-	\item Then, sample $h$ from the hash functions (LSH) of $S_{i*}$ (that is, we are choosing which LSH to use);
-	\item Thus we have:
-	\begin{flalign*}
-		\Prs_h{h(A)=h(B)}
-		&=\sum_{i=0}^{\infty}(p_i S_i(A, B)) &&\\
-		&=\sum_{i=0}^{\infty}(\underbrace{\Pr(i=i*)}_{p_i} \cdot \underbrace{\Prs_h{h(A)=h(B) | i=i*)}}_{S_i(A,B)} &&\\
-	\end{flalign*}
-	\end{enumerate}
+	\begin{proof}[Proof by scheme]\
+        \begin{enumerate}
+            \item First, sample $i*$ at random from $\mathbb{N}$ with probability $p_0, ..., p_i, ...$;
+            \item Then, sample $h$ from the hash functions (LSH) of $S_{i*}$ (that is, we are choosing which LSH to use);
+            \item Thus we have:
+            \begin{flalign*}
+            \Prs_h{h(A)=h(B)}
+            &=\sum_{i=0}^{\infty}(p_i S_i(A, B)) &&\\
+            &=\sum_{i=0}^{\infty}(\underbrace{\Pr(i=i*)}_{p_i} \cdot \underbrace{\Prs_h{h(A)=h(B) | i=i*)}}_{S_i(A,B)} &&\\
+            \end{flalign*}
+        \end{enumerate}
+    \end{proof}
 
 	\obs This lemma is useful if we need a weighted average \\
 	$W(A,B) = \sum_{i=0}^{\infty}(p_i S_i(A, B))$.
 	
-	\textit{Proof} of the theorem [\ref{t:pgf_1}]:
-	\begin{itemize}
-	\item We want to prove that $\sum_{i=0}^{\infty}p_iS^i$ has a scheme (is LSHable);
-	\item By L3 [\ref{l:pgf_3}] we know $S^i$ has a scheme;
-	\item By L4 [\ref{l:pgf_4}] we know the sum is lshable;
-	\item Proven.
-	\end{itemize}
+	\begin{proof}[Proof of the theorem \ref{t:pgf_1}]\
+        \begin{itemize}
+            \item We want to prove that $\sum_{i=0}^{\infty}p_iS^i$ has a scheme (is LSHable);
+            \item By L3 [\ref{l:pgf_3}] we know $S^i$ has a scheme;
+            \item By L4 [\ref{l:pgf_4}] we know the sum is lshable;
+        \end{itemize}
+    \end{proof}	
 	
 	\obs This theorem tells us how to build a LSH: by concatenating the results of different hash functions, keeping the output small. \\ I.e. PGF is an approach for making schemes for similarities from other schemes.
+    
 	\ex $\sum_{i=1}^{a}(2^{-i} \cdot x^i)$.
 	
 	\section{A mention of the sketches}
 	
 	Like LSH, they're a means for simplify the storage of data; they are slower than LSH but allow you to keep interesting information in a small space.
 	
-	\textbf{Definition}: a sketch is a representation of big objects with small images. They can be used to retrieve interesting information about original objects without regain the whole original objects (i.e. they are not compression algorithms).
+	\defn[Sketch] A sketch is a representation of big objects with small images. They can be used to retrieve interesting information about original objects without regain the whole original objects (i.e. they are not compression algorithms).
 	
 	\ex It's possible to go back to $\abs{A \cap B}$ from only $|A|, |B|, h(A), h(B),$ $\jaccsim(A,B)\pm\varepsilon$. Note that $\jaccsim(A,B)\pm\varepsilon$ can be obtained from $h(A), h(B)$ by applying the Chernoff Bounf [\ref{chernoff}] and the other data need only few bits to be stored.
 	
-	\ex It's possible to approximate $\frac{\abs{A \cap B}}{\abs{A \cap B} + \frac{1}{2}\abs{A \vartriangle B}}$ with \\
+	\ex It's possible to approximate $\frac{\abs{A \cap B}}{\abs{A \cap B} + \frac{1}{2}\abs{A \vartriangle B}}$ with
 	 $\frac{1}{2} \cdot \abs{A \cup B} + \frac{1}{2} \cdot \abs{A \cap B}$.
 	
 	% TODO check
@@ -251,12 +278,14 @@
 	\ex \label{ex:appr_1} We can approximate $S_\gamma$ with $\jaccsim$ with an error of $\frac{1}{\gamma}$.
 	
 	% TODO check
-	\thm (???) Let $f$ be a PGF, $\alpha \in [0, 1]$. \\
-	\begin{flalign*}
-		& \alpha f = \alpha f(S)\ |\ (1 - \alpha)T &&\\
-		& T \in U^2 \to [0, 1] : \forall {t, t'} \in \binom{U}{2} \ T(t, t') = 0 \text{ but } T(t, t) = 1 &&\\
-		& h(t)=-t &&
-	\end{flalign*}
+    \begin{thm}
+        Let $f$ be a PGF, $\alpha \in [0, 1]$. \\
+        \begin{flalign*}
+        & \alpha f = \alpha f(S)\ |\ (1 - \alpha)T &&\\
+        & T \in U^2 \to [0, 1] : \forall {t, t'} \in \binom{U}{2} \ T(t, t') = 0 \text{ but } T(t, t) = 1 &&\\
+        & h(t)=-t &&
+        \end{flalign*}
+    \end{thm}
 	
 	For the $1$ case we wanted a banal partition, now with $0$ we want a punctual partition, so we need a hash function that assigns a distinct value to each argument. (You can actually use the identity) \\
 	Not a good scheme, because we're not shrinking data.
@@ -264,42 +293,42 @@
 	% TODO ???
 	% GOTO %&
 	
-	\textbf{Definition}: Let $S: U^2 \to [0,1]$ be a similarity, then its \textbf{distortion} is the minimum* $\delta \geq 1$ s.t. $\exists$ an LSHable similarity $S'$ s.t. $\forall {A, B} \in \binom{U}{2}$ \\ $\frac{1}{\delta} \cdot S(A, B) \leq S'(A, B) \leq S(A, B)$, where minimum* is the lower bound (if $U$ isn't finite, there is no actual minimum).
+	\defn[Distortion] Let $S: U^2 \to [0,1]$ be a similarity, then its \textbf{distortion} is the minimum* $\delta \geq 1$ s.t. $\exists$ an LSHable similarity $S'$ s.t. $\forall {A, B} \in \binom{U}{2}$ $\frac{1}{\delta} \cdot S(A, B) \leq S'(A, B) \leq S(A, B)$, where minimum* is the lower bound (if $U$ isn't finite, there is no actual minimum).
 	
 	\obs $S'$ is the LSHable similarity closest to $S$; the more $\delta$ is near to $1$, the closer $S'$ is to $S$ (i.e. $\delta$ is the \textit{approximation factor}); if $\delta$ tends to $1$, then $S$ is LSHable.
 	
 	\ex \label{ex:appr_2} In the example \ref{ex:appr_1}, where we used $\jaccsim$ to approximate $S_\gamma$, we had $\delta \to \frac{1}{\gamma}$.
 	
-	\textit{Question}: How can I know if there is a better approximation than the one I found?
+	\qst: How can I know if there is a better approximation than the one I found?
 	
-	\lem \label{l:center} (Center lemma) Let $S$ be a LSHable similarity s.t. $\exists \mathcal{X} \subseteq U : \forall \{x, x'\} \in \binom{\mathcal{X}}{2} \ S(x, x')=0$, then $\forall y \in U \ avg_{x \in \mathcal{X}}(S(X, Y)) \leq \frac{1}{\abs{\mathcal{X}}}$.
+	\lem[Center lemma] \label{l:center} Let $S$ be a LSHable similarity s.t. $\exists \mathcal{X} \subseteq U : \forall \{x, x'\} \in \binom{\mathcal{X}}{2} \ S(x, x')=0$, then $\forall y \in U \ avg_{x \in \mathcal{X}}(S(X, Y)) \leq \frac{1}{\abs{\mathcal{X}}}$.
 	
 	\obs $\mathcal{X}$ is a set of the most different objects in $U$ and $y$ is a center in $U$; so the meaning of the lemma is that the average of the distances between each point and the center is $\leq \frac{1}{\abs{\mathcal{X}}}$.
 	
 	\obs $\mathcal{X}$ is actually a (possibly incomplete) section of the partition of $U$ induced by $h$.
 	
-	\obs (important) From the lemma, it trivially follows that \\ $\exists \ x^* \in \mathcal{X} : S(x^*, Y \leq \frac{1}{\abs{\mathcal{X}}})$.
+	\obs (important) From the lemma, it trivially follows that $\exists \ x^* \in \mathcal{X} : S\left(x^*, Y \leq \frac{1}{\abs{\mathcal{X}}}\right)$.
 	
-	\
-	
-	\textit{Proof} of the Center lemma:
-	\begin{itemize}
-	\item Fix $y \in U$;
-	\item If the hash function $h$ has positive probability in the (chosen) LSH for $S$, then $\forall {x, x'} \in \binom{\mathcal{X}}{2} \ h(x)\neq h(x')$ (otherwise we would have $S(x, x')>0$);
-	\item Thus, $\forall$ hash functions with positive probability, there can exist at most one $x \in \mathcal{X}$ s.t. $h(x)=h(y)$ (by transitivity of equality);
-	\item Than we have:
-		\begin{flalign*}
-			\sum_{x \in \mathcal{X}}S(x, y)
-			&= \sum_{x \in \mathcal{X}}\Prs_h{h(x)=h(y)} &&\\
-			&= \sum_{x \in \mathcal{X}}\sum_{h}\Pr{h\ \text{is chosen}} \cdot
-				\underbrace{[h(x)=h(y)]}_{\text{pr. that $x=y$ with the choosen $h$}} &&\\
-			&= \sum_h \Pr{h \text{ is chosen}} \cdot
-				\sum_{x \in \mathcal{X}}[h(x)=h(y)] &&\\
-			&\leq \sum_h \Pr{h \text{ is chosen}} = 1 &&
-		\end{flalign*}
-	(Note that he square brackets here are a boolean evaluation operator);
-	\item Thus, $\sum_{x \in \mathcal{X}}S(x, y) \leq 1$, that implies that $avg(S(X, Y)) \leq \frac{1}{\abs{\mathcal{X}}}$, and the lemma is proven.
-	\end{itemize}
+	\begin{proof}[Proof of the Center lemma] [ref. \ref{l:center}]
+        
+    	\begin{itemize}
+    	\item Fix $y \in U$;
+    	\item If the hash function $h$ has positive probability in the (chosen) LSH for $S$, then $\forall {x, x'} \in \binom{\mathcal{X}}{2} \ h(x)\neq h(x')$ (otherwise we would have $S(x, x')>0$);
+    	\item Thus, $\forall$ hash functions with positive probability, there can exist at most one $x \in \mathcal{X}$ s.t. $h(x)=h(y)$ (by transitivity of equality);
+    	\item Than we have:
+    		\begin{flalign*}
+    			\sum_{x \in \mathcal{X}}S(x, y)
+    			&= \sum_{x \in \mathcal{X}}\Prs_h{h(x)=h(y)} &&\\
+    			&= \sum_{x \in \mathcal{X}}\sum_{h}\Pr{h\ \text{is chosen}} \cdot
+    				\underbrace{[h(x)=h(y)]}_{\text{pr. that $x=y$ with the choosen $h$}} &&\\
+    			&= \sum_h \Pr{h \text{ is chosen}} \cdot
+    				\sum_{x \in \mathcal{X}}[h(x)=h(y)] &&\\
+    			&\leq \sum_h \Pr{h \text{ is chosen}} = 1 &&
+    		\end{flalign*}
+    	(Note that he square brackets here are a boolean evaluation operator);
+    	\item Thus, $\sum_{x \in \mathcal{X}}S(x, y) \leq 1$, that implies that $avg(S(X, Y)) \leq \frac{1}{\abs{\mathcal{X}}}$, and the lemma is proven.
+    	\end{itemize}
+    \end{proof}
 		
 	\ex We will now prove what we said about $S_\gamma$'s approximation in examples [\ref{ex:appr_1}] and [\ref{ex:appr_2}], using the lemma we have just demonstrated [\ref{l:center}]:
 	\begin{itemize}
