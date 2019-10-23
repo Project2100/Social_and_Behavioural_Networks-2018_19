@@ -27,8 +27,14 @@
 % Some redundant names
 \newcommand{\coin}{\berdist}
 \newcommand{\order}{\permut}
-%\newcommand{\exx}{\emph{Example}: }
-%\newcommand{\obss}{\textbf{Observation}: }
-%\newcommand{\lemm}{\textbf{Lemma}: }
-%\newcommand{\corr}{\textbf{Corollary}: }
-%\newcommand{\thmm}{\textbf{Theorem}: }
+
+% Nicer lists
+\renewcommand{\labelitemiii}{$\circ$}
+\renewcommand{\labelenumii}{\theenumii}
+\renewcommand{\theenumii}{\theenumi.\arabic{enumii}.}
+\renewcommand{\labelenumiii}{\theenumiii}
+\renewcommand{\theenumiii}{\theenumii\arabic{enumiii}.}
+
+% Apply colored underline or overline to math expressions
+\def\mathunderline#1#2{\color{#1}\underline{{\color{black}#2}}\color{black}}
+\def\mathoverline#1#2{\color{#1}\overline{{\color{black}#2}}\color{black}}

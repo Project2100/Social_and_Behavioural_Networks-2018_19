@@ -1,10 +1,8 @@
-\newpage
 \chapter{Chernoff bound}
 
 	The Chernoff bound allows you to control how much a RV is close to its expected value.
 
-	Let $X_1, \dots, X_n \in \coin(p)$ \iid, i.e. $X_1, \dots, X_n$ are $n$ RV such that\\
-	$\Pr{X_i=1} = p$ and $\Pr{X_i=0}=1-p$.\\
+	Let $X_1, \dots, X_n \in \coin(p)$ \iid, i.e. $X_1, \dots, X_n$ are $n$ RV such that $\Pr{X_i=1} = p$ and $\Pr{X_i=0}=1-p$.
 	In other words, they are $n$ independent throws of the same coin.
 	
 	Let $X=\sum_{i=1}^{n}(X_i)$.
@@ -30,7 +28,7 @@
 	
 	\ex If you want to know how many Facebook users have more than 100 friends, you can't simply count, but you can obtain a good approximation sampling a reasonable number of profiles.
 	
-	It's important to observe that the size of the sample we need in order to obtain a good approximation depends on the error we tolerate, not on the total population.
+	\obs It's important to observe that the size of the sample we need in order to obtain a good approximation depends on the error we tolerate, not on the total population.
 	
 	There are many possible formulations of the Chernoff bound, another one that can be useful is the following:
 	\begin{equation}\label{chernoff2}
@@ -38,3 +36,16 @@
 	\end{equation}
 	
 	\ex Let be $E[X]=\frac{50}{100}$ and $\varepsilon=\frac{1}{100}$, the probability that $X \geq \frac{51}{100}$ or $X \leq \frac{49}{100}$ is less then or equal to $2e^{-\frac{1}{30000}n}$.
+    
+    Another useful formulation:
+    \begin{equation}\label{chernoff3}
+        \Pr{\abs{\left( \frac{1}{n} \sum_{i=1}^{n} X_i \right) - p} > \varepsilon} \leq 2e^{-2n\varepsilon^2}
+    \end{equation}
+    
+    \ex Let the true expected value be $p=\frac{1}{2}$, and the additive error be $\varepsilon = \sqrt{\frac{\ln(1/\delta)}{n}}$:
+    \begin{flalign*}
+        &\Pr{\abs{\text{empirical average} - \text{true expected value}} > \varepsilon} \leq 2e^{-2n\varepsilon^2}
+        = 2e^{-2n \frac{\ln(1/\delta)}{n}} = 2\delta^2&
+    \end{flalign*}
+    
+    \obs The resulting approximation doesn't depend on the probability $p$.
