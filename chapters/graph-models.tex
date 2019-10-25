@@ -347,7 +347,7 @@ Sample G(n,p):
         \textbf{Base step}, with $t=0$:\\
         At time $t+1$ the graph is $G_1$ and is composed by a single node with degree 2, as previously described (see [\ref{fig:pref-att-steps}]), so the claim holds for $c \geq \frac{2}{3}$:
         \begin{flalign*}
-            &\frac{2}{3} (t+1) -c \leq E\left[ X_{t+1}^{\left(1\right)} \right] = 0 \leq \frac{2}{3} (t+1) +c&
+            &\frac{2}{3} -c \leq E\left[ X_{1}^{\left(1\right)} \right] = 0 \leq \frac{2}{3} +c&
         \end{flalign*}
         
         \textbf{Inductive step for the upper bound}: suppose that the claim holds for $E\left[ X_{t}^{\left(1\right)} \right]$,
@@ -384,13 +384,78 @@ Sample G(n,p):
 
     \begin{lem}\label{l:pref-att-4}
         \begin{flalign}
-            &abc&
+            &E\left[ X_{t+1}^{\left(2\right)} \st X_{t}^{\left(2\right)} = x,\ X_{t}^{\left(1\right)} = y \right] = x \cdot \left( 1 - \frac{2}{2t+1} \right) + y \cdot \frac{1}{2t + 1} + \frac{1}{2t + 1}&
         \end{flalign}
     \end{lem}
     \begin{proof}
         \begin{flalign*}
-            &abc&
+            &E\left[ X_{t+1}^{\left(2\right)} \st X_{t}^{\left(2\right)} = x,\ X_{t}^{\left(1\right)} = y \right] =&\\
+            &= \mathunderline{red}{\Pr{\parbox{\textwidth/2}{node $t+1$ connects itself to some node that had degree 1 in $G_t$ or to $t+1$ itself} \st X_{t}^{\left(2\right)} = x,\ X_{t}^{\left(1\right)} = y}} \cdot (x+1) &\tag{we are adding a new node of degree 2}\\
+            &\ \ \ + \mathunderline{green}{\Pr{\parbox{\textwidth/2}{node $t+1$ connects itself to some node that had degree 2 in $G_t$} \st X_{t}^{\left(2\right)} = x,\ X_{t}^{\left(1\right)} = y}} \cdot (x-1)&\tag{we are loosing a node of degree 2}\\
+            &\ \ \ + \mathunderline{purple}{\Pr{\parbox{\textwidth/2}{node $t+1$ connects itself to some node that had degree $\geq 3$ in $G_t$} \st X_{t}^{\left(2\right)} = x,\ X_{t}^{\left(1\right)} = y}} \cdot x&\tag{the number of nodes of degree 2 does not change}\\
+            &= \mathunderline{red}{\left( y \cdot \frac{1}{2t+1} + \frac{1}{2t+1} \right)} \cdot (x+1)
+            + \mathunderline{green}{\left( x \cdot \frac{2}{2t+1} \right)} \cdot (x-1)
+            + \mathunderline{purple}{\left( 1 - y \cdot \frac{1}{2t+1} - \frac{1}{2t+1} - \frac{2x}{2t+1} \right)} \cdot x&\tag{since we have three disjoint events, where the third one is the complement of the first two}\\
+            &= \frac{y+1}{2t+1}x + \frac{y+1}{2t+1} + \frac{2x}{2t+1}x - \frac{2x}{2t+1} + \left( 1 - \frac{y+1}{2t+1} - \frac{2x}{2t+1} \right)&\\
+            &= x - \frac{2x}{2t+1} + \frac{y+1}{2t+1}&\\
+            &= x \cdot \left( 1 - \frac{2}{2t+1} \right) + \frac{y+1}{2t+1}&
         \end{flalign*}
+    \end{proof}
+
+    \begin{lem}\label{l:pref-att-5}
+        \begin{flalign}
+        &E\left[ X_{t+1}^{\left(2\right)} \right] = E\left[ X_{t}^{\left(2\right)} \right] \cdot \left( 1 - \frac{2}{2t+1} \right) + \frac{E\left[ X_{t}^{\left(1\right)} \right] +1}{2t + 1}&
+        \end{flalign}
+    \end{lem}
+    \begin{proof}
+        It is possible to prove this lemma explicitly with a procedure similar to the one used for lemma [\ref{l:pref-att-2}], but here we will present a more compact (implicit) proof:
+        \begin{flalign*}
+            &E_{X_t^{(2)}=x} \left[ E_{X_t^{(1)}=y \st X_t^{(2)}=x} \left[ x \cdot \left( 1 - \frac{2}{2t+1} \right) + \frac{y+1}{2t+1} \right] \right]&
+        \end{flalign*}
+        Note that this is possible because the expected value is linear and (in this case) also its value is linear with respect to $x$ and $y$.
+    \end{proof}
+
+    Now we are going to use the bounds found for $E\left[X_t^{(1)}\right]$ in lemma [\ref{l:pref-att-3}] to proof similar bounds for $E\left[X_{t+1}^{(2)}\right]$.
+    
+    \begin{lem}\label{l:pref-att-6}
+        \begin{flalign}
+        &\exists\ c > 0 \text{ s. t. } \forall\ t\geq 0,\ \frac{1}{6} (t+1) -c \leq E\left[ X_{t+1}^{\left(2\right)} \right] \leq \frac{1}{6} (t+1) +c&
+        \end{flalign}
+    \end{lem}
+    \begin{proof}[Proof by induction] \
+        
+        \textbf{Base step}, with $t=0$:\\
+        At time $t+1$ the graph is $G_1$ and is composed by a single node with degree 2, as previously described (see [\ref{fig:pref-att-steps}]), so the claim holds for $c \geq \frac{5}{6}$:
+        \begin{flalign*}
+        &\frac{1}{6} -c \leq E\left[ X_{1}^{\left(2\right)} \right] = 1 \leq \frac{1}{6} +c&
+        \end{flalign*}
+        
+        \textbf{Inductive step for the upper bound}: suppose that the claim holds for $E\left[ X_{t}^{\left(2\right)} \right]$,
+        \begin{flalign*}
+        E\left[ X_{t+1}^{\left(2\right)} \right] &= E\left[ X_{t}^{\left(2\right)} \right] \cdot \left( 1 - \frac{2}{2t+1} \right) + \frac{E\left[ X_{t}^{\left(1\right)} \right]+1}{2t + 1}& \tag{by lemma [\ref{l:pref-att-5}]}\\
+        &\leq \left( \frac{t}{6} + c \right) \cdot \left( 1 - \frac{2}{2t+1} \right) + \frac{\frac{2t}{3}+c+1}{2t + 1}&
+        \tag{\parbox{\textwidth/3}{by inductive hypothesis and upper bound given by [\ref{l:pref-att-3}]}}\\
+        &= \frac{t}{6} - \mathunderline{red}{\frac{1}{2t+1} \cdot \frac{t}{3}} + \mathunderline{green}{c \cdot \left( 1 - \frac{2}{2t+1} \right)} + \mathunderline{purple}{\frac{2t}{3} \cdot \frac{1}{2t+1}} + \mathunderline{green}{\frac{c}{2t+1}} + \frac{1}{2t+1}&\\
+        &= \frac{t}{6} + \frac{1}{2t+1} \cdot \left( \mathunderline{purple}{\frac{2}{3}t} - \mathunderline{red}{\frac{1}{3}t} \right) + \mathunderline{green}{c \cdot \left( 1 - \frac{2-1}{2t+1} \right)} + \frac{1}{2t+1}&\\
+        &= \frac{t}{6} + \mathunderline{cyan}{\frac{1}{2t+1} \cdot \frac{t}{3}} + c \cdot \left( 1 - \frac{1}{2t+1} \right) + \mathunderline{cyan}{\frac{1}{2t+1}}&\\
+        &= \frac{t}{6} + \mathunderline{cyan}{\frac{t}{6t+3} + \frac{3}{6t+3}} + c \cdot \left( 1 - \frac{1}{2t+1} \right)&\\
+        &= \frac{t}{6} + \mathunderline{cyan}{\frac{t+1/2}{6t+3} + \frac{5/2}{6t+3}} + c \cdot \left( 1 - \frac{1}{2t+1} \right)&\\
+        &= \frac{t+1}{6} + \frac{5/2}{6t+3} + c - \frac{3c}{6t+3}& \tag{since $\frac{t+1/2}{6t+3} = \frac{1}{6}$}\\
+        &\leq \frac{t+1}{6} + c& \tag{since $\frac{5/2}{6t+3} - \frac{3c}{6t+3} \leq 0$ if $c \geq \frac{5}{6}$}
+        \end{flalign*}
+        
+        \textbf{Inductive step for the lower bound}: suppose that the claim holds for $E\left[ X_{t}^{\left(2\right)} \right]$,
+        \begin{flalign*}
+            E\left[ X_{t+1}^{\left(2\right)} \right] &= E\left[ X_{t}^{\left(2\right)} \right] \cdot \left( 1 - \frac{2}{2t+1} \right) + \frac{E\left[ X_{t}^{\left(1\right)} \right]+1}{2t + 1}& \tag{by lemma [\ref{l:pref-att-5}]}\\
+            &\geq \left( \frac{t}{6} - c \right) \cdot \left( 1 - \frac{2}{2t+1} \right) + \frac{\frac{2t}{3}-c+1}{2t + 1}&
+            \tag{\parbox{\textwidth/3}{by inductive hypothesis and lower bound given by [\ref{l:pref-att-3}]}}\\
+            &= \frac{t}{6} + \frac{1}{2t+1} \cdot \left( \frac{2}{3}t - \frac{1}{3}t \right) - c \cdot \left( 1 - \frac{2-1}{2t+1} \right) + \frac{1}{2t+1}&\\
+            &= \frac{t}{6} + \frac{t+3}{6t+3} - c \cdot \left( 1 - \frac{1}{2t+1} \right)&\\
+            &\geq \frac{t}{6} + \frac{t+1/2}{6t+3} -c&\tag{$*$}\\
+            &= \frac{t+1}{6}-c&\tag{since $\frac{t+1/2}{6t+3}=\frac{1}{6}$}
+        \end{flalign*}
+        
+        Note that most steps are analogous to those in the previous part of the proof (the inductive step for the upper bound), so we skipped some intermediate steps, while the step marked with $*$ is due to the fact that we subtracted the positive value $\frac{5/2}{6t+3}$ to  $\frac{t+3}{6t+3}$ and divided $c \cdot \left( 1 - \frac{1}{2t+1} \right)$ by its second factor, that is $<1$.
     \end{proof}
 
 
@@ -399,8 +464,8 @@ Sample G(n,p):
             &abc&
         \end{flalign}
     \end{lem}
-    \begin{proof}
+        \begin{proof}
         \begin{flalign*}
-            &abc&
+        &abc&
         \end{flalign*}
     \end{proof}
