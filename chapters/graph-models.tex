@@ -1,4 +1,4 @@
-\chapter{Modeling users' behaviors}\label{sec:users-behaviors}
+\chapter{Modeling users' behaviors \\ \LARGE(Graph models)}\label{sec:users-behaviors}
 
     If we want to infer some information about a huge graph, such as the ones behind the web or Facebook, we usually can't perform our computation directly on the real graph, so we use models of the graph.
 
@@ -267,7 +267,7 @@ Sample G(n,p):
     Now, our claim about the degree distribution.
     
     \begin{thm}\label{thm:pref-attach-degree}
-        Let $X_t^{\left(d\right)}$ be the number of nodes that have degree $d$ in $G_t$, then \\ $E\left[X_t^{\left(d\right)}\right] = t \cdot \frac{4}{(d+2) \cdot (d+1) \cdot d} + O(1)$.
+        Let $X_t^{\left(d\right)}$ be the number of nodes that have degree $d$ in $G_t$, then \\ $E\left[X_t^{\left(d\right)}\right] = t \cdot \frac{4}{(d+2) \cdot (d+1) \cdot d} \pm O(1)$.
     \end{thm}
 
     Note that is meaningful to study the expected value because the random variable $X$ is concentrated.
@@ -459,13 +459,85 @@ Sample G(n,p):
     \end{proof}
 
 
-    \begin{lem}\label{l:pref-att-n}
+\subsubsection{\large{Inductive step: $d \geq 3$.}}
+
+    \begin{lem}\label{l:pref-att-7}
         \begin{flalign}
-            &abc&
+            &E\left[ X_{t+1}^{\left(d\right)} \st X_{t}^{\left(d\right)} = x,\ X_{t}^{\left(d-1\right)} = y \right] = x \cdot \left( 1 - \frac{d}{2t+1} \right) + y \cdot \frac{d-1}{2t + 1}&
         \end{flalign}
+        Note that the third term in [\ref{l:pref-att-4}] is absent here, since an eventual self loop wouldn't affect the number of nodes of degree $d$, with $d \geq 3$.
     \end{lem}
-        \begin{proof}
+    \begin{proof}
         \begin{flalign*}
-        &abc&
+            &E\left[ X_{t+1}^{\left(d\right)} \st X_{t}^{\left(d\right)} = x,\ X_{t}^{\left(d-1\right)} = y \right]=&\\
+            &= \Pr{\parbox{\textwidth/2}{node $t+1$ connects itself to some node that had degree $d-1$ in $G_t$} \st X_{t}^{\left(2\right)} = x,\ X_{t}^{\left(1\right)} = y} \cdot (x+1) &\tag{we are adding a new node of degree $d$}\\
+            &\ \ \ + \Pr{\parbox{\textwidth/2}{node $t+1$ connects itself to some node that had degree $d$ in $G_t$} \st X_{t}^{\left(2\right)} = x,\ X_{t}^{\left(1\right)} = y} \cdot (x-1)&\tag{we are loosing a node of degree $d$}\\
+            &\ \ \ + \Pr{\parbox{\textwidth/2}{node $t+1$ connects itself to some node (possibly itself) that had degree $\neq d$ and $\neq d-1$ in $G_t$} \st X_{t}^{\left(2\right)} = x,\ X_{t}^{\left(1\right)} = y} \cdot x&\tag{the number of nodes of degree $d$ does not change}\\
+            &= \frac{d-1}{2t+1} \cdot y \cdot (x+1) + \frac{d}{2t+1} \cdot x \cdot (x-1) + \left( 1 - \frac{(d-1)y}{2t+1} - \frac{dx}{2t+1} - \frac{2x}{2t+1} \right) \cdot x&
+            \tag{since we have three disjoint events, where the third one is the complement of the first two}\\
+            &= x \cdot \left( 1 - \frac{d}{2t+1} \right) + y \cdot \frac{d-1}{2t+1}&\tag{since we simplify similar terms}
         \end{flalign*}
     \end{proof}
+
+    \begin{lem}\label{l:pref-att-8}
+        \begin{flalign}
+        &E\left[ X_{t+1}^{\left(d\right)} \right] =
+        E\left[ X_{t}^{\left(d\right)} \right] \cdot
+        \left( 1 - \frac{d}{2t+1} \right) +
+        E\left[ X_{t}^{\left(d-1\right)} \right] \cdot \frac{d-1}{2t + 1}&
+        \end{flalign}
+    \end{lem}
+    \begin{proof}
+        It is possible to prove this lemma explicitly as we did for lemma [\ref{l:pref-att-2}], or implicitly as we did for lemma [\ref{l:pref-att-5}].
+    \end{proof}
+
+    \begin{lem}\label{l:pref-att-9}
+        \begin{flalign}
+            &\frac{4(t+1)}{(d+2)(d+1)d} - c \leq
+            E\left[ X_{t+1}^{\left(d\right)} \right] \leq
+            \frac{4(t+1)}{(d+2)(d+1)d} + c&
+        \end{flalign}
+    \end{lem}
+    \begin{proof}[Proof by induction] \
+        
+        \textbf{Base step}, with $t=0$:\\
+        At time $t+1$ the graph is $G_1$ and is composed by a single node with degree 2, as previously described (see [\ref{fig:pref-att-steps}]), so the claim holds for $c \geq 1$:
+        \begin{flalign*}
+            &0 \leq E\left[ X_{t+1}^{\left(d\right)} \right] = 0 \leq 1&
+        \end{flalign*}
+        
+        \textbf{Inductive step for the upper bound}: suppose that the claim holds for $E\left[ X_{t}^{\left(d\right)} \right]$,
+        \begin{flalign*}
+            E\left[ X_{t+1}^{\left(d\right)} \right] &=
+            E\left[ X_{t}^{\left(d\right)} \right] \cdot
+            \left( 1 - \frac{d}{2t+1} \right) +
+            E\left[ X_{t}^{\left(d-1\right)} \right] \cdot \frac{d-1}{2t + 1}&\tag{by lemma [\ref{l:pref-att-8}]}\\
+            &\leq \left( \frac{4t}{(d+2)(d+1)d} +c \right) \cdot \left( 1 - \frac{d}{2t+1} \right) + \left( \frac{4t}{(d+1)(d-1)d} +c \right) \cdot \frac{d-1}{2t+1}&\tag{by inductive hypothesis}\\
+            &= \frac{4t}{(d+2)(d+1)d} - \frac{4t}{(d+2)(d+1)(2t+1)} + c \cdot \left( 1 - \frac{d}{2t+1} \right) + \frac{4t}{(d+1)(2t+1)d} + c \cdot \frac{d-1}{2t+1}&\\
+            &= \frac{4t}{(d+2)(d+1)d} + \frac{4t}{2t+1} \cdot \left( \frac{1}{(d+1)d} - \frac{1}{(d+1)(d+2)} \right) + c \cdot \left( 1 - \frac{d}{2t+1} + \frac{d-1}{2t+1} \right)&\\
+            &= \frac{4t}{(d+2)(d+1)d} + \frac{4t}{2t+1} \cdot \frac{d+2-d}{(d+2)(d+1)d} + c \cdot \left( 1 - \frac{1}{2t+1} \right)&\\
+            &\leq \frac{4t}{(d+2)(d+1)d} + \frac{8t+4}{(2t+1)(d+2)(d+1)d} +c &\tag{since $1 - \frac{1}{2t+1} < 1$}\\
+            &= \frac{4t}{(d+2)(d+1)d} + \frac{4}{(d+2)(d+1)d} +c &\tag{\parbox{0.45\textwidth}{we added +4 to the numerator of the second fraction, since this allows us the simplification and doesn't affect the upper bound}}\\
+            &= \frac{4(t+1)}{(d+2)(d+1)d} + c&
+        \end{flalign*}
+        
+        \textbf{Inductive step for the lower bound}: suppose that the claim holds for $E\left[ X_{t}^{\left(d\right)} \right]$,
+        \begin{flalign*}
+            E\left[ X_{t+1}^{\left(d\right)} \right] &=
+            E\left[ X_{t}^{\left(d\right)} \right] \cdot
+            \left( 1 - \frac{d}{2t+1} \right) +
+            E\left[ X_{t}^{\left(d-1\right)} \right] \cdot \frac{d-1}{2t + 1}&\tag{by lemma [\ref{l:pref-att-8}]}\\
+            &\leq \left( \frac{4t}{(d+2)(d+1)d} -c \right) \cdot \left( 1 - \frac{d}{2t+1} \right) + \left( \frac{4t}{(d+1)(d-1)d} -c \right) \cdot \frac{d-1}{2t+1}&\tag{by inductive hypothesis}\\
+            &= \frac{4t}{(d+2)(d+1)d} - \frac{4t}{(d+2)(d+1)(2t+1)} - c \cdot \left( 1 - \frac{d}{2t+1} \right) + \frac{4t}{(d+1)(2t+1)d} - c \cdot \frac{d-1}{2t+1}&\\
+            &= \frac{4t}{(d+2)(d+1)d} + \frac{4t}{2t+1} \cdot \left( \frac{1}{(d+1)d} - \frac{1}{(d+1)(d+2)} \right) - c \cdot \left( 1 - \frac{1}{2t+1} \right)&\\
+            &= \frac{4t}{(d+2)(d+1)d} + \frac{4t}{2t+1} \cdot \frac{2}{(d+2)(d+1)d} - c + \frac{c}{2t+1}&\\
+            &= \frac{4t}{(d+2)(d+1)d} + \frac{8t+4}{(2t+1)(d+2)(d+1)d} -\frac{4}{(2t+1)(d+2)(d+1)d} + \frac{c}{2t+1} -c &\tag{$*^1$}\\
+            &= \frac{4t}{(d+2)(d+1)d} + \frac{4}{(d+2)(d+1)d} -\frac{4}{(2t+1)(d+2)(d+1)d} + \frac{c}{2t+1} -c &\\
+            &= \frac{4(t+1)}{(d+2)(d+1)d} + \frac{1}{2t+1} \left( c - \frac{4}{(d+2)(d+1)d} \right) - c&\\
+            &\geq \frac{4(t+1)}{(d+2)(d+1)d} - c&\tag{$*^2$}
+        \end{flalign*}
+        Note that, in the step marked by $*^1$, we added and subtracted $\frac{4}{(2t+1)(d+2)(d+1)d}$ so that we could simplify the second fraction.\\
+        In the last step, marked with $*^2$, we subtracted a positive term, since $\frac{4}{(d+2)(d+1)d} \leq \frac{4}{5 \cdot 4 \cdot 3} = \frac{1}{15} \leq c$, for $d \geq 3$, so the inequality holds.
+    \end{proof}
+
+    This finally concludes the proof of the theorem [\ref{thm:pref-attach-degree}].
