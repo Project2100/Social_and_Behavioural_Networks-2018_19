@@ -15,35 +15,17 @@
 % binom macro
 \usepackage{amsmath}
 
+% Theorem symbols
+\usepackage{amsthm}
+
 % Apply paragraph spacing
 \setlength{\parskip}{1em}
 
 % Put all formulae in display style for fractions, binomial coefficients, etc.
 \everymath{\displaystyle}
 
-% Theorem symbols
-\usepackage{amsthm}
-\newtheorem{thm}{Theorem}[section]
-\newtheorem{cor}{Corollary}[thm]
-\newtheorem{lem}[thm]{Lemma}
-\newtheorem{defn}{Definition}[section]
-\theoremstyle{definition}
-\newtheorem{obs}{Observation}[section]
-\theoremstyle{remark}
-\newtheorem{ex}{Example}[section]
-\theoremstyle{remark}
-\newtheorem{qst}{Question}[section]
-
-% adds commands \abs and \norm (from https://tex.stackexchange.com/questions/43008/absolute-value-symbols)
+% addsnew math commands
 \usepackage{mathtools}
-\DeclarePairedDelimiter\abs{\lvert}{\rvert}%
-\DeclarePairedDelimiter\norm{\lVert}{\rVert}%
-\makeatletter
-\let\oldabs\abs
-\def\abs{\@ifstar{\oldabs}{\oldabs*}}
-\let\oldnorm\norm
-\def\norm{\@ifstar{\oldnorm}{\oldnorm*}}
-\makeatother
 
 % links
 \usepackage{hyperref}
@@ -109,9 +91,11 @@
 
 \subimport{chapters/}{lsh2.tex}
 
-\subimport{chapters/}{181015.tex}
+\subimport{chapters/}{lp.tex}
 
-\subimport{chapters/}{181105.tex}
+% \subimport{chapters/}{181015.tex}
+
+% \subimport{chapters/}{181105.tex}
 
 % \subimport{chapters/}{prova.tex}
 

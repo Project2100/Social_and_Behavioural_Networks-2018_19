@@ -38,3 +38,32 @@
 % Apply colored underline or overline to math expressions
 \def\mathunderline#1#2{\color{#1}\underline{{\color{black}#2}}\color{black}}
 \def\mathoverline#1#2{\color{#1}\overline{{\color{black}#2}}\color{black}}
+
+% Theorems
+\newtheorem{thm}{Theorem}[section]
+\newtheorem{cor}{Corollary}[thm]
+\newtheorem{claim}{Claim}[thm]
+\newtheorem{lem}[thm]{Lemma}
+\newtheorem{defn}{Definition}[section]
+\theoremstyle{definition}
+\newtheorem{obs}{Observation}[section]
+\theoremstyle{remark}
+\newtheorem{ex}{Example}[section]
+\theoremstyle{remark}
+\newtheorem{qst}{Question}[section]
+
+% adds commands \abs and \norm (from https://tex.stackexchange.com/questions/43008/absolute-value-symbols)
+\DeclarePairedDelimiter\abs{\lvert}{\rvert}%
+\DeclarePairedDelimiter\norm{\lVert}{\rVert}%
+\makeatletter
+\let\oldabs\abs
+\def\abs{\@ifstar{\oldabs}{\oldabs*}}
+\let\oldnorm\norm
+\def\norm{\@ifstar{\oldnorm}{\oldnorm*}}
+\makeatother
+
+% other math commands
+\DeclareMathOperator*{\argmin}{arg\,min}
+\DeclareMathOperator*{\argmax}{arg\,max}
+\DeclareMathOperator*{\avg}{avg}
+
