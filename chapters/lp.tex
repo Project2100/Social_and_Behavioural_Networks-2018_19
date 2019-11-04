@@ -296,7 +296,7 @@ What we will be proving is that the optimal solution $OPT_{LP}$ of this LP is eq
             &= \sum_{i=1}^n Y_{\pi_{(i)}} = \sum_{i=1}^n Y_i&
         \end{flalign*}
         
-        The step marked by $(*^3)$ is due to the fact that we can remove the last term of the sum by just working on the indices.\\
+        The step marked by $(*^2)$ is due to the fact that we can remove the last term of the sum by just working on the indices.\\
         The step marked by $(*^3)$ is due to the fact that for $i=0$ and for $i=n$ the value of the term is $0$, so we can sum from $1$ to $n$ as in the first sum, to obtain compatible addends.
     \end{proof}
     
@@ -778,10 +778,3 @@ $DS_\varepsilon(G(V,E))$:
 \end{proof}
 
 To conclude, we can say that not only this algorithm is very efficient, but it can also be easily implemented in parallel with frameworks such as MapReduce or Pregel.
-
-
-
-
-
-
-
