@@ -213,3 +213,203 @@ Let's take a function $f: 2^{[n]} \to \mathbb{R}$, we can define three classes o
         f(S) = z + \sum_{i \in S} w_i.
     \end{equation}
 \end{thm}
+
+\subsection{Submodular functions properties}
+\begin{lem}[Diminishing return property] \label{lem:dim-return}
+    If $f$ is submodular and $S \subseteq T$, $i \notin T$, then
+    \[
+        \Delta(i|S) \geq \Delta(i | T)
+    \]
+\end{lem}
+
+\begin{proof}
+    Let's take $A = S \cup {i}, B = T$
+    \begin{align*}
+        f(A) + f(B) &\geq f(A \cup B) + f(A \cap B) \tag{by submodularity}\\
+        f(S \cup \{ i\} ) + f(T) &\geq f(T \cup \{ i\}) + f(S) \tag{by definition of A,B} \\
+        f(S \cup \{ i \}) - f(S) &\geq f(T \cup \{i\}) - f(T) \\
+        \Delta(i|S) &\geq \Delta(i | T) \tag{by definition of $\Delta$ }
+    \end{align*}
+\end{proof}
+
+\begin{obs}
+    The lemma is actually an ``if and only if''; proof of the inverse implication is left as an exercise.
+\end{obs}
+
+\begin{obs}
+    If $f$ was modular in \cref{lem:dim-return} the equality would hold instead.
+\end{obs}
+
+\begin{lem}\label{lem:submodular-power-function}
+    if $f_1, f_2, \dots, f_k: 2^x \mapsto \mathcal{R}$ are submodular, and $\alpha_1, \alpha_2 , \dots, \alpha_k \geq 0$ then
+    \[
+        g(S) \overset{\Delta}{=} \sum_{i=1}^{k} \alpha_i f_i(S)
+    \]
+    is submodular as well.
+\end{lem}
+
+\begin{proof}
+    \begin{align*}
+        g(S) + g(T) &= \sum_{i=1}^{k} \alpha_i f_i(S) + \sum_{i=1}^{k} \alpha_i f_i(T) = \sum_{i=1}^{k} \alpha_i f_i(S) + \alpha_i f_i(T) \\
+        &= \sum_{i=1}^{k} \alpha_i \left( f_i(S) + f_i(T) \right) \geq \sum_{i=1}^{k} \alpha_i \left(f_i (S \cap T) + f_i (S \cup T) \right) \\
+        &= \sum_{i=1}^{k} \alpha_i f_i(S \cap T) + \sum_{i=1}^{k} \alpha_i f_i (S \cup T) \\
+        &= g(S \cap T) + g(S \cup T)
+    \end{align*}
+\end{proof}
+
+\begin{obs}
+    If one of the $\alpha$s is negative the \cref{lem:submodular-power-function} doesn't hold.
+\end{obs}
+
+\subsubsection{One particular submodular function}
+
+\begin{defn}
+    Let $ C \subseteq 2^{[n]}, \ w: C \mapsto \mathcal{R}_{\geq 0 }, \ A \subseteq [n] $
+    \[
+        f_C(A) = \sum_{S \in C}\left( w(S) \cdot \left[ A \cap S \neq \emptyset \right] \right)
+    \]
+\end{defn}
+%
+This function looks for all the sets of a class and sums the weights of the ones that intersect the parameter set.
+%
+\begin{lem} \label{fC-submodular}
+    $f_C(A)$ is submodular.
+\end{lem}
+%
+\begin{proof} 
+    Fix $A,B \subseteq [n]$; let 
+    \begin{align*}
+        C_A &= \left\{ S | S \in C \ \land \ S \cap A \neq \emptyset \ \land \ S \cap B = \emptyset \right\} \\
+        C_B &= \left\{ S | S \in C \ \land  \ S \cap B \neq \emptyset \ \land \ S \cap A = \emptyset \right\} \\
+        C_{\cap} &= \left\{ S | S \in C \ \land \ S \cap A \neq \emptyset \ \land \ S \cap B \neq \emptyset \right\}
+    \end{align*}
+    \textit{i.e.}, $C_A$ are the sets that intersect $A$ but not $B$, $C_B$ are the sets that intersect $B$ but not $A$ and $C_{\cap}$ are the sets that intersect both $A$ and $B$.
+    %
+    \begin{obs}
+        The conditions are mutually exclusive.
+    \end{obs}
+    %
+    \begin{align}
+        f_C(A) &= \sum_{S \in C_A}w(S) + \sum_{s \in C_{\cap}}w(S) \\
+        f_C(B) &= \sum_{S \in C_B}w(S) + \sum_{s \in C_{\cap}}w(S) \\
+        f_C(A \cup B) &= \sum_{S \in C_A}w(S) + \sum_{S \in C_B}w(S) + \sum_{s \in C_{\cap}}w(S) \\
+        f_C(A \cap B) &\leq \sum_{s \in C_{\cap}}w(S) \label{eq:AcapB-leq-sum}\tag{*}
+    \end{align}
+
+    \cref{eq:AcapB-leq-sum} is true because of cases like the one in \cref{fig:sets-intersect-empty}; in general in $C_{\cap}$ there may be more sets than in $A \cap B$.
+
+    \begin{figure}[ht]
+        \centering
+        \includegraphics[width=.5\textwidth]{sets-intersect-empty.png}
+        \caption{Set C has non-empty intersection with both B and A but does not intersect their intersection.}\label{fig:sets-intersect-empty}
+    \end{figure}
+    
+    So we have that 
+    \begin{align}
+        f_C(A) + f_C(B) &= \sum_{S \in C_A}w(S) + \sum_{S \in C_B}w(S) + 2 \sum_{S \in C_{\cap}} w(S) \\
+                        &= f_C(A \cup B) + \sum_{S \in C_{cap}} w(S) \\
+                        &\geq f_C(A \cup B) + f_C(A \cap B) \tag{by inequality \cref{eq:AcapB-leq-sum}}
+    \end{align}
+\end{proof}
+
+\subsection{KKT model}
+
+KKT stands for Kempe, Kleinsberg and Tardos.
+Let's assume we have $k$ gift products to give to $k$ persons for free for marketing reasons; let's assume as well that whenever a person buys the product he keeps it forever.
+
+Moreover, let's assume that time is discrete and that the product spreads over time:
+\begin{itemize}
+    \item at time $t_0$ the only persons having the product will be the ones that got it for free;
+    \item at time $t_i$ for each of the edges incident on the nodes having the product we will be flipping a coin:
+    \begin{itemize}
+        \item with prob $p$ the product will spread on that edge;
+        \item else the edge is lost forever.
+    \end{itemize}  
+\end{itemize} 
+
+While this point of view is dynamic, there is a static point of view which states the following:
+Regardless of which nodes are activated at time 0 what actually happens is that a coin is flipped indipendently for each edge in the graph: 
+%
+\begin{itemize}
+    \item if the coin is $H$ the edge will stay there;
+    \item else the edge will be removed (won't be used for spreading the product).
+\end{itemize}
+
+Nature will then make its choices, removing some edges. 
+By looking at the connected components after nature removes the edges we see that:
+%
+\begin{itemize}
+    \item each connected component containing at least one seed node will be fully conquered;
+    \item the others will be forever lost.
+\end{itemize}  
+
+If we knew the final components, it would be clear which seed set to choose (we would sort the components in decreasing size and pick one node for each of the first $k$ components); sadly, this is not the case because the set of seed nodes must be chosen a priori.
+
+Suppose that after nature's random choices, A is the set of ``used'' edges, and $C_A$ is the partition of the node set $V$ into connected components with $A$ as the edge set.
+Let $R(S)$ be the set of nodes ``conquered'' with seed set $S$; this is clearly a random variable depending on which edges survive.
+
+We can now ask what's the expected cardinality of the reached set $R(S)$ conditioned on the used edges set $A$; we, in fact, would like to maximize this quantity.
+%
+\begin{align}
+    E\left[\abs{R(S)} \big\rvert A\right] = \sum_{T \in C_A}{\left( \abs{T} \cdot \left[ T \cap S \neq \emptyset \right] \right)} \overset{\Delta}{=} f_A(S)
+\end{align}
+
+\begin{claim}
+    $f_A$ is submodular. 
+\end{claim}
+
+\begin{proof}
+    See \cref{fC-submodular}.
+\end{proof}
+
+Moreover, we can define the expected value as a function of $S$ without conditioning it on a particular $A$ by using the law of total expectation.
+\begin{align}
+    f(S) = \sum_{A \subseteq E}\left( f_A(S) \cdot Pr\left\{ \text{A is the set of survived edges} \right\} \right) = E\left[ \abs{R(S)} \right]
+\end{align}
+
+\begin{claim}
+    $f(S)$ is submodular.
+\end{claim}
+
+\begin{proof}
+    Follows from \cref{lem:submodular-power-function}.
+\end{proof}
+
+The problem in optimazing this function is that computing it on a single set takes exponential time, but it can be approximated very well; as an exercise you can try to give the best sampling algorithm to do it.
+
+\subsection{Greedy}
+
+Now we present a greedy algorithm that gives an approximation for $f$:
+
+\begin{lstlisting}[caption={Greedy algorithm},label={lst:fS-greedy}]
+$Greedy_{f,\varepsilon}$($k$):
+    $S_0 \gets \emptyset$
+    for $i = 1, \ldots, k$:
+        let $x_i \ be \ s.t. \ \Delta(x_i|S_{i-1}) \geq (1- \varepsilon) \cdot \max_x \Delta(x | S_{i-1})$
+        $S_i \gets S_{i-1} \cup \{x_i\}$
+    return $S_k$
+\end{lstlisting}
+
+\begin{thm}
+    If $f$ is monotone, non-negative and submodular GREEDY returns a $(1-e^{-1+\epsilon})$-approximation.
+\end{thm}
+
+\begin{proof}
+    \begin{flalign*}
+            S^{\star} = {x_1^*, x_2^*, \ldots, x_k^*}   \tag{optimal solution}&\\
+            \forall i \in  \{0, \ldots, k-1\}&\\
+            f(S^*) &\leq f(S^* \cup S_i)    \tag{by monotonicity of $f$}&\\
+            &= f(S_i) + \left( f(\{x_1^*\} \cup S_i) - f(S_i) \right)&\\
+            &\phantom{\ = f(S_i)} + \left( f(\{x_1^*, x_2^*\} \cup S_i ) - f(\{x_1^*\} \cup S_i) \right)&\\
+            &\phantom{\ = f(S_i)} + \ldots&\\
+            &\phantom{\ = f(S_i)} + \left( f(\{x_1^*, \ldots, x_{k-1}^*\} \cup S_i ) - f(\{x_1^*, \ldots, x_{k-2}^*\} \cup S_i) \right)&\\
+            &\phantom{\ = f(S_i)} + \left( f(S^* \cup S_i \right) - f(\{x_1^*, \ldots, x_{k-1}^*\} \cup S_i)&\tag{telescoping series -- see $(*^1)$}\\
+            &= f(S_i) + \Delta(x_1^* | S_i) + \Delta(x_2^* | S_i \cup \{x_1^*\}) + \ldots \Delta(x_k^* | S_i \cup \{x_1^*, \ldots, x_{k-1}^*\})\\
+            &= f(S_i) + \sum_{j=1}^{k} \left( \Delta(x_j^* | S_i \cup \{x_1^*, \ldots, x_{j-1}^*\})\right)\\
+            &\leq f(S_i) + \sum_{j=1}^{k} \left( \Delta(x_j^* | S_i )\right)&\tag{by diminishing returns -- see $(*^2)$}\\
+            &\leq f(S_i) + \sum_{j=1}^{k} \left( \frac{1}{1-\epsilon}\Delta(x_{i+1} | S_i )\right)&\tag{GREEDY}\\
+            &= f(S_i) +\frac{k}{1-\epsilon} \Delta(x_{i+1} | S_i )\\
+    \end{flalign*}
+
+    where $(*^1)$ and $(*^2)$ are explained in detail in the proof of \cref{l:mcp-1}.
+\end{proof}
