@@ -43,8 +43,12 @@
     
     Then we have some useful definitions.
     
-    \begin{defn}[Expected value]
-        $E[X]$ is called the \textit{expected value} because it means the midpoint where all outcomes, compounded with their weight, contribute to the equilibrium.
+    \begin{defn}[Expected value]\label{def:expected-value}
+        Let $X$ be a random variable with a finite number $n$ of finite outcomes $x_{1},x_{2},\ldots,x_{n}$ occurring with probabilities $p_{1},p_{2},\ldots,p_{n}$ respectively. Then The expected value of $X$ is
+        \begin{equation}
+            E[X] = \sum_{i=1}^{n} x_i \cdot p_i.
+        \end{equation}
+        Note that $E[X]$ is called the \textit{expected value} because it means the midpoint where all outcomes, compounded with their weight, contribute to the equilibrium.
         
         \begin{qst}
             Can we still talk about expected value when the outcomes are not numeric? What could be a good bijection between a generic sample space $\Omega$ and $\nonneg$?
@@ -108,7 +112,7 @@
 	If the events are mutually disjoint, then the equality is strict.
 
 	
-\subsection{Markov inequality}
+\subsection{Markov's inequality}
 	
 	Let $X$ be a non-negative random variable (RV) in a sample space $\Omega$, and $a$ an outcome in $\Omega$, then:
 	
@@ -135,6 +139,14 @@
 	More about this \href{https://youtu.be/vjYanZ1nsZg}{here} or \href{https://ocw.mit.edu/resources/res-6-012-introduction-to-probability-spring-2018/part-i-the-fundamentals/}{here}.
 
 
+\subsection{Chebyshev's inequality}
+
+    Let $X$ (integrable) be a random variable with finite expected value $\mu$ and finite non-zero variance $\sigma^2$. Then, for any real number $k > 0$,
+    \begin{equation}\label{eq:chebyshev}
+        \Pr{\abs{X-\mu} \geq k \sigma} \leq \frac{1}{k^2}
+    \end{equation}
+
+
 \subsection{Moment generating functions}
 	
 	Moments, in a mathematical-analytical sense, are ``quantitative measures" that describe characteristic of a shape. E.g.: a generic function's first moment is its slope (first derivative).\\
@@ -143,6 +155,6 @@
 	M_X(t) = e^{tX}, t \in \mathbb{R}
 	\end{equation}
 	
-	To be continued... % TODO moment generating function
+    % TODO moment generating function
 	
-	Reminder! Power series of the $e^x$ function: $\displaystyle e^x = \sum_{i=0}^{\infty}\frac{x^n}{n!}$
+	Reminder! Power series of the $e^x$ function: $\displaystyle e^x = \sum_{i=0}^{\infty}\frac{x^n}{n!}$.
