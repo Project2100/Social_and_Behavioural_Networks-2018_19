@@ -1,3 +1,4 @@
+%!TEX root=../main.tex
 \chapter{Clustering}\label{sec:clustering}
 
 In clustering problems, we have a dataset of points in a multi-dimensional space, and we want to partition this dataset into a certain number of clusters, such that a certain distance or cost functions is minimized within the clusters and maximized among them.
@@ -99,7 +100,7 @@ randomized_pivot($V, E^+, E^-$):
         $C_i \gets \left\{ w \st w \in V_i \wedge \{v_i, w\} \in E^+ \right\} \cup \{v_i\}$   // we create a new cluster $V_{i+1}$
         $V_{i+1} \gets V_i - C_i$   // we remove all the nodes of $V_{i+1}$
         $i \gets i+1$
-    return $\mathscr{C}_G = \{C_1, C_2, \ldots, C_{i+1}\}$
+    return $\mathscr{C}_G = \{C_1, C_2, \ldots, C_{i-1}\}$
 \end{lstlisting}
 
 \begin{ex}
@@ -272,23 +273,71 @@ randomized_pivot($V, E^+, E^-$):
         \end{aligned}
     \end{equation}
     
-    \begin{lem}\label{l:clust-4}
-        $Y_T = \frac{p_T}{3}$
-    \end{lem}
-    \begin{proof}
-        \textit{To be continued...}
-    \end{proof}
+%     \begin{lem}\label{l:clust-4}
+%         $Y_T = \frac{p_T}{3}$
+%     \end{lem}
+%     \begin{proof}
+%         \textit{To be continued...}
+%     \end{proof}
 
-    This Lemma concludes the proof of the inequality [\ref{eq:clust-ineq}], and thus the proof Theorem [\ref{thm:clust-rp-approx}].
+%     This Lemma concludes the proof of the inequality [\ref{eq:clust-ineq}], and thus the proof Theorem [\ref{thm:clust-rp-approx}].
+% \end{proof}
+
+Let $\pi^{\star}$ be the value of the optimal solution of the primal problem. Then,
+%
+\begin{thm}\label{thm:corr-alg-complex}
+    $$\frac13 \cdot \text{E}[\text{cost}(\mathcal{C}_P)] = \frac13 \cdot \sum_{T \in \mathcal{T}} p_T \le \pi^\star \le \delta^{\star} \le \text{cost}(\mathcal{C}^{\star}).$$
+\end{thm}
+%
+\begin{proof}
+    The first equation follows from Lemma~\ref{l:clust-2}. We will consider the first inequality in a moment. The second inequality follows from the weak duality theorem. The third inequality follows from Corollary~\ref{cor:clust-2}.
+
+    \smallskip
+
+    Therefore, if we prove the first inequality, we will have proved that the expected cost of the solution returned by the algorithm is no more than 3 times the cost of the optimal solution.
+
+    \smallskip
+
+    Consider the primal program, and set $y_T = p_T / 3$ for each $T \in \mathcal{T}$. This solution has a value of $\frac13 \cdot \sum_{T \in \mathcal{T}} p_T$ in the primal so, if we prove it is feasible for the primal, we have shown that $\frac13 \cdot \sum_{T \in \mathcal{T}} p_T \le \pi^{\star}$.
+
+    \smallskip
+
+    To conclude that the solution is feasible for the primal, we only have to prove that, for each $\{i,j\} \in \binom V2$, it holds
+    $$\sum_{\substack{T \in \mathcal{T}\\T \supset \{i,j\}}} y_T \le 1.$$
+
+    Fix an edge $\{i,j\} \in \binom V2$, and let $A = \bigcup_{\substack{T \in \mathcal{T}\\T \supset \{i,j\}}} T$ be the set of each node of each bad triangle that includes the edge $\{i,j\}$. Let $\xi$ be the event that, during a run of the algorithm, at least one node of $A$ becomes a pivot.
+
+    Then,
+    \begin{align*}
+        \sum_{\substack{T \in \mathcal{T}\\T \supset \{i,j\}}} y_T &= \sum_{\substack{T \in \mathcal{T}\\T \supset \{i,j\}}} \frac{p_T}3\\
+        &=\frac13 \cdot \sum_{\substack{T \in \mathcal{T}\\T \supset \{i,j\}}} Pr[T \text{ is hit}]\\
+        &=\frac13 \cdot \sum_{\substack{T \in \mathcal{T}\\T \supset \{i,j\}}} \left( Pr[T \text{ is hit} \mid \xi] \cdot Pr[\xi] +  Pr\left[T \text{ is hit} \mid \overline{\xi}\,\right] \cdot Pr\left[\,\overline{\xi}\,\right]\right)\\
+        &=\frac13 \cdot \sum_{\substack{T \in \mathcal{T}\\T \supset \{i,j\}}} \left( Pr[T \text{ is hit} \mid \xi] \cdot Pr[\xi] +  0 \cdot Pr\left[\,\overline{\xi}\,\right]\right)\\
+        &=\frac13 \cdot \sum_{\substack{T \in \mathcal{T}\\T \supset \{i,j\}}} \left( Pr[T \text{ is hit} \mid \xi] \cdot Pr[\xi]\right)\\
+        &\le \frac13 \cdot \sum_{\substack{T \in \mathcal{T}\\T \supset \{i,j\}}}  Pr[T \text{ is hit} \mid \xi].
+    \end{align*}
+    Under the conditioning $\xi$, there will be one node that ends up being the first  pivot chosen in $A$; suppose it is $v_k$ (that is, let $k$ be such that $v_k \in A$ and $v_{k'} \not\in A$ fo each $1 \le k' < k$ --- observe that such a $k$ must exists if $\xi$ happens).
+    Moreover, let $B = V_k \cap A$ be the subset of nodes of $A$ that are part of the residual graph when $v_k$ is chosen as a pivot.
+
+    Then,
+    \begin{align*}
+        \sum_{\substack{T \in \mathcal{T}\\T \supset \{i,j\}}} y_T &\le \frac13 \cdot \sum_{\substack{T \in \mathcal{T}\\T \supset \{i,j\}}}  Pr[T \text{ is hit} \mid \xi]\\
+        &=\frac13 \cdot \sum_{S \subseteq A} \left(Pr\left[B = S \mid \xi\right] \cdot \sum_{\substack{T \in \mathcal{T}\\T \supset \{i,j\}}}  Pr[T \text{ is hit} \mid B = S \wedge \xi]\right)\\
+        &=\frac13 \cdot \sum_{S \subseteq A} \left(Pr\left[B = S \mid \xi\right] \cdot \left(\sum_{\substack{T \in \mathcal{T}\\ \{i,j\} \subset T  \subseteq S}}  Pr[T \text{ is hit} \mid B = S \wedge \xi] + \sum_{\substack{T \in \mathcal{T}\\ \{i,j\} \subset T  \not\subseteq S}}  Pr[T \text{ is hit} \mid B = S \wedge \xi]\right)\right)\\
+        &=\frac13 \cdot \sum_{S \subseteq A} \left(Pr\left[B = S \mid \xi\right] \cdot \left(\sum_{\substack{T \in \mathcal{T}\\ \{i,j\} \subset T  \subseteq S}}  Pr[T \text{ is hit} \mid B = S \wedge \xi] + \sum_{\substack{T \in \mathcal{T}\\ \{i,j\} \subset T  \not\subseteq S}}  0\right)\right)\\
+        &=\frac13 \cdot \sum_{S \subseteq A} \left(Pr\left[B = S \mid \xi\right] \cdot \sum_{\substack{T \in \mathcal{T}\\ \{i,j\} \subset T  \subseteq S}}  Pr[T \text{ is hit} \mid B = S \wedge \xi] \right)\\
+        &=\frac13 \cdot \sum_{S \subseteq A} \left(Pr\left[B = S \mid \xi\right] \cdot \sum_{\substack{T \in \mathcal{T}\\ \{i,j\} \subset T  \subseteq S}}  \frac3{|S|}] \right)\\
+        &=\frac13 \cdot \sum_{S \subseteq A} \left(Pr\left[B = S \mid \xi\right] \cdot (|S| -2) \cdot  \frac3{|S|}] \right)\\
+        &\le\frac13 \cdot \sum_{S \subseteq A} \left(Pr\left[B = S \mid \xi\right] \cdot 3 \right)\\
+        &=\sum_{S \subseteq A} \left(Pr\left[B = S \mid \xi\right] \right) = Pr\left[B \subseteq A\mid \xi\right]= 1.
+    \end{align*}
+    Thus, the generic constraint of the primal is satisfied: the proposed primal solution is then feasible --- its value, then, cannot be larger than the optimal primal value $\pi^\star$. The proof is concluded.
 \end{proof}
 
-
-
-
-
-
-
-
+%
+By Theorem~\ref{thm:corr-alg-complex}, we have
+$$\text{E}[\text{cost}(\mathcal{C}_P)] \le 3 \cdot \text{cost}(\mathcal{C}^{\star}).\qedhere$$
+\end{proof}
 
 
 
