@@ -415,7 +415,7 @@ Note that this is almost the same algorithm as [\ref{lst:mcp-greedy}], with the 
 \end{thm}
 \obs Note that $1-e^{-1+\epsilon} = 1 - \frac{1}{e} - O(\varepsilon)$.
 \begin{proof}[Proof of \cref{thm:sub-greedy}]
-    Let's pick an optimal solution $S^{\star} = \{x_1^*, x_2^*, \ldots, x_k^*\}$, $\forall\ i \in \{0, \ldots, k-1\}$ we have that:
+    Let's pick an optimal solution $S^{*} = \{x_1^*, x_2^*, \ldots, x_k^*\}$, $\forall\ i \in \{0, \ldots, k-1\}$ we have that:
     \begin{flalign*}
             f(S^*) &\leq f(S^* \cup S_i)    \tag{by monotonicity of $f$}&\\
             &= f(S_i) + \left( f(\{x_1^*\} \cup S_i) - f(S_i) \right)&\\

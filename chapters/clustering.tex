@@ -90,6 +90,9 @@ These examples allow us to make some observations:
     The set of all the bad triangles of a graph is $\mathscr{T} = \left\{ \{i,j,k\} \st \{i,j,k\} \in \binom{V}{3} \text{ is a bad triangle} \right\}$.
 \end{defn}
 
+
+\subsection{Randomized pivot}\label{sec:random-pivot}
+
 Now we present a greedy algorithm by Ailon, Charikar, Newman to approximate the correlation clustering problem:
 \begin{lstlisting}[caption={Randomized Pivot}, label={lst:clust-random-pivot}]
 randomized_pivot($V, E^+, E^-$):
@@ -231,6 +234,8 @@ randomized_pivot($V, E^+, E^-$):
         \end{aligned}
     \end{equation}
     
+    \obs The objective function is the number of errors the algorithm makes (that is, the cost function), while the meaning of the constraint is that the sum of the costs paid for a bad triangle is at least 1, since we know we will make at least one error for each bad triangle.
+    
     \begin{lem}\label{l:clust-3}
         For each solution $\mathscr{C}$, $cost(\mathscr{C}) \geq \text{DUAL}^*$, where $\text{DUAL}^*$ is the optimal solution of the dual LP.
     \end{lem}
@@ -257,89 +262,102 @@ randomized_pivot($V, E^+, E^-$):
     \end{proof}
 
     Now we are going to present the primal LP and to show that $\frac{p_T}{3}$ is a feasible solution. This will allow us to conclude that the following inequality holds:
-    \begin{equation}\label{eq:clust-ineq}
-        \sum_{T \in \mathscr{T}} \frac{p_T}{3} \leq \text{PRIMAL}^* \leq \text{DUAL}^* \leq OPT
-    \end{equation}
-    where the second $\leq$ is due to the weak duality theorem [\ref{thm:weak-duality}], the third one to Corollary [\ref{cor:clust-2}], and we'll prove the first one shortly with Lemma [\ref{l:clust-4}].
-    
-    Primal LP:
-    \begin{equation}\label{lp:clust-primal}
-        \begin{aligned}
-            &\max \sum_{T \in \mathscr{T}} Y_T&\\
-            &\begin{cases}
-                \sum_{T \in \mathscr{T},\ \{i,j\} \subset T} Y_T \leq 1 & \forall\ \{i,j\} \in \binom{V}{2}
-            \end{cases}&\\
-            &Y_T \geq 0 \ \forall\ T \in \mathscr{T}&
-        \end{aligned}
-    \end{equation}
-    
-%     \begin{lem}\label{l:clust-4}
-%         $Y_T = \frac{p_T}{3}$
-%     \end{lem}
-%     \begin{proof}
-%         \textit{To be continued...}
-%     \end{proof}
+    \begin{claim}\label{cl:clust-ineq}
+        \begin{equation}\label{eq:clust-ineq}
+            \frac13 \cdot \text{E}[\text{cost}(\mathscr{C}_P)] =  \sum_{T \in \mathscr{T}} \frac{p_T}{3} \leq \text{PRIMAL}^* \leq \text{DUAL}^* \leq OPT
+        \end{equation}
+    \end{claim}
 
-%     This Lemma concludes the proof of the inequality [\ref{eq:clust-ineq}], and thus the proof Theorem [\ref{thm:clust-rp-approx}].
-% \end{proof}
+    \obs\label{obs:clust-ineq} If we prove the first inequality, we will have proved that the expected cost of the solution returned by the algorithm is no more than 3 times the cost of the optimal solution. Note that this concludes the proof of Theorem [\ref{thm:clust-rp-approx}].
+    
+    \begin{proof}
+        The first equation follows from Lemma~\ref{l:clust-2}, the second inequality is due to the weak duality theorem [\ref{thm:weak-duality}], the third one to Corollary [\ref{cor:clust-2}], and we'll prove the first one shortly with Lemma [\ref{l:clust-4}].
+    
+        Primal LP:
+        \begin{equation}\label{lp:clust-primal}
+            \begin{aligned}
+                &\max \sum_{T \in \mathscr{T}} y_T&\\
+                &\begin{cases}
+                    \sum_{T \in \mathscr{T},\ \{i,j\} \subset T} y_T \leq 1 & \forall\ \{i,j\} \in \binom{V}{2}
+                \end{cases}&\\
+                &y_T \geq 0 \ \forall\ T \in \mathscr{T}&
+            \end{aligned}
+        \end{equation}
+        
+        \obs This kind of constraint is called \textit{fractional packing of triangles}: for each edge, we want to take at most a weight of 1, summing up the weights of the bad triangles that contain that edge.
+    
+        Consider the primal program, and set $y_T = p_T / 3$ for each $T \in \mathscr{T}$. This solution has a value of $\frac13 \cdot \sum_{T \in \mathscr{T}} p_T$ in the primal so, if we prove it is feasible for the primal, we have shown that $\frac13 \cdot \sum_{T \in \mathscr{T}} p_T \le \pi^{*}$, where $\pi^{*}$ is the solution of the primal.
+    
+        \begin{lem}\label{l:clust-4}
+            $y_T = \frac{p_T}{3}$ is a feasible solution for the primal.
+        \end{lem}
+    
+        \begin{proof}
+            To conclude that the solution is feasible for the primal, we only have to prove that, for each $\{i,j\} \in \binom V2$, it holds
+            $\sum_{\substack{T \in \mathscr{T}\\T \supset \{i,j\}}} y_T \le 1$.
+        
+            Fix an edge $\{i,j\} \in \binom V2$, and let $A = \bigcup_{\substack{T \in \mathscr{T}\\T \supset \{i,j\}}} T$ be the set of each node of each bad triangle that includes the edge $\{i,j\}$. Let $\xi$ be the event that, during a run of the algorithm, at least one node of $A$ becomes a pivot.\\
+            Note that we need $\xi$ because we know that, if it happens, the algorithm will find at least a triangle in $A$, otherwise none, and this allows us to divide the probabilities in two parts, by lat of total probability.
+        
+            Then,
+            \begin{flalign*}
+                \sum_{\substack{T \in \mathscr{T}\\T \supset \{i,j\}}} y_T &= \sum_{\substack{T \in \mathscr{T}\\T \supset \{i,j\}}} \frac{p_T}3&\\
+                &=\frac13 \cdot \sum_{\substack{T \in \mathscr{T}\\T \supset \{i,j\}}} \Pr{T \text{ is hit}}&\\
+                &=\frac13 \cdot \sum_{\substack{T \in \mathscr{T}\\T \supset \{i,j\}}} \Big( \Pr{T \text{ is hit} \mid \xi} \cdot \Pr{\xi} +  \Pr{T \text{ is hit} \mid \overline{\xi}\,} \cdot \Pr{\,\overline{\xi}\,} \Big)&\tag{by total probability}\\
+                &=\frac13 \cdot \sum_{\substack{T \in \mathscr{T}\\T \supset \{i,j\}}} \Big( \Pr{T \text{ is hit} \mid \xi} \cdot \Pr{\xi} + 0 \cdot \Pr{\,\overline{\xi}\,}\Big)&\\
+                &=\frac13 \cdot \sum_{\substack{T \in \mathscr{T}\\T \supset \{i,j\}}} \Big( \Pr{T \text{ is hit} \mid \xi} \cdot \Pr{\xi}\Big)&\\
+                &\le \frac13 \cdot \sum_{\substack{T \in \mathscr{T}\\T \supset \{i,j\}}} \Pr{T \text{ is hit} \mid \xi}.&
+            \end{flalign*}
+            Under the conditioning $\xi$, there will be one node that ends up being the first  pivot chosen in $A$; suppose it is $v_k$ (that is, let $k$ be such that $v_k \in A$ and $v_{k'} \not\in A$ fo each $1 \le k' < k$ --- observe that such a $k$ must exists if $\xi$ happens).
+            Moreover, let $B = V_k \cap A$ be the subset of nodes of $A$ that are part of the residual graph when $v_k$ is chosen as a pivot.
+        
+            Then,
+            \begin{flalign*}
+                \sum_{\substack{T \in \mathscr{T}\\T \supset \{i,j\}}} y_T &\le \frac13 \cdot \sum_{\substack{T \in \mathscr{T}\\T \supset \{i,j\}}} \Pr{T \text{ is hit} \mid \xi}&\\
+                &=\frac13 \cdot \sum_{S \subseteq A} \left(\Pr{B = S \mid \xi} \cdot \sum_{\substack{T \in \mathscr{T}\\T \supset \{i,j\}}} \Pr{T \text{ is hit} \mid B = S \wedge \xi}\right)&\tag{$*^1$}\\
+                &=\frac13 \cdot \sum_{S \subseteq A} \left(\Pr{B = S \mid \xi} \cdot \left(\sum_{\substack{T \in \mathscr{T}\\ \{i,j\} \subset T  \subseteq S}} \Pr{T \text{ is hit} \mid B = S \wedge \xi} + \sum_{\substack{T \in \mathscr{T}\\ \{i,j\} \subset T  \not\subseteq S}} \Pr{T \text{ is hit} \mid B = S \wedge \xi}\right)\right)&\tag{$*^2$}\\
+                &=\frac13 \cdot \sum_{S \subseteq A} \left(\Pr{B = S \mid \xi} \cdot \left(\sum_{\substack{T \in \mathscr{T}\\ \{i,j\} \subset T  \subseteq S}} \Pr{T \text{ is hit} \mid B = S \wedge \xi} + \sum_{\substack{T \in \mathscr{T}\\ \{i,j\} \subset T  \not\subseteq S}} 0\right)\right)\tag{$*^3$}&\\
+                &=\frac13 \cdot \sum_{S \subseteq A} \left(\Pr{B = S \mid \xi} \cdot \sum_{\substack{T \in \mathscr{T}\\ \{i,j\} \subset T  \subseteq S}} \Pr{T \text{ is hit} \mid B = S \wedge \xi} \right)&\\
+                &=\frac13 \cdot \sum_{S \subseteq A} \left(\Pr{B = S \mid \xi} \cdot \sum_{\substack{T \in \mathscr{T}\\ \{i,j\} \subset T  \subseteq S}}  \frac3{|S|} \right)\tag{$*^4$}&\\
+                &=\frac13 \cdot \sum_{S \subseteq A} \left(\Pr{B = S \mid \xi} \cdot (|S| -2) \cdot  \frac3{|S|} \right)&\\
+                &\le\frac13 \cdot \sum_{S \subseteq A} \Big(\Pr{B = S \mid \xi} \cdot 3 \Big)&\tag{we upper bound $\frac{|S|-2}{|S|}$ with 1}\\
+                &=\sum_{S \subseteq A} \left(\Pr{B = S \mid \xi} \right) = \Pr{B \subseteq A\mid \xi}= 1.&
+            \end{flalign*}
+            
+            In $(*^1)$ we apply the law of total probability again, to split the probabilities according to the value of $B$; in $(*^2)$ we break the sum in two parts, with triangles completely in $S$ and \textit{not} completely in $S$, the latter will never be hit by the algorithm, by definition of hit [\ref{def:clust-hit}], (so their probabilities are 0 in $(*^3)$), the former have probability $3/|S|$ of being hit, since each of their vertexes has the same probability of being chosen as the pivot (since it's picked $\uar$), and we use it in $(*^4)$.
+            
+            Thus, the generic constraint of the primal is satisfied: the proposed primal solution is then feasible, which concludes the proof of Lemma [\ref{l:clust-4}].
+        \end{proof}
+        
+        Then, $\frac13 \cdot \sum_{T \in \mathscr{T}} p_T$ cannot be larger than the optimal primal value $\pi^*$. The proof of Claim [\ref{cl:clust-ineq}] is concluded.
+    \end{proof}
+    
+    By Claim [\ref{cl:clust-ineq}], we have
+    $E[\text{cost}(\mathscr{C}_P)] \le 3 \cdot \text{cost}(\mathscr{C}^{\star})$, that concludes the proof of Theorem [\ref{thm:clust-rp-approx}], as observed in [\ref{obs:clust-ineq}].
+\end{proof}    
 
-Let $\pi^{\star}$ be the value of the optimal solution of the primal problem. Then,
-%
-\begin{thm}\label{thm:corr-alg-complex}
-    $$\frac13 \cdot \text{E}[\text{cost}(\mathcal{C}_P)] = \frac13 \cdot \sum_{T \in \mathcal{T}} p_T \le \pi^\star \le \delta^{\star} \le \text{cost}(\mathcal{C}^{\star}).$$
+
+\subsection{Parallel Random Pivot}
+
+\obs The random-pivot algorithm [\ref{lst:clust-random-pivot}] can be very slow if there are many isolated nodes (i.e., many negative edges).
+
+The good news is we can obtain a $(3+\varepsilon)-approximation$ in logarithmic time, if we run a parallel version of the algorithm in a framework such as Pregel or Map-Reduce.\\
+The algorithm is deeply discussed and analyzed in the paper \href{https://dl.acm.org/citation.cfm?id=2623743}{Correlation clustering in MapReduce}, by Chierichetti et al., here we just purpose a brief description.
+
+\begin{lstlisting}[caption={Parallel Randomized Pivot}, label={lst:parallel-random-pivot}]
+parallel randomized pivot:
+    while istance is not empty:
+        - $\Delta^+ \gets$ max positive degree;
+        - activate each element with probability $\varepsilon/\Delta^+$;
+        - deactivate active nodes liked to other active nodes;
+        - create a cluster for each remaining active node   // there are many pivots
+          (break ties randomly);
+\end{lstlisting}
+
+\begin{thm}
+    $\Delta^+$ is halved after $1/3 \cdot \log(n)$ iterations.
 \end{thm}
-%
-\begin{proof}
-    The first equation follows from Lemma~\ref{l:clust-2}. We will consider the first inequality in a moment. The second inequality follows from the weak duality theorem. The third inequality follows from Corollary~\ref{cor:clust-2}.
 
-    \smallskip
+\obs The probability $\frac{\varepsilon}{\Delta^+}$ is higher for nodes with higher degree, but those nodes have more neighbors that could deactivate them, so there is a balancing between these two aspects.
 
-    Therefore, if we prove the first inequality, we will have proved that the expected cost of the solution returned by the algorithm is no more than 3 times the cost of the optimal solution.
-
-    \smallskip
-
-    Consider the primal program, and set $y_T = p_T / 3$ for each $T \in \mathcal{T}$. This solution has a value of $\frac13 \cdot \sum_{T \in \mathcal{T}} p_T$ in the primal so, if we prove it is feasible for the primal, we have shown that $\frac13 \cdot \sum_{T \in \mathcal{T}} p_T \le \pi^{\star}$.
-
-    \smallskip
-
-    To conclude that the solution is feasible for the primal, we only have to prove that, for each $\{i,j\} \in \binom V2$, it holds
-    $$\sum_{\substack{T \in \mathcal{T}\\T \supset \{i,j\}}} y_T \le 1.$$
-
-    Fix an edge $\{i,j\} \in \binom V2$, and let $A = \bigcup_{\substack{T \in \mathcal{T}\\T \supset \{i,j\}}} T$ be the set of each node of each bad triangle that includes the edge $\{i,j\}$. Let $\xi$ be the event that, during a run of the algorithm, at least one node of $A$ becomes a pivot.
-
-    Then,
-    \begin{align*}
-        \sum_{\substack{T \in \mathcal{T}\\T \supset \{i,j\}}} y_T &= \sum_{\substack{T \in \mathcal{T}\\T \supset \{i,j\}}} \frac{p_T}3\\
-        &=\frac13 \cdot \sum_{\substack{T \in \mathcal{T}\\T \supset \{i,j\}}} Pr[T \text{ is hit}]\\
-        &=\frac13 \cdot \sum_{\substack{T \in \mathcal{T}\\T \supset \{i,j\}}} \left( Pr[T \text{ is hit} \mid \xi] \cdot Pr[\xi] +  Pr\left[T \text{ is hit} \mid \overline{\xi}\,\right] \cdot Pr\left[\,\overline{\xi}\,\right]\right)\\
-        &=\frac13 \cdot \sum_{\substack{T \in \mathcal{T}\\T \supset \{i,j\}}} \left( Pr[T \text{ is hit} \mid \xi] \cdot Pr[\xi] +  0 \cdot Pr\left[\,\overline{\xi}\,\right]\right)\\
-        &=\frac13 \cdot \sum_{\substack{T \in \mathcal{T}\\T \supset \{i,j\}}} \left( Pr[T \text{ is hit} \mid \xi] \cdot Pr[\xi]\right)\\
-        &\le \frac13 \cdot \sum_{\substack{T \in \mathcal{T}\\T \supset \{i,j\}}}  Pr[T \text{ is hit} \mid \xi].
-    \end{align*}
-    Under the conditioning $\xi$, there will be one node that ends up being the first  pivot chosen in $A$; suppose it is $v_k$ (that is, let $k$ be such that $v_k \in A$ and $v_{k'} \not\in A$ fo each $1 \le k' < k$ --- observe that such a $k$ must exists if $\xi$ happens).
-    Moreover, let $B = V_k \cap A$ be the subset of nodes of $A$ that are part of the residual graph when $v_k$ is chosen as a pivot.
-
-    Then,
-    \begin{align*}
-        \sum_{\substack{T \in \mathcal{T}\\T \supset \{i,j\}}} y_T &\le \frac13 \cdot \sum_{\substack{T \in \mathcal{T}\\T \supset \{i,j\}}}  Pr[T \text{ is hit} \mid \xi]\\
-        &=\frac13 \cdot \sum_{S \subseteq A} \left(Pr\left[B = S \mid \xi\right] \cdot \sum_{\substack{T \in \mathcal{T}\\T \supset \{i,j\}}}  Pr[T \text{ is hit} \mid B = S \wedge \xi]\right)\\
-        &=\frac13 \cdot \sum_{S \subseteq A} \left(Pr\left[B = S \mid \xi\right] \cdot \left(\sum_{\substack{T \in \mathcal{T}\\ \{i,j\} \subset T  \subseteq S}}  Pr[T \text{ is hit} \mid B = S \wedge \xi] + \sum_{\substack{T \in \mathcal{T}\\ \{i,j\} \subset T  \not\subseteq S}}  Pr[T \text{ is hit} \mid B = S \wedge \xi]\right)\right)\\
-        &=\frac13 \cdot \sum_{S \subseteq A} \left(Pr\left[B = S \mid \xi\right] \cdot \left(\sum_{\substack{T \in \mathcal{T}\\ \{i,j\} \subset T  \subseteq S}}  Pr[T \text{ is hit} \mid B = S \wedge \xi] + \sum_{\substack{T \in \mathcal{T}\\ \{i,j\} \subset T  \not\subseteq S}}  0\right)\right)\\
-        &=\frac13 \cdot \sum_{S \subseteq A} \left(Pr\left[B = S \mid \xi\right] \cdot \sum_{\substack{T \in \mathcal{T}\\ \{i,j\} \subset T  \subseteq S}}  Pr[T \text{ is hit} \mid B = S \wedge \xi] \right)\\
-        &=\frac13 \cdot \sum_{S \subseteq A} \left(Pr\left[B = S \mid \xi\right] \cdot \sum_{\substack{T \in \mathcal{T}\\ \{i,j\} \subset T  \subseteq S}}  \frac3{|S|}] \right)\\
-        &=\frac13 \cdot \sum_{S \subseteq A} \left(Pr\left[B = S \mid \xi\right] \cdot (|S| -2) \cdot  \frac3{|S|}] \right)\\
-        &\le\frac13 \cdot \sum_{S \subseteq A} \left(Pr\left[B = S \mid \xi\right] \cdot 3 \right)\\
-        &=\sum_{S \subseteq A} \left(Pr\left[B = S \mid \xi\right] \right) = Pr\left[B \subseteq A\mid \xi\right]= 1.
-    \end{align*}
-    Thus, the generic constraint of the primal is satisfied: the proposed primal solution is then feasible --- its value, then, cannot be larger than the optimal primal value $\pi^\star$. The proof is concluded.
-\end{proof}
-
-%
-By Theorem~\ref{thm:corr-alg-complex}, we have
-$$\text{E}[\text{cost}(\mathcal{C}_P)] \le 3 \cdot \text{cost}(\mathcal{C}^{\star}).\qedhere$$
-\end{proof}
-
-
-
-
-
+Open problem: How to handle the case where there are neither positive nor negative edges? I.e., in which, for some pairs of nodes, we don't know if the two elements are similar or dissimilar.
