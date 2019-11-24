@@ -3,7 +3,31 @@
 
 In clustering problems, we have a dataset of points in a multi-dimensional space, and we want to partition this dataset into a certain number of clusters, such that a certain distance or cost functions is minimized within the clusters and maximized among them.
 
-In traditional approaches to this problem, such as \textit{k-mean}, \textit{k-median} or \textit{k-center}, the number of clusters $k$ is fixed in advance, and the algorithm partitions the dataset in the given number of clusters; but, in real cases, this number often is not known \textit{a priori}, so one can use \textit{hierarchical clustering}, but this technique only produces some levels of grouping, so the user of the model still have to decide how many groups to use, and this is not always trivial.
+In traditional approaches to this problem, the number of clusters $k$ is fixed in advance, and the algorithm partitions the dataset in the given number of clusters.\\
+The best known algorithms of this type are:\label{clust-k-algs}
+\begin{itemize}
+    \item \textit{k-medians}: find the location of the $k$ centers as to minimize the average distance between a point and a center;
+    \item \textit{k-centers}: find the location of the $k$ centers as to minimize the maximum distance between a point and a center;
+    \item \textit{k-means}: find the location of the $k$ centers as to minimize the square of the distance between a point and a center;
+\end{itemize}
+
+\obs The most used is k-means, because its objective functions resembles variance, and so it can be interpreted as the search of Gaussians that randomly generated the points of the dataset.
+
+\begin{thm}\label{thm:clustering-np}
+    k-medians, k-centers and k-means are NP-complete problems.
+\end{thm}
+
+\begin{ex}
+    We have a dataset of vectors representing users of a social network. Each vector could have up to millions dimensions (this is called \href{https://en.wikipedia.org/wiki/Curse_of_dimensionality}{\textit{curse of dimensionality}}), and we could have billions of such vectors.\\
+    The distance between any pair of nodes tells us how much they are similar, so we want to cluster similar users to recommend them similar products or movies, or to send them similar ads.
+\end{ex}
+
+\begin{ex}
+    We are Amazon and we have a dataset of users, each one with his/her geographic position in a map, so the distance between two points is the actual distance between two users. We have a fixed budget to position $k$ warehouses, and we want to find the best places where to put them.\\
+    A good strategy could be to apply k-medians, so that each client, on average, is at the minimum possible distance from the warehouse.
+\end{ex}
+
+In real cases, often the number of clusters $k$ is not known \textit{a priori}, so one can use \textit{hierarchical clustering}, but this technique only produces some levels of grouping, so the user of the model still have to decide how many groups to use, and this is not always trivial.
 
 \begin{ex}
     In the example in figure [\ref{fig:hierarchical-clustering-ex}] we can see that, after the algorithm groups the elements in levels of clusters, the user must decide which level to use, of if an intermediate number of clusters is preferable.
@@ -40,7 +64,7 @@ The goal is to put similar nodes together and different nodes separated, that is
     
     \begin{figure}[h!]
         \centering
-        \includegraphics[width=0.4\textwidth]{corr-clustering}
+        \includegraphics[width=0.3\textwidth]{corr-clustering}
         \caption{An example of correlation clustering.}
         \label{fig:corr-clustering-ex}
     \end{figure}
@@ -170,14 +194,14 @@ randomized_pivot($V, E^+, E^-$):
     \end{lem}
     \begin{proof}
         The proof directly follows from the definition of $cost_j^+$ and $cost_j^-$: as we can see in figure [\ref{fig:clust-costs}], $cost_j^+$ covers the first part of the definition of $cost$ [\ref{eq:clust-cost}], that is, the cases in which the algorithm puts two similar nodes in different clusters (edges marked with $*$ in the picture), and $cost_j^-$ covers the second part of the definition, i.e., the cases in which two dissimilar nodes are put in the same cluster (edges marked with $**$ in the picture). Thus, all the errors (red edges) are covered either by $cost_j^+$ or by $cost_j^-$.
-        
-        \begin{figure}[h!]
-            \centering
-            \includegraphics[width=0.35\textwidth]{clust-costs}
-            \caption{Example of application of the definition of $cost_j^+$ and $cost_j^-$.}
-            \label{fig:clust-costs}
-        \end{figure}
     \end{proof}
+
+    \begin{figure}[h!]
+        \centering
+        \includegraphics[width=0.35\textwidth]{clust-costs}
+        \caption{Example of application of the definition of $cost_j^+$ and $cost_j^-$.}
+        \label{fig:clust-costs}
+    \end{figure}
 
     The following two claims, that follow from Lemma [\ref{l:clust-1}], connect the different types of bad triangles we see in figure [\ref{fig:clust-costs}] with the different types of errors, or costs.
     
@@ -361,3 +385,65 @@ parallel randomized pivot:
 \obs The probability $\frac{\varepsilon}{\Delta^+}$ is higher for nodes with higher degree, but those nodes have more neighbors that could deactivate them, so there is a balancing between these two aspects.
 
 Open problem: How to handle the case where there are neither positive nor negative edges? I.e., in which, for some pairs of nodes, we don't know if the two elements are similar or dissimilar.
+
+
+\section{K-Centers}\label{sec:k-centers}
+
+As we briefly saw at the beginning of this chapter [\ref{clust-k-algs}], the goal of k-centers problem is to find the location of the $k$ centers as to minimize the maximum distance between a point and a center. Now we'll define the problem more formally and we'll give an algorithm to approximate its solution.
+
+\begin{defn}[Minimum k-centers]\label{defn:k-centers}
+    The minimum k-centers problem is defined as follows:\\
+    Input: $X = \{x_1, x_2, ..., x_n\}$ points in a metric space.\\
+    Goal: Find $C \subseteq X$ such that $|C| = k$ and $\max_{x \in X} d(x,C)$ is minimized, where $d(x,C) := \min_{y \in C} d(x,y)$ is the distance between a point and a set of points.\\
+    Using the value of $d(x,C)$, we can rewrite the goal as: Minimize $\max_{x \in X} \min_{y \in C} d(x, y)$.
+\end{defn}
+
+As we stated in the introduction [\ref{thm:clustering-np}], minimum k-centers is np-complete, so we look for an approximation. It has been proved that the best possible approximation one can obtain in polynomial time is a 2-approximation: $$OPT \leq A(X,k) \leq 2 OPT \ \ \ \forall\ X,k.$$
+
+Now we present the algorithm to solve the minimum k-centers problem, then we'll prove it gives a 2-approximation.
+
+\begin{lstlisting}[caption={Minimum k-centers}, label={lst:min-k-centers}]
+min-k-centers:
+    $C \gets \{ \text{any point} \}$
+    for $i = 2, \ldots, k$:
+        let $x$ be such that $d(x,C)$ is maximized
+        $C \gets C \cup \{x\}$
+    return $C$
+\end{lstlisting}
+
+\begin{thm}\label{thm:k-centers-approx}
+    Min-k-centers algorithm [\ref{lst:min-k-centers}] returns a 2-approximation for the minimum k-centers clustering problem.\\
+    In other words, $\forall\ x \in X,\ d(x,C) \leq 2 \cdot OPT$.
+\end{thm}
+\begin{proof}
+    Let $C = \{c_1, c_2, \ldots, c_k\}$ be the set of centers chosen by the algorithm, where the indexes follows the order in which they are chosen.
+    
+    Assume, by contradiction, that $C$ is not a 2-approximation, then 
+    \begin{equation}\label{eq:centers-assumption}
+        \exists\ z \text{ s.t. } d(z, C) > 2 \cdot OPT.
+    \end{equation}
+    
+    If we prove that the following claim holds under this assumption, we will reach an absurd, so we'll prove the theorem.
+    \begin{claim}\label{cl:centers}
+        $d(c_i, c_j) > 2 \cdot OPT\ \forall\ i,j$.
+    \end{claim}
+    \begin{proof}[Proof of claim \ref{cl:centers}]
+        \begin{obs}
+            $\forall\ A \subset C,\ d(z,A) \geq d(z,C)$, since we have more possibilities to find a point closer to $z$ in $C$ than in $A$ (since it's bigger).
+        \end{obs}
+        We can use this observation and our assumption [\ref{eq:centers-assumption}] to show that $d(z, \{c_1\}) \geq d(z,C) > 2 \cdot OPT$.\\
+        Since the algorithm [\ref{lst:min-k-centers}] pick as center the furthest point from those already considered, we also know that $d(c_2, \{c_1\}) \geq d(z, \{c_1\})$.
+        
+        Similarly, we can say that $d(c_3, \{c_1, c_2\}) \geq d(z, \{c_1, c_2\}) \geq d(z,C) > 2 \cdot OPT$.
+        The same holds for $c_4$: $d(c_4, \{c_1, c_2, c_3\}) \geq d(z, \{c_1, c_2, c_3\}) > 2 \cdot OPT$.
+        And so on for each $c_i$ up to $c_k$.
+    \end{proof}
+
+    Now we can go back to the proof of Theorem [\ref{thm:k-centers-approx}], and show that the claim [\ref{cl:centers}], true under assumption [\ref{eq:centers-assumption}], produces a contradiction.
+    
+    Let $O = \{o_1, o_2, \ldots, o_k\}$. Any point in the dataset must be at distance at most $OPT$ from a center in $O$, by definition of the problem; the same holds for the points in $C$, so let's pick $c_1$ from $C$ and let's say that the closest point to $c_1$ in $O$ is $o_1$ (it's just a name). Then $c_2$ can't be at distance $\leq OPT$ from $o_1$, otherwise we have $d(c_1, c_2) \leq 2 \cdot OPT$, but it's impossible for [\ref{cl:centers}].
+    
+    The same holds for any $c_i \in C$, thus each $c_i$ is ``covered'' by a different $o_i$.
+    
+    Then, $z$ can't be covered by any $o_i$, which is a contradiction.
+\end{proof}
