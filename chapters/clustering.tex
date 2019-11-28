@@ -389,7 +389,7 @@ Open problem: How to handle the case where there are neither positive nor negati
 
 \section{K-Centers}\label{sec:k-centers}
 
-As we briefly saw at the beginning of this chapter [\ref{clust-k-algs}], the goal of k-centers problem is to find the location of the $k$ centers as to minimize the maximum distance between a point and a center. Now we'll define the problem more formally and we'll give an algorithm to approximate its solution.
+As we briefly saw at the beginning of this chapter, the goal of k-centers problem is to find the location of the $k$ centers as to minimize the maximum distance between a point and a center. Now we'll define the problem more formally and we'll give an algorithm to approximate its solution.
 
 \begin{defn}[Minimum k-centers]\label{defn:k-centers}
     The minimum k-centers problem is defined as follows:\\
@@ -447,3 +447,90 @@ min-k-centers:
     
     Then, $z$ can't be covered by any $o_i$, which is a contradiction.
 \end{proof}
+
+\section{K-Means}\label{sec:k-means}
+
+\begin{defn}[Minimum k-means]\label{defn:k-means}
+    The minimum k-means problem is defined as follows:\\
+    Input: $X \in \mathbb{R}^d = \{x_1, x_2, ..., x_n\}$ points in a metric space.\\
+    Goal: Find $k$ centers $c_1, \dots, c_k$ in $\mathbb{R}^d$ s.t. $\sum_{x \in X} d(x,C)^2$ is minimized, where $d(x,C) := \min_{y \in C} d(x,y)$ is the distance between a point and a set of points.\\
+\end{defn}
+
+The following algorithm is frequently used for the $K-means$ problems, even though it does not solve it.
+\begin{lstlisting}[caption={Lloyd's algorithm}, label={lst:lloyds}]
+min-k-means:
+    arbitrarily pick $c_1, \dots, c_k$
+    repeat
+        for $i = 1$ to $k$:
+            $C_i \gets$ set of points in $X$ closest to $c_i$
+            $c_i \gets \frac{1}{|C_i|}\sum_{x \in C_i}x$
+    until $C_i$s and $c_i$s do not change
+    return $C_1, \dots, C_k$, $c_1, \dots, c_k$
+\end{lstlisting}
+
+This algorithm is a special case of an \emph{EM} algorithm:
+\begin{defn}
+    An \emph{Expectation\-Maximization} algorithm is an iterative method to find maximum likelihood or maximum a posteriori (MAP) estimates of parameters in statistical models, where the model depends on unobserved latent variables. The EM iteration alternates between performing an expectation (E) step, which creates a function for the expectation of the log-likelihood evaluated using the current estimate for the parameters, and a maximization (M) step, which computes parameters maximizing the expected log-likelihood found on the E step. These parameter-estimates are then used to determine the distribution of the latent variables in the next E step.
+\end{defn}
+
+\begin{obs}
+    The algorithm takes exponential time even in $\mathbb{R}^2$.
+\end{obs}
+\begin{obs}
+    Solution can be \emph{very far} from optimal.
+\end{obs}
+
+Since the algorithm performs some kind of optimization on real numbers, we could wonder whether it will effectively succeed at finding some minimum.
+\begin{thm}
+    The algorithm effectively finds a local minimum.
+\end{thm}
+\begin{proof}
+    To prove this we are going to need two claims.
+    %
+    \begin{claim}
+        After each iteration of the algorithm, the cost function decreases.
+    \end{claim}
+    \begin{proof}
+        Left as an exercise.
+    \end{proof}
+    %
+    \begin{claim}
+        The algorithm terminates.
+    \end{claim}
+    \begin{proof}
+        The clusterization can be seen as a coloring where we are using $k$ colors.
+        Having $k$ colors and $n$ points there may be $k^n$ colorings, so the number of possible clusterings is finite.
+    \end{proof}
+    What the algorithm is doing is a local search; since the cost function decreases at each iteration until it finds a minimum and the algorithm terminates, the algorithm effectively finds a local minimum.
+\end{proof}
+
+The algorithm is much used, due to the following facts:
+\begin{itemize}
+    \item The algorithm is simple.
+    \item The algorithm's expected running time, computed with a smoothed analysis, is polynomial.
+\end{itemize}
+%
+Let's thus see what a smoothed analysis is.
+%
+\begin{defn}[Smoothed analysis]
+    In a smoothed analysis the running time is computed in the following way:
+    \begin{enumerate}
+        \item The input is adversary;
+        \item The datapoints are perturbed a little bit;
+        \item The expected running time is computed (expected because of the perturbation of the points, which is stochastic).
+    \end{enumerate}
+\end{defn}
+
+The following modification by Arthur-Vassilitski guaranties that the algorithm will perform well in any case.
+\begin{lstlisting}[caption={kmeans++}, label={lst:arthurv-assilitski}]
+new first step:
+    pick $c \in X$ UAR
+    $C \gets \{c\}$
+    for $i = 2$ to $k$:
+        pick $c \in X$ w.p. $\propto d(x,C)^2$
+        $C \gets C \cup \{X\}$
+\end{lstlisting}
+
+\begin{claim}
+    After the first step centers are a $O(lg(k))$\-approx in expectation.
+\end{claim}
