@@ -80,12 +80,12 @@ The goal is to put similar nodes together and different nodes separated, that is
 \end{figure}
 
 Now we're interested in some \textbf{special cases}, shown in figure [\ref{fig:clust-special}]:
-\renewcommand{\theenumi}{\alph{enumi}}
+{ \renewcommand{\theenumi}{\alph{enumi}}
 \begin{enumerate}
     \item If the nodes are all similar to each other, a single cluster will be created, and the \textit{cost} is 0;
     \item If nodes are all dissimilar to each other, a singleton for each node will be created, and the \textit{cost} is 0;
     \item If there are ``triangles'' like the ones in figures c1-c5, whatever clustering we produce the \textit{cost} is at least 1.
-\end{enumerate}
+\end{enumerate} }
 
 These examples allow us to make some observations:
 \begin{obs}\label{obs:clust-1}
@@ -150,11 +150,11 @@ randomized_pivot($V, E^+, E^-$):
     \end{figure}
 
     In figure [\ref{fig:clust-rp-3}] we see a case in which Randomized Pivot could find a very bad approximation: if there is a positive star, there are two possibilities:
-    \renewcommand{\theenumi}{\alph{enumi}}
+    { \renewcommand{\theenumi}{\alph{enumi}}
     \begin{enumerate}
         \item the algorithm chooses a leave of the star as pivot, so the $cost$ is only $n-1$;
         \item the algorithm chooses the root of the star as pivot, so the $cost$ is  even $\binom{n-1}{2} \approx n^2$.
-    \end{enumerate}
+    \end{enumerate} }
     Note that the second (and worst) possibility happen with probability $1/n$, so it's not so unlikely.
     \begin{figure}[h!]
         \centering
@@ -391,14 +391,14 @@ Open problem: How to handle the case where there are neither positive nor negati
 
 As we briefly saw at the beginning of this chapter, the goal of k-centers problem is to find the location of the $k$ centers as to minimize the maximum distance between a point and a center. Now we'll define the problem more formally and we'll give an algorithm to approximate its solution.
 
-\begin{defn}[Minimum k-centers]\label{defn:k-centers}
+\begin{defn}[Minimum k-centers]\label{def:k-centers}
     The minimum k-centers problem is defined as follows:\\
     Input: $X = \{x_1, x_2, ..., x_n\}$ points in a metric space.\\
     Goal: Find $C \subseteq X$ such that $|C| = k$ and $\max_{x \in X} d(x,C)$ is minimized, where $d(x,C) := \min_{y \in C} d(x,y)$ is the distance between a point and a set of points.\\
     Using the value of $d(x,C)$, we can rewrite the goal as: Minimize $\max_{x \in X} \min_{y \in C} d(x, y)$.
 \end{defn}
 
-As we stated in the introduction [\ref{thm:clustering-np}], minimum k-centers is np-complete, so we look for an approximation. It has been proved that the best possible approximation one can obtain in polynomial time is a 2-approximation: $$OPT \leq A(X,k) \leq 2 OPT \ \ \ \forall\ X,k.$$
+As we stated in the introduction [\ref{thm:clustering-np}], minimum k-centers is np-hard, so we look for an approximation. It has been proved that the best possible approximation one can obtain in polynomial time is a 2-approximation: $$OPT \leq A(X,k) \leq 2 OPT \ \ \ \forall\ X,k.$$
 
 Now we present the algorithm to solve the minimum k-centers problem, then we'll prove it gives a 2-approximation.
 
@@ -448,63 +448,107 @@ min-k-centers:
     Then, $z$ can't be covered by any $o_i$, which is a contradiction.
 \end{proof}
 
+
 \section{K-Means}\label{sec:k-means}
 
-\begin{defn}[Minimum k-means]\label{defn:k-means}
+\begin{defn}[Minimum k-means]\label{def:k-means}
     The minimum k-means problem is defined as follows:\\
     Input: $X \in \mathbb{R}^d = \{x_1, x_2, ..., x_n\}$ points in a metric space.\\
-    Goal: Find $k$ centers $c_1, \dots, c_k$ in $\mathbb{R}^d$ s.t. $\sum_{x \in X} d(x,C)^2$ is minimized, where $d(x,C) := \min_{y \in C} d(x,y)$ is the distance between a point and a set of points.\\
+    Goal: Find $k$ centers $c_1, \dots, c_k$ in $\mathbb{R}^d$ (the euclidian space) s.t. $\sum_{x \in X} d(x,C)^2$ is minimized, where $d(x,C) := \min_{y \in C} d(x,y)$ is the distance between a point and a set of points.
 \end{defn}
 
-The following algorithm is frequently used for the $K-means$ problems, even though it does not solve it.
+\obs Differently from k-centers problem [\ref{def:k-centers}], k-means doesn't require that the centers are a subset of the points of the dataset.
+
+\obs As we stated in the introduction [\ref{thm:clustering-np}], minimum k-means is np-hard, so we can't actually find a solution for this problem. The following algorithm is frequently used for the \textit{K-means} problem, even though it does not solve it.
+
+\begin{enumerate}
+    \item Phase 1:
+    \begin{enumerate}
+        \item Choose $k$ centers $\uar$,
+        \item Associate each point in $X$ to the closest centers, thus creating clusters;
+    \end{enumerate}
+    \item Phase 2:
+    \begin{enumerate}
+        \item Compute the center of mass (barycenter) of each cluster,
+        \item Assign each point to a barycenter to build new clusters,
+        \item Repeat 2.1 and 2.2 until clusters stay the same.
+    \end{enumerate}
+\end{enumerate}
+
+Formally:
 \begin{lstlisting}[caption={Lloyd's algorithm}, label={lst:lloyds}]
 min-k-means:
-    arbitrarily pick $c_1, \dots, c_k$
-    repeat
+    arbitrarily pick $c_1, \ldots, c_k$
+    repeat:
         for $i = 1$ to $k$:
             $C_i \gets$ set of points in $X$ closest to $c_i$
-            $c_i \gets \frac{1}{|C_i|}\sum_{x \in C_i}x$
+            $c_i \gets \frac{1}{|C_i|}\sum_{x \in C_i}x$   // centers of mass, or barycenters
     until $C_i$s and $c_i$s do not change
     return $C_1, \dots, C_k$, $c_1, \dots, c_k$
 \end{lstlisting}
 
 This algorithm is a special case of an \emph{EM} algorithm:
-\begin{defn}
-    An \emph{Expectation\-Maximization} algorithm is an iterative method to find maximum likelihood or maximum a posteriori (MAP) estimates of parameters in statistical models, where the model depends on unobserved latent variables. The EM iteration alternates between performing an expectation (E) step, which creates a function for the expectation of the log-likelihood evaluated using the current estimate for the parameters, and a maximization (M) step, which computes parameters maximizing the expected log-likelihood found on the E step. These parameter-estimates are then used to determine the distribution of the latent variables in the next E step.
+\begin{defn}[EM]
+    An \emph{Expectation-Maximization} algorithm is an iterative method to find maximum likelihood or maximum a posteriori (MAP) estimates of parameters in statistical models, where the model depends on unobserved latent variables. The EM iteration alternates between performing an expectation (E) step, which creates a function for the expectation of the log-likelihood evaluated using the current estimate for the parameters, and a maximization (M) step, which computes parameters maximizing the expected log-likelihood found on the E step. These parameter-estimates are then used to determine the distribution of the latent variables in the next E step.
 \end{defn}
 
-\begin{obs}
-    The algorithm takes exponential time even in $\mathbb{R}^2$.
+Thus, \texttt{min-k-means} is sort of a greedy algorithm in two steps, where two different objectives are optimized.
+
+\begin{obs}\label{obs:k-means-1}
+    The algorithm can take exponential time even in $\mathbb{R}^2$.
 \end{obs}
-\begin{obs}
+\begin{obs}\label{obs:k-means-2}
     Solution can be \emph{very far} from optimal.
 \end{obs}
 
 Since the algorithm performs some kind of optimization on real numbers, we could wonder whether it will effectively succeed at finding some minimum.
-\begin{thm}
+\begin{thm}\label{thm:k-means-min}
     The algorithm effectively finds a local minimum.
 \end{thm}
-\begin{proof}
-    To prove this we are going to need two claims.
+\begin{proof}[Proof of theorem \ref{thm:k-means-min}]
+    To prove this we are going to need two lemmas.
     %
-    \begin{claim}
+    \begin{lem}\label{lem:k-means-1}
         After each iteration of the algorithm, the cost function decreases.
-    \end{claim}
-    \begin{proof}
-        Left as an exercise.
+    \end{lem}
+    \begin{proof}[Proof of lemma \ref{lem:k-means-1}]
+        Let's show the first solutions found by the algorithm and the relative costs.
+        \begin{flalign*}
+            &\mathscr{S}_0 = \{ C_1^0, \ldots, C_l^0; c_1^0, \ldots, c_k^0 \} \text{ is the first solution}&\\
+            &\mathscr{S}_1 = \{ C_1^1, \ldots, C_l^1; c_1^1, \ldots, c_k^1 \} \text{ is the second solution}&\\
+            &cost(\mathscr{S}_0) = \sum_{x \in X} d\left( x, \{c_1^0, \ldots, c_k^0\} \right)^2&\\
+            &cost(\mathscr{S}_1) = \sum_{x \in X} d\left( x, \{c_1^1, \ldots, c_k^1\} \right)^2&
+        \end{flalign*}
+        We can see that the algorithm performs a greedy choice since it takes always the lowest cost.
+        
+        Then, to prove the lemma, we use the following claim:
+        \begin{claim}\label{cl:k-means}
+            Let $C_1, \ldots, C_k$ be a partition of $X$ in $k$ sets, $b_i$ be the centers of mass of the $C_i$, $c_i$ be the centers around which the $C_i$ were built, and $\mathscr{S} = \{ C_1, \ldots, C_k; c_1, \ldots, c_k \}$, $\mathscr{S}' = \{ C_1, \ldots, C_k; b_1, \ldots, b_k \}$. Then
+            \begin{flalign*}
+                cost(\mathscr{S}) &= \sum_{x \in X} d\left( x, \{c_1^1, \ldots, c_k^1\} \right)^2\\
+                &\geq \sum_{x \in X} d\left( x, \{b_1^1, \ldots, b_k^1\} \right)^2 = cost(\mathscr{S}')
+            \end{flalign*}
+        \end{claim}
+        \begin{proof}[Proof of claim \ref{cl:k-means}]
+            Left as an exercise.
+        \end{proof}
+        Once we proved claim [\ref{cl:k-means}], lemma [\ref{lem:k-means-1}] follows directly.
     \end{proof}
     %
-    \begin{claim}
+    \begin{lem}\label{lem:k-means-2}
         The algorithm terminates.
-    \end{claim}
-    \begin{proof}
+    \end{lem}
+    \begin{proof}[Proof of lemma \ref{lem:k-means-2}]
+        Let's look at the algorithm from a combinatorial point of view.\\
         The clusterization can be seen as a coloring where we are using $k$ colors.
         Having $k$ colors and $n$ points there may be $k^n$ colorings, so the number of possible clusterings is finite.
     \end{proof}
+
+    Then we can finally go back to the proof of theorem [\ref{thm:k-means-min}].\\
     What the algorithm is doing is a local search; since the cost function decreases at each iteration until it finds a minimum and the algorithm terminates, the algorithm effectively finds a local minimum.
 \end{proof}
 
-The algorithm is much used, due to the following facts:
+Despite its long running time and its bad approximation, observed in [\ref{obs:k-means-1}] and [\ref{obs:k-means-2}], the algorithm is much used, due to the following facts:
 \begin{itemize}
     \item The algorithm is simple.
     \item The algorithm's expected running time, computed with a smoothed analysis, is polynomial.
@@ -521,16 +565,27 @@ Let's thus see what a smoothed analysis is.
     \end{enumerate}
 \end{defn}
 
-The following modification by Arthur-Vassilitski guaranties that the algorithm will perform well in any case.
+The following modification of the Lloyd's algorithm [\ref{lst:lloyds}] by Arthur-Vassilitski guaranties that the algorithm will perform well in any case.
 \begin{lstlisting}[caption={kmeans++}, label={lst:arthurv-assilitski}]
 new first step:
-    pick $c \in X$ UAR
-    $C \gets \{c\}$
+    pick $c_1 \in X$ UAR
+    $C \gets \{c_1\}$
     for $i = 2$ to $k$:
-        pick $c \in X$ w.p. $\propto d(x,C)^2$
+        pick $c \in X$ w.p. $\propto d(x,C)^2$   // $\propto$ means "proportional to"
         $C \gets C \cup \{X\}$
 \end{lstlisting}
+That is, we can improve the algorithm just picking the first set of centers not uniformly at random but accordingly with a probability distribution that is proportional to the distance between $x$ and $C$, formally:
+\begin{equation}
+    \Pr{\text{point $x$ is choosen as center}} = \frac{d(x,C)^2}{\sum_{y \in X} d(x,C)^2}.
+\end{equation}
 
 \begin{claim}
-    After the first step centers are a $O(lg(k))$\-approx in expectation.
+    After the first step, centers are a $O(\log(k))$-approx in expectation.
 \end{claim}
+
+Open problems:
+\begin{itemize}
+    \item Researches tried to apply the same procedure of k-means++ to other problems that have similar objective function: the distance $d$ with exponents $e \neq 2$. The result was that it works if the exponent is $e \geq 2$, but it is unknown if it could work if $1 \leq e < 2$;
+    \item Since each solution depends on the previous one, the algorithms we saw can't be parallelized without getting a worse approximation, thus researchers are looking for a parallel algorithm that obtain the minimum loose in approximation;
+    \item There are some algorithms that returns a constant approximation of k-means problem, but they aren't used since they are too slow or too hard to implement or use, so maybe some better algorithm can still be found.
+\end{itemize}
