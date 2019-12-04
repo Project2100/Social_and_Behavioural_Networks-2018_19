@@ -5,6 +5,14 @@ Graphs representing networks, including biological networks and social networks,
 
 Network motifs are sub-graphs that repeat themselves in a specific network or even among various networks. Each of these sub-graphs, defined by a particular pattern of interactions between vertices, may reflect a framework in which particular functions are achieved efficiently. Indeed, motifs are of notable importance largely because they may reflect functional properties.
 
+Let's consider how motifs are used in social networks:
+   \begin{itemize}
+       \item To understand what is happening in a graph and build better algorithms;
+       \item Classification: to find structural differences among graphs induced by different relations and measured counting the frequency of various motifs;
+       \item Clustering: one can analyze the structure of a graph based on the cuts induced by the motifs instead of those induced by the edges (this approach turns out to be more accurate);
+       \item Coordinate system: each subgraph (defined by some group or event on a social network, for example) becomes a point in the space based on the number of motifs.
+   \end{itemize}
+
 Let's start by the simplest network motifs, the triangles.
 
 
@@ -155,7 +163,7 @@ Let's consider the star again, in algorithm [\ref{lst:triangles-alg1}] we loose 
 \end{ex}
 
 This gives us the following algorithm:
-\begin{lstlisting}[caption={Algorithm 2}, label={lst:triangles-alg3}]
+\begin{lstlisting}[caption={Algorithm 3}, label={lst:triangles-alg3}]
 Algorithm_3(G):
     $\tau \gets 0$
     $order(V) \gets$ sort $V$ so that $u < v \Longleftrightarrow  deg(u) \leq deg(v)$
@@ -247,3 +255,116 @@ Algorithm_3(G):
         &\leq \mathcal{E} \sqrt{\mathcal{E}} \cdot \sum_{i=1}^{\log_2 \sqrt{\mathcal{E}}} 2^{-2i} \leq 4 \mathcal{E}^{3/2}.&
     \end{flalign*}
 \end{proof}
+
+
+\section{Motifs with more than three nodes}\label{sec:big-motifs}
+
+If we want to count the number of motifs with more than three nodes, it becomes increasingly difficult as the number of nodes we consider increases (for example, the problem of counting the number of cliques in a graph is NP-complete). For this reason, generally we look for an approximation of the optimal solution.
+
+\begin{defn}
+    Given a motif $H$ on $k$ nodes, let
+    \begin{equation}\label{eq:motif}
+        c_H = \abs{\{U \subseteq V : G[U] \simeq H\}}
+    \end{equation}
+    be the number of occurrences of the motif we are looking for in the graph.\\
+    Note that $G[U] \simeq H$ means ``the subgraph on $G$ induced by $U$ is isomorphic to $H$''. 
+\end{defn}
+
+Thus, our goal is to obtain an estimate $\hat{c}_H$ of $c_H$ such that $c_H - t \leq \hat{c}_H \leq c_H + t$ with probability $1-p$.\\
+Note that this resembles what we've done with Randomized Pivot algorithm for Correlation clustering (see [\ref{thm:clust-rp-approx}]).
+
+Since it would take an exponential amount of time to pick each subgraph of $k$ nodes and check if it is isomorphic to $H$, we'll use sampling (see [\ref{def:sampling}]).
+
+\begin{lstlisting}[caption={Algorithm 1}, label={lst:motifs-alg1}]
+Algorithm_1(G, H):
+    $U \gets \left\lbrace k \text{ nodes sampled } \uar \text{ from } \binom{V}{k} \right\rbrace$;
+    $F \gets G[U]$;
+    return $Y_H = \mathbbm{1}[F \simeq H]$;
+\end{lstlisting}
+Note that, to evaluate the characteristic function $\mathbbm{1}$, that returns 1 if the argument is true and 0 otherwise, it takes only constant time, since we are considering only $k$ nodes, and so we'll need to verify at most $k!$ permutations of the nodes in $U$.
+
+Now let's analyze the expected value of the output of the algorithm:
+\begin{equation}\label{eq:eyh-1}
+    E[Y_H] = \frac{\sum_{F \subseteq G, F \simeq H} 1}{\binom{|V|}{k}} = \frac{c_H}{\binom{n}{k}} = \sum_{F \subseteq G, F \simeq H} \frac{1}{\binom{n}{k}}
+\end{equation}
+That is, the number of subgraphs of $G$ that are isomorphic to $H$ over the number of all the subrapgs of $G$ of size $k$.
+
+\begin{obs}
+    The expected value of the solution returned by Algorithm 1 [\ref{lst:motifs-alg1}] is linear with respect to $c_H$, but we would like to obtain an unbiased estimator of $c_H$, i.e., a random variable $X_H$ such that $E[X_H] = c_H$. We can define it as follows:
+    \begin{equation}\label{eq:exh-1}
+        X_H = \binom{n}{k} \cdot Y_H.
+    \end{equation}
+    In this way, the expected value is what we want, but the variance is very high: a single sample gives us 0 or $\binom{n}{k}$, nothing very useful, and we can't pick $\binom{n}{k}$ samples.
+\end{obs}
+
+\begin{obs}
+    Since $H$ is connected, if we apply Algorithm 1 [\ref{lst:motifs-alg1}] on a sparse graph, we'll perform many useless samplings (we'll pick unconnected subgraphs with high probability). For example, the probability of peaking a $k$-motif on a star is $k/n$. Thus, we can slightly modify the algorithm as follows:
+    \begin{lstlisting}[caption={Algorithm 1b}, label={lst:motifs-alg1b}]
+Algorithm_1b(G, H):
+    $U \gets \left\lbrace k \text{ nodes sampled } \uar \text{ from } \binom{V}{k} \right\rbrace$;
+    $F \gets G[U]$;
+    if $F$ is not connected:
+        return "FAIL";
+    else:
+        return $Y_H = \mathbbm{1}[F \simeq H]$;
+    \end{lstlisting}
+    But this doesn't produce a big improvement, so how can we pick $k$ nodes in such a way that they are connected, and so they have the possibility to form the motif we are looking for? A possibility is to pick a random node, then choose one of its neighbors, then choose a neighbor of the selected neighbor, and so on. We'll describe an algorithm to do this for a special case: the 4-motif.
+\end{obs}
+
+
+\subsection{4-motifs}\label{sec:4-motifs}
+
+Let's consider different examples of motifs with 4 nodes, shown in figure [\ref{fig:4-motifs}].
+
+\begin{figure}[h!]
+    \centering
+    \includegraphics[width=0.9\textwidth]{4-motifs}
+    \caption{Examples of 4-motifs}
+    \label{fig:4-motifs}
+\end{figure}
+
+\obs The star (a.) can be considered a special case, since it doesn't contain any 4-path.
+
+\obs Considering 4-motifs from b. to f., if we use the procedure mentioned at the end of the previous section (\textit{sample a random node, choose one of its neighbors, choose a neighbor of the selected neighbor, and so on}), these motifs have different probabilities to be found, since they have different number of 4-paths (increasing from b. to f.).
+
+Let's describe an algorithm for finding the 4-paths (b.) in a graph:
+\begin{lstlisting}[caption={Algorithm 2 (Path sample)}, label={lst:motifs-alg2}]
+Algorithm_2(G):
+    choose $u_1\ \uar$ from $V$
+    for $i = 2,3,4$:
+        choose $u_i\ \uar$ from $N_{u_{i-1}}$   // $N_x$ is the set of the neighbors of $x$
+    return $Y_H = \mathbbm{1}[F \simeq H]$;
+\end{lstlisting}
+
+Let's study the expected value of the result of \texttt{Path sample}.\\
+Let $a,b,c,d$ be nodes in $G$ that form a 4-path, note that the algorithm can pick the path $a \to b \to c \to d$ or the path $d \to c \to b \to a$.
+\begin{flalign}
+    E[Y_H] &= \sum_{F \subseteq G, F \simeq H} \Pr{\text{\texttt{Path sample} hits }F} =&\\
+    &= \sum_{F \subseteq G, F \simeq H} \left( \frac1n \cdot \frac{1}{deg(a)} \cdot \frac{1}{deg(b)} \cdot \frac{1}{deg(c)} + \frac1n \cdot \frac{1}{deg(d)} \cdot \frac{1}{deg(c)} \cdot \frac{1}{deg(b)} \right)&\\
+    &= \sum_{F \subseteq G, F \simeq H} \left( \frac{1}{n \cdot \deg(b) \cdot \deg(c)} \left( \frac{1}{deg(a)} + \frac{1}{deg(d)} \right) \right)&\\
+    &= \sum_{F \subseteq G, F \simeq H} \sigma_F&\label{eq:eyh-2}
+\end{flalign}
+
+\obs While the probability of hitting any node in \texttt{Algorithm 1} [\ref{lst:motifs-alg1}] was uniform, and so we had a sum of the same value for each $F$, the probability of sampling a node in \texttt{Path sample} [\ref{lst:motifs-alg2}] depends on the degrees of the previous picked nodes, except for the first chosen node, picked $\uar$. Thus, the probability of finding a certain path depends on the degrees of the nodes that compose it, so an isolated path, where each node has degree 1 or 2, has higher probability of being chosen than any other path.
+
+To obtain an expected value of $c_H$, we need to remove this unbalancing, so we apply a compensation factor to $Y_H$, similarly to what we did in [\ref{eq:exh-1}]:
+\begin{equation}\label{eq:exh-2}
+    X_H = \frac{1}{\sigma_F} \cdot Y_H.
+\end{equation}
+
+Let $Y_F := \mathbbm{1}[\text{\texttt{Path sample} hits }F]$ (bernoullian random variable) and $X_F := Y_F \cdot \frac{1}{\sigma_F}$, then
+\begin{flalign*}
+    \Var(X_F) &= \Var(Y_F \cdot \frac{1}{\sigma_F}) =\\
+    &= \frac{1}{\left(\sigma_F\right)^2} \cdot \Var(Y_F)&\\
+    &= \frac{1}{\left(\sigma_F\right)^2} \cdot \left( \sigma_F \cdot (1 - \sigma_F) \right)&\\
+    &= \frac{1}{\left(\sigma_F\right)^2} \cdot \sigma_F -1&\\
+    &\leq \frac{1}{\sigma_F} = O\left(n \cdot \Delta^3\right)&
+\end{flalign*}
+where $\Delta$ is the maximum degree of the graph. Thus, if the graph is sparse (the degree is constant), $\Var(X_F) = O(n)$.
+
+At this point, it's important to note that there is a problem in the algorithm [\ref{lst:motifs-alg2}]: when we choose a node $u_i$, a neighbor of $u_i$, $u_{i+1}$, and we look for a neighbor of $u_{i+1}$, we could pick $u_i$ again, thus picking a path with less than 4 nodes. But it isn't difficult to overcome this problem, for example by going back to the second step of the algorithm if $F$ does not contain 4 nodes.\\
+Thus, \texttt{Path sample} is a \textbf{rejection sampling} algorithm, i.e., one pick new elements at random and increment a counter if they match some criterion, otherwise the elements are thrown away.
+
+\obs A strength of the algorithm is that it actually produces the list of the motifs it founds, not only their number. This behavior is similar to that of \texttt{Algorithm 3} for triangles [\ref{lst:triangles-alg3}] but opposite to that of \texttt{Algorithm 2} for triangles [\ref{lst:triangles-alg2}].
+
+\obs For other kind of motifs, one can use the same algorithm, but the probability $\sigma_F$ will change.
