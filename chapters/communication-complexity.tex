@@ -1,0 +1,239 @@
+%!TEX root=../main.tex
+\chapter{Communication Complexity}\label{ch:comm-complex}
+
+In a distributed computing framework like MapReduce it is not only important to have computionally efficient algorithms but also not to overload the network with information. This kind of problem is often referred as \emph{Communication Complexity}.
+
+\section{String equality}\label{sec:string-eq}
+In the following we see an algorithm to compute strings equality.
+
+\begin{lstlisting}[caption={Greedy algorithm},label={lst:fS-greedy}]
+$\bar{X}$: bits string of computer $A$
+$\bar{Y}$: bits string of computer $B$
+Algo(X,Y):
+    let $S \subseteq [n]$ be the set of indexes sampled u.a.r.
+    let computer $A$ compute $a = \xor_{i \in S} x_{i}$
+    $A$ sends $a$ to $B$
+    $B$ computes $b = \xor_{i \in S} y_{i}$
+    if $a = b$ then return $\mathbf{EQUAL}$
+    else return $\mathbf{DIFF}$
+\end{lstlisting}
+
+\begin{obs}
+if $a = b$ the algorithm always returns $EQUAL$; if the algorithm returns $EQUAL$ this does not mean necessarily $a = b$. If the algorithm returns $DIFF$ then $a \neq b$.
+\end{obs}
+
+As we will see, when $a$ and $b$ are different, the algorithm will return $DIFF$ with probability $\frac{1}{2}$.
+We can thus use the algorithm iteratively $k$ times. If it never returns $DIFF$ we can say that $a = b$ with confidence $1 - (\frac{1}{2})^k$. The first time the algorithm returns $DIFF$ we can stop because $a \neq b$.
+
+\begin{thm}
+    If $a \neq b$ the algorithm says $DIFF$ with probability $\frac{1}{2}$
+\end{thm}
+
+\begin{proof}
+    Let $T$ be the set of indexes in which $\bar{X}$ and $\bar{Y}$ differ.
+    \[
+        T = \{ i | x_i \neq y_i\} 
+    \]
+    Let $S'$ be the subset of indexes sampled \emph{u.a.r} by the algorithm where $\bar{X}$ and $\bar{Y}$ differ.
+    \[
+        S' = S \cap T 
+    \]
+    $S'$ is \emph{u.a.r.} because $S$ is \emph{u.a.r}. We know that $A$ will compute $\xor_{i \in S} x_i$, while $B$ will compute $\xor_{i \in S} y_i$.
+    %
+    \begin{multicols}{2}
+    \noindent
+        \begin{align}
+            a &= \xor_{i \in S} x_i
+        \end{align}
+        \begin{align}
+            b &= \xor_{i \in S} y_i 
+        \end{align}
+    \end{multicols}
+    %
+    Now, thanks to the commutative and distributive properties of the $xor$, we have that
+    \begin{multicols}{2}   
+    \noindent
+        \begin{align}
+            \xor_{i \in S} x_i &= \left( \xor_{i \in S'} x_i \right) \xor \left( \xor_{i \in S-S'} x_i \right)
+        \end{align}
+        \begin{align}
+            \xor_{i \in S} y_i &= \left( \xor_{i \in S'} y_i \right) \xor \left( \xor_{i \in S-S'} y_i \right)
+        \end{align}
+    \end{multicols}
+    We will now define $z$ as the $xor$ over all the indices in $S-S'$ of $x_i$. It is equal to the $xor$ over all the same indices of $y_i$.
+    \begin{align}        
+        z = \xor_{i \in S-S'} x_i &= \xor_{i \in S-S'} y_i
+    \end{align}
+    This is true because $T$ is the set of indices where the two strings differ, so $S'$ is the subset of $S$ containing those indices where the two strings differ. It then holds that $S-S'$ will be the set of indices where the two strings are same. 
+    \begin{align}
+        \xor_{i \in S} x_i &= \xor_{i \in S'} x_i \xor z \\
+        \xor_{i \in S} y_i &= \xor_{i \in S'} y_i \xor z
+    \end{align}
+    We thus have that for $a$ to be different from $b$, $\xor_{i \in S'} x_i$ must be different from $\xor_{i \in S'} y_i $.
+    \begin{align}
+        \xor_{i \in S} x_i \neq \xor_{i \in S} y_i \iff \xor_{i \in S'} x_i \neq \xor_{i \in S'} y_i 
+    \end{align}
+    Reminding that the $xor$ of two bits is $1$ when the two bits are different, we have that
+    \begin{align}
+        \xor_{i \in S'} x_i \neq \xor_{i \in S'} y_i \iff \left(\xor_{i \in S'} x_i\right) \xor \left(\xor_{i \in S'} y_i\right) = 1
+    \end{align}
+    Furthermore, by distributive property, it holds that
+    \begin{align}
+        \left(\xor_{i \in S'} x_i\right) \xor \left(\xor_{i \in S'} y_i\right) = \xor_{i \in S'}\left( x_i \xor y_i \right)
+    \end{align}
+    According to the definition of $S'$, the two strings differ in each $i \in S'$; it is then true that $x_i \oplus y_i$ must be equal to $1$ for $i \in S'$.
+    \begin{align}
+        \xor_{i \in S'}( x_i \xor y_i ) = \xor_{i \in S'} 1
+    \end{align}
+    The $xor$ of a binary string is $0$ if the string is composed of a even number of $1$s while it is $0$ otherwise.
+    \begin{align}
+        \xor_{i \in S'} 1 = 
+        \begin{cases}
+            0 & if \ |S'|\ is\ even\\
+            1 & otherwise
+        \end{cases}
+    \end{align}
+    Summing up, we have that
+    \begin{align}
+        Pr\left\{\xor_{i \in S} x_i \neq \xor_{i \in S} y_i\right\} = Pr\left\{ |S'|\ is\ even\right\} = 
+        \begin{cases}
+            0 & if \ |T| = 0\\
+            \frac{1}{2} & if \ |T| \ge 1\\
+        \end{cases}
+    \end{align}
+\end{proof}
+
+We have shown what happens when $a \neq b$, now we are going to show that the algorithm will never make a mistake when the two strings are effectively equal.
+%
+\begin{claim}
+    If $a = b$ the algorithm \textbf{always} returns EQUAL.
+\end{claim}
+\begin{proof}
+    If $a = b$ then $|T| = 0$; we then have that
+    \[
+    Pr\left\{\xor_{i \in S} x_i = \xor_{i \in S} y_i\right\} = 1 - Pr\left\{ |S'|\ is\ even\right\} = 1 - 0 = 1
+    \] 
+\end{proof}
+    
+
+\subsection{Model}
+
+Let $V = \{1,\ldots, n\}$. Let $E \subseteq \binom V 2$. Let $V$ be partitioned among $k$ disjoint parts $V_1, \ldots, V_k$ ($\bigcup_{i=1}^k V_i = V$ and $V_i \cap V_j = \varnothing$ for $1 \le i <  j \le k$). We will mostly be interested in the case $k = n$.
+
+\smallskip
+
+There are $k$ computers with unbounded memory and computational power. For each $i \in [k]$, computer $i$ knows the set $V_i$ and, for each $v \in V_i$, the set of neighbors of $v$, $N(v)$. More precisely, computer $i$ has the following set as input: $$\left\{(v, N(v)) \mid v \in V_i\right\}.$$
+
+Computers can communicate in a {\em point-to-point} manner --- that is, the generic computer $i \in [k]$ can send any string of bits $\bar{w} \in \{0,1\}^{\star}$ to the generic computer $j \in [k] - \{i\}$; the cost of sending a string is equal to its number of bits.
+
+\smallskip
+
+The goal of the $k+1$ computers is to determine the  connected components of $G$, while minimizing the cost --- that is, while minimizing the number of transmitted bits. 
+
+\subsection{A simple algorithm}
+
+First, observe that there exists the following trivial algorithm, if $|E| = m$.
+\begin{thm}
+The problem can be solved using $O(m \log n)$  bits of communication.
+\end{thm}
+\begin{proof}
+For each $i \in \{2,\ldots, k\}$, let computer $i$ sends its input to computer 1. Let computer 1 compute the   components. The total number of bits is $O(m \log n)$.
+\end{proof}
+% \iffalse
+\begin{thm}
+The problem can be solved using $O((k-1)n \log n)$ bits of communication.
+\end{thm}
+\begin{proof}
+At the outset, let each node have a label equal to its identifier. Computation will proceed in iterations:\begin{itemize}
+\item in the first step of each iteration, each computer tells Computer 1 one (if any) couple of adjacent (in the graph) and distinct labels that it sees in its subgraph;
+\item in the second step of each iteration, the central computer selects
+arbitrarily a couple that it receives, say $x<y$, and tells to every
+computer that the label $y$ has been changed to $x$;
+\item in the third and last step of each iteration, each computer changes the labels
+as dictated by the central computer (e.g., every label $y$ is changed to
+$x$).
+\end{itemize}
+The first two steps of each iteration cost $O((k-1) \log n)$ bits of communication each. The third step is free.
+
+
+ 
+The algorithm ends if no distinct adjacent labels are found in the
+first step of an iteration. When the algorithm ends, Computer 1 can easily guess the number of components: it will be equal
+to the number of remaining labels (that is: it will be equal to $n$
+minus the number of completed iterations).
+
+The number of transmitted bits  is then equal to $O((k-1) \log n)$ times the number of
+completed iterations. In each completed iteration, one label is
+removed. Since we start with $n$ labels, the total
+cost is $O(n (k-1) \log n)$ bits.
+\end{proof}
+
+\subsection{A $O\left(n^{3/2} \log^{1/2} n\right)$-bits algorithm}
+
+Let us assume, for simplicity, that the computers share a common random source --- in particular, let us assume that they can all freely access a  function $h: \binom{V}2 \rightarrow \left\{0,1\right\}$ chosen uniformly at random in the set $\left\{g \mid g: \binom{V}2 \rightarrow \left\{0,1\right\}\right\}$.
+
+\smallskip
+
+The algorithm \cite{cks15} that we will describe can be made to work in the {\em simultaneous message} model (that is, the communication can end after a single round.)\footnote{A result of Newman \cite{newman91} can be used to translate any simultaneous message algorithm into a $O(1)$-rounds protocol, using private randomness and the same $O\left(n^{3/2} \log^{1/2} n\right)$ bits of communication. Thus, the assumption that the computers share a common random source can be avoided.}
+
+\smallskip
+
+For simplicity of exposition, we assume that each computer holds exactly one node (so that $k = n$).
+
+\subsubsection{Randomized cut checking algorithm}
+
+We begin by describing an algorithm that can probabilistically check whether one or more sets of nodes leave some edges in their cuts.
+
+\begin{algorithm}
+Every node $v \in V$ computes $$x(v) = \bigoplus_{e \in E | v \in e} h(e),$$
+and sends it to the referee.
+\caption{\label{alg:cutcheck}The Cut-Checking Algorithm.}
+\end{algorithm}
+
+\begin{lem}
+Algorithm~\ref{alg:cutcheck} uses $n$ bits of communication. Moreover, for any $S \subseteq V$, the following holds. Let $y_S =\bigoplus_{v \in S} x(v)$; then:\begin{itemize}
+\item if there are no edges in the cut induced by $S$, then $y_S = 0$ with probability $1$;
+\item if there is at least one edge in the cut induced by $S$, then $y_S = 1$ with probability $1/2$.
+\end{itemize}
+\end{lem}
+\begin{proof}
+The output of each application of the hash function $h$ can be represented with $1$ bit; the nodes only send $n$ exclusive-ors of outputs of the hash function --- thus the total bit cost is $n$.
+
+\smallskip
+
+
+Let $I(S) = \left\{e \mid e \subseteq S\right\}$ be the set of edges that are completely contained in $S$, and let $C(S) = \left\{e \mid |e \cap S| = 1\right\}$ be the set of edges in the cut $(S,V-S)$.
+
+Then,
+$$y_S = \bigoplus_{v \in S} \bigoplus_{\substack{e \in E\\v \in e}} h(e) = \bigoplus_{e \in I(S)} \left(h(e) \oplus h(e)\right) \oplus \bigoplus_{e \in C(S)} h(e)  = \bigoplus_{e \in C(S)} h(e).$$
+
+Thus, if $C(S) = \varnothing$ (that is: if $S$ has no edges in its cut) we will have $y_S = 0$ with probability $1$.
+
+\smallskip
+
+Now suppose, instead, that $C(S) \ne \varnothing$; choose arbitrarily an edge $e^{\star} \in C(S)$. We can then write $$y_S = h(e^{\star}) \oplus \bigoplus_{e \in C(S) - \{e^{\star}\}} h(e).$$
+By the iid choice of the outputs of $h$ we  have that  --- regardless of $\bigoplus_{e \in C(S) - \{e^{\star}\}} h(e)$ --- the random choice of $h(e^{\star})$ will guarantee that $y_S$ will be chosen uniformly at random in $\{0,1\}$.
+The proof is completed.
+\end{proof}
+
+\subsubsection{Components-Guessing with $O\left(n^{3/2} \log^{1/2} n\right)$ bits}
+
+We now give an algorithm that correctly identifies the components with probability $1-o(1)$ using $O\left(n^{3/2} \log^{1/2} n\right)$ bits of communication, in a single round, with a common source of randomness. 
+\medskip
+
+As usual, wlog, we assume that each computer holds exactly one node — and that there exists one (arbitrarily chosen) computer called the {\em leader} of the computation:\begin{itemize}
+\item[(i)] each node $v$ acts independently as follows: if $\deg(v) \le \sqrt{n / \log n}$, then $v$ (lets its computer) send a complete listing of  all its incident edges to the leader; if, instead, $\deg(v) > \sqrt{n / \log n}$, then $v$ (lets its computer) select a UAR sample of $\left\lfloor\sqrt{n / \log n}\right\rfloor$ of the  edges incident on $v$, and sends them to the leader. In both cases, $v$ tells $\deg(v)$ to the leader;
+\item[(ii)] the leader reconstructs the partial graph $H$ of the edges it received; observe that each component of $H$ is a subcomponent of some component of the  graph $G$; a {\em complete} component of $H$ is a component containing only nodes whose degrees, as claimed by the computers that contain them, equal their degrees in $H$;
+\item[(iii)]  the leader  runs the Cut-Checking algorithm for $2 \sqrt{n \log n}$ times simultaneously on all the subsets of incomplete components\footnote{Observe that there exist up to $2^{O(n)}$ such subsets --- so, this step can require exponential time. We will not care about this particular aspect, because we are only interested in the number of bits exchanged by the computers. Note, though, that this step can be performed in polynomial time using the Gaussian elimination algorithm.};
+\item[(iv)] claim that the minimal sets that were deemed to be correct by all the runs of the Cut-Checking algorithm are the components.
+\end{itemize}
+
+\begin{thm}
+The above Components-Guessing algorithm outputs the correct partition into components with probability $1-o(1)$; the algorithm uses at most $O(n^{3/2} \log^{1/2} n)$ bits of communication.
+\end{thm}
+\begin{proof}
+Observe that the algorithm will communicate $O(n^{3/2} \log^{1/2} n)$ bits; indeed, step (i) requires at most $O(n \sqrt{n \log n})$ bits; moreover, the $\Theta\left(\sqrt{n \log n}\right)$ runs of the Cut-Checking algorithm in step (iii) will send $\Theta(n )$ bits each. Step (ii) and (iv) will not send any bit.
+
+
+Since each incomplete component has at least one node of degree not smaller than $\sqrt{n / \log n}$, each incomplete component contains more than $\sqrt{n / \log n}$ nodes --- thus, there are at most $\frac n{\sqrt {n / \log n}} = \sqrt{n \log n}$ incomplete components. The number of subsets of incomplete components is then at most $2^{\sqrt{n \log n}}$; the probability that any given set, that has one or more edges in its cuts, passes all the runs of the Cut-Checking algorithm is at most $2^{-2\sqrt{n \log n}}$ --- therefore, by the union bound, the probability that some set that strictly includes a connected component passes all the tests is at most $$2^{\sqrt{n \log n}} \cdot 2^{-2\sqrt{n \log n}} = 2^{-\sqrt{n \log n}} = o(1).$$ The claim is proved.
+\end{proof}
