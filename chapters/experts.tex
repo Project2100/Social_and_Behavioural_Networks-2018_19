@@ -197,17 +197,17 @@ WM:
             $w_i^t = 
             \begin{cases}
                 w_i^{t+1} &\text{if } G_i(t) = X(t)\\
-                w_i^{(t-1)/2} &\text{otherwise}
+                w_i^{(t-1)}/2 &\text{otherwise}
             \end{cases}$
 \end{lstlisting}
 
-\begin{lem}\label{lem:exp-lm-errors}
+\begin{lem}\label{lem:exp-wm-errors}
     \texttt{WM} makes at most $2.4 \cdot(m^* + \log_2(n))$ mistakes.
 \end{lem}
 
 \obs This algorithm is better than [\ref{lst:exp-algo2}] since we have a sum between $m^*$ and $\log_2(n)$ instead of a multiplication.
 
-\begin{proof}
+\begin{proof}[Proof of lemma \ref{lem:exp-wm-errors}]
     We'll analyze the algorithm using a \textit{potential}, that is a function of the current state that changes in time: our potential is
     \begin{equation}\label{eq:exp-wm-potential}
         W^t = \sum_{i=1}^{n} w_i^t
@@ -216,10 +216,242 @@ WM:
     \obs This potential is monotone since it always decreases with the increasing of $t$.
     
     As usual, we will proof the lemma going through some claims.
+
+    \begin{claim}\label{cl:exp-wm-1}
+        $W^0 = n$
+    \end{claim}
+    \begin{proof}
+        This is evident by definition of $W^t$ [\ref{eq:exp-wm-potential}] when the algorithm [\ref{lst:exp-wm}] is at time 0.
+    \end{proof}
+
+    \begin{claim}\label{cl:exp-wm-2}
+        Suppose that $i^*$ is an expert that, at the final time $T$, has made the smallest number of mistakes (i.e., $m^* = m_{i^*}$). Then
+        \begin{flalign*}
+             W^T &= \sum_{i=1}^T w_i^T&\tag{by definition of $W^t$ [\ref{eq:exp-wm-potential}]}\\
+                 &\geq w_{i^*}^T&\tag{by definition of $i^*$}\\
+                 &= 2^{-m^*}&\tag{by updating of $w_i^t$ in \texttt{WM} [\ref{lst:exp-wm}], repeated $m^*$ times}
+        \end{flalign*}
+    \end{claim}
+    \begin{proof}
+        The proof is comprised in the claim itself.
+    \end{proof}
+
+    \begin{claim}\label{cl:exp-wm-3}
+        Let $m$ be the number of mistakes made by the algorithm \texttt{WM} [\ref{lst:exp-wm}], and let $t_1 < t_2 \ldots < t_m$ be the times at which $A(t_j) \neq X(t_j)$, then we have:
+        \begin{flalign}
+            a := \sum_{\substack{i \in [n]\\ G_i(t_j) = X(t_j)}} w_i^t &= \sum_{\substack{i \in [n]\\ G_i(t_j) = X(t_j)}} w_i^{t-1}&\\
+            b := \sum_{\substack{i \in [n]\\ G_i(t_j) \neq X(t_j)}} w_i^t &= \frac12 \cdot \sum_{\substack{i \in [n]\\ G_i(t_j) = X(t_j)}} w_i^{t-1}&
+        \end{flalign}
+    \end{claim}
+    \begin{proof}
+        The equality in $a$ is true because the weights of the experts who make the right prediction don't change from time $t-1$ to time $t$.\\
+        The equality in $b$ is true because the weights of the experts who make the wrong prediction are halved from time $t-1$ to time $t$.
+    \end{proof}
+
+    \begin{cor}\label{cor:exp-wm-1}
+        $2b \geq a$.
+    \end{cor}
+    \begin{proof}
+        Intuitively, at time $t_j$ the algorithm made an error (by our assumption on $t_j$ in claim [\ref{cl:exp-wm-3}]), thus the majority of the experts were wrong.
+        
+        Now we'll go through a formal proof:
+        \begin{flalign}
+            W^{t_j} &= \sum_{i \in [n]} w_i^{t_j} = a + b&\tag{by definition of $a$ and $b$}
+        \end{flalign}
+        \begin{flalign}\label{eq:wtj-1}
+            W^{t_{j-1}} &= \sum_{i \in [n]} w_i^{t_{j-1}}&\\
+            &= \sum_{\substack{i \in [n]\\ G_i(t_j) = X(t_j)}} w_i^{t_{j-1}} + \sum_{\substack{i \in [n]\\ G_i(t_j) \neq X(t_j)}} w_i^{t_{j-1}}&\tag{$*^1$}\\
+            &= \sum_{\substack{i \in [n]\\ G_i(t_j) = X(t_j)}} w_i^{t_{j}} + \sum_{\substack{i \in [n]\\ G_i(t_j) \neq X(t_j)}} 2 \cdot w_i^{t_{j}}&\tag{$*^2$}\\
+            &= a + 2b&\tag{by definition of $a$ and $b$}
+        \end{flalign}
+        In the step marked by $(*^1)$ we decompose the sum in two parts: the weights of the experts who guess and the weights of the experts who are wrong at time $t_j$.\\
+        The step marked by $(*^2)$ is due to the fact that the weights of the experts who guess don't change, while the weights of the experts who are wrong are halved.
+        
+        Since the algorithm makes the wrong guess at time $t$ only if the majority of the experts is wrong, that means that at time $t-1$ there were more $b$ than $a$, thus $2b \geq a$.
+    \end{proof}
+
+    \begin{obs}
+        Using corollary [\ref{cor:exp-wm-1}] we can say that
+        \begin{equation}
+            W^{t_{j-1}} - W^{t_j} = (a + 2b) - (a + b) = b \geq a/2.
+        \end{equation}
+    \end{obs}
+
+    \begin{cor}\label{cor:exp-wm-2}
+        The potential decreases significantly from time $t_{j-1}$ to time $t_j$.
+    \end{cor}
+    \begin{proof}
+        \begin{flalign*}
+            W^{t_{j-1}} &= a + 2b&\tag{by eq [\ref{eq:wtj-1}]}\\
+            &= (a+b)+b&\\
+            &= (a+b) + \left( \frac13 b + \frac23 b \right)&\\
+            &\geq (a+b) + \left( \frac13 b + \frac23 \frac{a}{2} \right)&\tag{by corollary [\ref{cor:exp-wm-1}]}\\
+            &= (a+b) + \frac13(a+b)&\\
+            &= \frac43 (a+b) = \frac43 W^{t_j}&
+        \end{flalign*}
+        
+        Thus $W^{t_j} \leq \frac34 W^{t_{j-1}}$, and this proves the corollary.
+    \end{proof}
+
+    \begin{obs}
+        We know that the potential will stop decreasing when it reaches the value of $m^*$, since it is the minimum error.
+    \end{obs}
+
+    \begin{claim}\label{cl:exp-wm-4}
+        \begin{flalign*}
+            W^{t_j} &\leq \frac34 W^{t_{j-1}}&\tag{by corollary [\ref{cor:exp-wm-2}]}\\
+            &\leq \left(\frac34\right)^j \cdot W^0&\tag{since $W$ decreases $j$ times of a factor $\frac34$ from the initial value $W^0$}\\
+            &= \left(\frac34\right)^j \cdot n&\tag{by claim [\ref{cl:exp-wm-1}]}
+        \end{flalign*}
+    \end{claim}
+
+    \begin{claim}\label{cl:exp-wm-5}
+        \begin{equation}
+            2^{-m^*} \leq W^T \leq \left( \frac34 \right)^m \cdot n.
+        \end{equation}
+    \end{claim}
+    \begin{proof}
+        The first inequality is due to claim [\ref{cl:exp-wm-2}] and the second to claim [\ref{cl:exp-wm-4}].
+    \end{proof}
+
+    Now we can finally conclude the proof of lemma [\ref{lem:exp-wm-errors}].
+    \begin{flalign*}
+        m \cdot \log_2 \frac34 + \log_2 n &\geq -m^*&\tag{by claim [\ref{cl:exp-wm-5}]}\\
+        -m \log_2 \frac34 + \log_2 n &\geq -m^*&\tag{since $\log_2 \frac34$ is negative}\\
+        m \cdot \log_2 \frac34 &\leq m^* + \log_2 n&\\
+        m &\leq \frac{1}{\log_2 4/3} \cdot \left( m^* + \log_2 n \right) \approx 2.4 \cdot \left( m^* + \log_2 n \right)
+    \end{flalign*}
 \end{proof}
 
 
+\subsection{Better algorithms}\label{sec:exp-better-algs}
+
+We can modify the weighted majority algorithm [\ref{lst:exp-wm}] to obtain a better approximation of the behavior of the best expert, but the improvement isn't very significant if we don't use non-determinism.
 
 
+\subsubsection{$\varepsilon$-Weighted Majority}
+\label{sec:exp-weighted-bet}
+
+If we change the weight the algorithm gives to the experts that are wrong from $w_i^{(t-1)}/2$ to $w_i^{(t-1)} \cdot (1 - \varepsilon)$, we obtain the following changes in the analysis of the algorithm:
+\begin{itemize}
+    \item Claim [\ref{cl:exp-wm-2}] becomes $W^T \geq (1 - \varepsilon)^{m^*}$;
+    \item $b$ defined in claim [\ref{cl:exp-wm-3}] becomes $b = (1 - \varepsilon) \cdot \sum_{\substack{i \in [n]\\ G_i(t_j) = X(t_j)}} w_i^{t-1}$;
+    \item The ratio between $a$ and $b$ described in corollary [\ref{cor:exp-wm-1}] depends on $\varepsilon$;
+    \item Lemma [\ref{lem:exp-wm-errors}] becomes $m \leq (2 + \Theta(\varepsilon)) \cdot m^* + \frac{\log_2 n}{\Theta(\varepsilon)}$, so the constant factor in front of $m^*$, that usually dominates the sum, decreases, but the one in front of $\log_2 n$ increases.
+\end{itemize}
+
+Therefore, we are doing more than twice the number of errors made by the best expert. At this point it is natural to ask ourselves if there exists an algorithm that can do better: the following theorem gives us a lower bound valid for each deterministic algorithm.
+
+\begin{thm}\label{thm:exp-lb}
+    $m \geq m^*$ for any deterministic algorithm.
+\end{thm}
+\begin{proof}
+    We show an example in which any algorithm that can be reproduced by and adversary makes twice the number of the errors made by the best expert.
+    
+    \begin{table}[h!]
+        \centering
+        \begin{tabular}{c|c|c|c|c|c}
+            & $t=0$    & $t=1$    & $t=2$    & $\cdots$ & $t=T$    \\ \hline
+            $E_1$ & 0        & 0        & 0        & $\cdots$ & 0        \\
+            $E_2$ & 1        & 1        & 1        & $\cdots$ & 1        \\
+            A     & $A(1)$   & $A(2)$   & $A(3)$   & $\cdots$ & $A(T)$   \\
+            X     & $1-A(1)$ & $1-A(2)$ & $1-A(3)$ & $\cdots$ & $1-A(T)$
+        \end{tabular}
+        \caption{Example of tightness of the lower bound.}
+        \label{tab:exp-lb}
+    \end{table}
+
+    The number of errors made by the algorithm is $m = T$, the total number of errors made by the experts is $m_1 + m_2 = T$, thus $\exists i \in \{1,2\} \st m_{i^*} \leq \frac{T}{2}$.
+
+    Since the ground-truth is decided by an adversary, who picks at each time the opposite of the guess made by the algorithm, with two experts that always makes different guesses we can't make less then $2 \cdot m^*$ errors.
+\end{proof}
 
 
+\subsubsection{Randomized Weighted Majority}
+\label{sec:exp-random-weighted-maj}
+
+The only way of reducing the constant error from $2+\varepsilon$ to $1 + \varepsilon$ is to use random algorithms, like the one we propose here.
+
+\begin{lstlisting}[caption={Randomized Weighted Majority}, label={lst:exp-rwm}]
+RWM:
+    $w_i^0 \gets 1\ \forall i \in [n]$
+    for each $t \geq 1$:
+        $s_x^t \gets \sum_{\substack{i \in [n]\\ G_i(t) = X(t)}} w_i^{t-1}\ (x \in \{0, 1\})$
+        with probability $\frac{s^t_0}{s^t_0 + s^t_1}$ claim $A(t) := 0$
+        with probability $\frac{s^t_1}{s^t_0 + s^t_1}$ claim $A(t) := 1$
+        // $X$ is revealed, phase 1 ends and phase 2 begins
+        for each $i \in [n]$:
+            $w_i^t = 
+                \begin{cases}
+                    w_i^{t+1} &\text{if } G_i(t) = X(t)\\
+                    w_i^{(t-1)} \cdot (1-\varepsilon) &\text{otherwise}
+                \end{cases}$
+\end{lstlisting}
+
+\begin{obs}
+    The algorithm is very similar to \texttt{WM} [\ref{lst:exp-wm}], in fact the decisions made by the algorithm are still based on the ones of the majority of the experts, but not deterministically, so to fool the adversary who can't exactly reproduce the algorithm.
+\end{obs}
+
+\begin{ex}
+    If the 51\% of the experts vote 0 and the 49\% vote 1, the two options have almost the same probability to be chosen by the algorithm.
+\end{ex}
+
+\begin{lem}\label{lem:exp-rwm-erros}
+    \texttt{RWM} makes at most $(1 + O(\varepsilon)) \cdot m^* + \log_2 n / \varepsilon$ mistakes in expectation.\\
+    In other words, $E[m] \leq (1 + \varepsilon) \cdot m^* + \frac{\log_2 n}{\varepsilon}$.
+\end{lem}
+\begin{proof}
+    Let's define the probability of failure at time $t$ as $T_t =
+    \begin{cases}
+        \frac{s^t_0}{s^t_0 + s^t_1} &\text{if } X(t)=1\\
+        \frac{s^t_1}{s^t_0 + s^t_1} &\text{otherwise}
+    \end{cases}.$
+    
+    As usual, we proceed by proving a number of claims.
+    
+    \begin{claim}\label{cl:exp-rwm-1}
+        $E[m] = \sum_{t=1}^{T}$.
+    \end{claim}
+
+    \begin{claim}\label{cl:exp-rwm-2}
+        $W^0 = n$.
+    \end{claim}
+
+    \begin{claim}\label{cl:exp-rwm-3}
+        $W^t = \left(1- \varepsilon F_t\right) \cdot w^{t-1}$.
+    \end{claim}
+    \begin{proof}
+        The proof is left as an exercise.
+    \end{proof}
+
+    \begin{claim}\label{cl:exp-rwm-4}
+        $W^T = n \cdot \prod_{t=1}^T \left( 1 - \varepsilon F_t \right)$.
+    \end{claim}
+
+    \begin{claim}\label{cl:exp-rwm-5}
+        Let $i^*$ be a best expert, $W^T \geq w_{i^*}^T = \left( 1 - \varepsilon \right)^{m^*}$.
+    \end{claim}
+
+    \begin{claim}\label{cl:exp-rwm-6}
+        \begin{flalign*}
+            \left( 1 - \varepsilon \right)^{m^*} &\leq
+            n \cdot \prod_{t=1}^T \left( 1 - \varepsilon F_t \right)&\\
+            &\Downarrow&\\
+            m^* \ln(1 - \varepsilon) &\leq \ln(n) + \sum_{t=1}^{T} \ln(1 - \varepsilon F_t)&\tag{by applying logarithm}\\
+            &\leq \ln(n) - \varepsilon \cdot \sum_{t=1}^{T} F_t&\tag{by inequality \ref{eq:ln-1-x}}\\
+            &= \ln(n) - \varepsilon \cdot E[m]&\tag{since $\sum_{t=1}^{T} F_t$ is the number of errors \texttt{RWM} will do in expectation}\\
+            &\Downarrow&\\
+            \varepsilon \cdot E[m] &\leq \ln(n) + m^* \cdot \ln\left( \frac{1}{1-\varepsilon} \right)&\\
+            &\Downarrow&\\
+            E[m] &\leq \frac{\ln(n)}{\varepsilon} + \frac{\ln\left( \frac{1}{1-\varepsilon} \right)}{\varepsilon} \cdot m^*&\\
+            &\leq \frac{\ln(n)}{\varepsilon} +  \frac{\varepsilon + O(\varepsilon^2)}{\varepsilon} \cdot m^*&\\
+            &= \frac{\ln(n)}{\varepsilon} + \left( 1 + O(\varepsilon) \right) \cdot m^*&
+        \end{flalign*}
+    \end{claim}
+\end{proof}
+
+At this point, we would like to show if this bound is tight for any non deterministic algorithm, in general.\\
+If the ground truth is chosen \uar, and the experts take their decision at random, the algorithm will eventually make $E[m] = \frac{T}{2}$ errors. Thus, the experts will make $\frac{T}{2}$ mistakes in expectation, but the luckiest one will make only $m^* = \frac{T}{2} \cdot \Theta\left( \sqrt{\ln(n) \cdot T} \right)$ mistakes. Thus the algorithm is pretty close to the best expert.\\
+Let's take $\varepsilon = \sqrt{\frac{\ln(n)}{T}}$, then $m* \cdot \varepsilon = \Theta(\sqrt{T \cdot \ln(n)})$. Therefore the algorithm is optimal for the right choice of $\varepsilon$.
+
+\obs The algorithm \texttt{RWM} [\ref{lst:exp-rwm}] can be generalized to cases in which the choice to be made isn't binary, but for example a vector or a real number.
