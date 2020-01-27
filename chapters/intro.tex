@@ -2,97 +2,163 @@
 
 \chapter{Introductory pills}
 
+\section{Objectives of the course}
+    
+    The main objective of the course are:
+    \begin{enumerate}
+        \item Find efficient solutions to analyze social networks;
+        \item Define models that describe users' behavior;
+        \item Find ways to infer missing data in a social network.
+    \end{enumerate}
+
+    Our models have to adapt well to real cases but also to be understandable.
+    
+    Our algorithms have to be efficient: they need few memory and execution time, and they can easily be executed in parallel on more computers, using frameworks such as Pregel or Map-Reduce.
+
+
 \section{Basic ideas}
 
-	Note: "pick" and "sample" are used interchangeably.
+    Here we enumerate some preliminary notes and formulas that should be already known and will be useful during the course:
+    
+    \begin{itemize}
+        \item \textit{Note}: ``pick" and ``sample" are used interchangeably;
+        \item We call \emph{node} an entity on the web that can be a blog, a website or a social network profile
+        \item A useful property of logarithms:
+            \begin{equation}\label{eq:log-prop}
+                e^{\ln x} = x
+            \end{equation}
+        \item A recurrent inequality:
+            \begin{equation}\label{eq:e-x}
+                1-x \leq e^{-x}
+            \end{equation}
+        \item A recurrent inequality:
+            \begin{equation}\label{eq:ln-1-x}
+                \ln(1-x) \leq -x
+            \end{equation}
+        \item A helpful limit:
+            \begin{equation}\label{eq:limit-1/e}
+                \lim_{x \to +\infty} \left(1 - \frac{1}{x}\right)^x = \frac{1}{e}
+            \end{equation}
+        \item Let $E_i$ be mutually independent events, then
+            \begin{equation}\label{eq:prob}
+                \Pr{\bigcap_{i=0}^n E_i} \leq \prod_{i=0}^{n}\Pr{E_i}
+            \end{equation}
+    \end{itemize}
+    
+    Then we have some useful definitions.
+    
+    \begin{defn}[Expected value]\label{def:expected-value}
+        Let $X$ be a random variable with a finite number $n$ of finite outcomes $x_{1},x_{2},\ldots,x_{n}$ occurring with probabilities $p_{1},p_{2},\ldots,p_{n}$ respectively. Then The expected value of $X$ is
+        \begin{equation}
+            E[X] = \sum_{i=1}^{n} x_i \cdot p_i.
+        \end{equation}
+        Note that $E[X]$ is called the \textit{expected value} because it means the midpoint where all outcomes, compounded with their weight, contribute to the equilibrium.
+        
+        \begin{qst}
+            Can we still talk about expected value when the outcomes are not numeric? What could be a good bijection between a generic sample space $\Omega$ and $\nonneg$?
+        \end{qst}
+    \end{defn}
+    
+    \begin{defn}[Sampling]\label{def:sampling}
+        It is a simple algorithmic approach used for abstracting and estimating the percentage of elements of a certain type in a large set.
+        
+        \ex If there is a huge number of black and white marbles in a (very big) bowl and you'd like to know the ratio of black marbles, you can't count all of them, so you extract a sample of marbles many times, until you have sufficient confidence in the obtained result.
+    \end{defn}
+    
+    \begin{defn}[Bayes' Theorem]
+        Bayes’ theorem (or law or rule) describes the probability of an event, based on prior knowledge of conditions that might be related to the event.
+        \begin{equation}\label{eq-bayes}
+            \Pr{(A \cap B)} = \Pr{(A)} \cdot \Pr{(B | A)}
+        \end{equation}
+    \end{defn}
 
-	About $E(X)$: It is called the "expected value" because it means the midpoint where all outcomes, compounded with their weight, contribute to the equilibrium.
-	
-	\textit{Question: Can we still talk about expected value when the outcomes are not numeric? What could be a good bijection between a generic sample space $\Omega$ and $\nonneg$?}
-	
-\subsection{Sampling}
 
-	\textit{Sampling} is a simple algorithmic approach used for abstracting and estimating the percentage of elements of a certain type in a large set.
-	
-	\ex If there is a huge number of black and white marbles in a (very big) bowl and you'd like to know the ratio of black marbles, you can't count all of them, so you extract a sample of marbles many times, until you have sufficient confidence in the obtained result.
+\subsection{Pregel framework}
+
+    Brief description:
+    \begin{itemize}
+        \item Each node can communicate only with its neighbors;
+        \item The computation si asynchronous;
+        \item Each node can use few local memory (since there are many nodes);
+        \item The nodes of a network (graph) are distributed on many computers, so it's important to group them based on community to reduce the number of communications among computers, and to accurately choose a threshold between the memory to assign to each node and the number of nodes we want to put into each single machine.
+    \end{itemize}
+    
+    \begin{ex}[Find connected components of a graph using Pregel]
+        Each node contains a unique number at the beginning (an ID), then every one send its ID to its neighbors, and when a node receives a new number replace its ID with the received one, if it's geater than its own. \\
+        When the values stop changing every connected component has the same value.
+        The maximum number of iterations is given by the diameter of the graph.
+    \end{ex}
 
 
 \subsection{Union bound}
-	
-	\begin{equation}
-	\Pr\left(\bigcup_{i=0}^n E_i\right) \leq \sum_{i=0}^{n}(\Pr(E_i))
-	\end{equation}
+
+	\begin{defn}[Union Bound]
+        Let $A$ and $B$ be two events, then
+        \begin{equation}\label{eq:union-bound}
+            \Pr{A \vee B} \leq \Pr{A} + \Pr{B}
+        \end{equation}
+    \end{defn}
+
+    \begin{proof}
+        The theorem directly follows from the fact that probabilities are non-negative and from the following property:
+        \begin{equation}\label{eq:prob-or}
+            \Pr{A \vee B} = \Pr{A} + \Pr{B} - \Pr{A \wedge B}
+        \end{equation}
+    \end{proof}
+    
+	\begin{defn}[Generalized Union Bound]
+        Let $E_i$ be a countable set of events, then
+        \begin{equation}\label{eq:union-bound-gen}
+            \Pr{\bigcup_{i=0}^n E_i} \leq \sum_{i=0}^{n}(\Pr{E_i})
+        \end{equation}
+    \end{defn}
+    
 	If the events are mutually disjoint, then the equality is strict.
 
 	
-\subsection{Markov inequality}
+\subsection{Markov's inequality}
 	
 	Let $X$ be a non-negative random variable (RV) in a sample space $\Omega$, and $a$ an outcome in $\Omega$, then:
 	
-	\begin{equation}
-	\Pr(X \geq a) \leq \frac{E[X]}{a}
+	\begin{equation}\label{eq:markov}
+	   \Pr{X \geq a} \leq \frac{\mathbb{E}[X]}{a}
 	\end{equation}
 	
-	Proof:
-	\begin{align*}
-	E(X) &= \int_{0}^{\infty}x \Pr(X=x)dx \\
-		 &\geq \int_{a}^{\infty}x\Pr(X=x)dx \\
-		 &\geq \int_{a}^{\infty}a\Pr(X=x)dx \\
-		 &= a\Pr(X \geq a)
-	\end{align*}
+	\begin{proof} \
+        \begin{flalign*}
+            \mathbb{E}[X] &= \int_{0}^{\infty}x \Pr{X=x}dx& \\
+            &\geq \int_{a}^{\infty}x\Pr{X=x}dx& \\
+            &\geq \int_{a}^{\infty}a\Pr{X=x}dx& \\
+            &= a\Pr{X \geq a}
+        \end{flalign*}
+    \end{proof}
 	
-	Informally, the Markov inequality let us tell something about an extreme event in a probability distribution of which we know only the expectation: if $E[X]$ is small, then X is unlikely to be very large.
+	Informally, the Markov inequality let us tell something about an extreme event in a probability distribution of which we know only the expectation: if $\mathbb{E}[X]$ is small, then X is unlikely to be very large.
+    
+    Another way of claiming this inequality is the following:
+    \begin{equation}\label{eq:markov2}
+        \Pr{X \geq a \cdot \mathbb{E}[X]} \leq \frac{1}{a}
+    \end{equation}
 	
 	More about this \href{https://youtu.be/vjYanZ1nsZg}{here} or \href{https://ocw.mit.edu/resources/res-6-012-introduction-to-probability-spring-2018/part-i-the-fundamentals/}{here}.
 
 
+\subsection{Chebyshev's inequality}
+
+    Let $X$ (integrable) be a random variable with finite expected value $\mu$ and finite non-zero variance $\sigma^2$. Then, for any real number $k > 0$,
+    \begin{equation}\label{eq:chebyshev}
+        \Pr{\abs{X-\mu} \geq k \sigma} \leq \frac{1}{k^2}
+    \end{equation}
+
+
 \subsection{Moment generating functions}
 	
-	Moments, in a mathematical-analytical sense, are "quantitative measures" that describe characteristic of a shape. E.g.: a generic function's first moment is its slope (first derivative).\\
+	Moments, in a mathematical-analytical sense, are ``quantitative measures" that describe characteristic of a shape. E.g.: a generic function's first moment is its slope (first derivative).\\
 	Given a random variable $X$, then its moment generating function is
 	\begin{equation}
 	M_X(t) = e^{tX}, t \in \mathbb{R}
 	\end{equation}
 	
-	To be continued... % TODO moment generating function
+    % TODO moment generating function
 	
-	Reminder! Power series of the $e^x$ function: $\displaystyle e^x = \sum_{i=0}^{\infty}\frac{x^n}{n!}$
-	
-	
-\section{Chernoff bound}
-
-	The Chernoff bound allows you to control how much a RV is close to its expected value.
-
-	Let $X_1, \dots, X_n \in \coin(p)$ \iid, i.e. $X_1, \dots, X_n$ are $n$ RV such that\\
-	$\Pr(X_i=1)=p$ and $\Pr(X_i=0)=1-p$.\\
-	In other words, they are $n$ independent throws of the same coin.
-	
-	Let $X=\sum_{i=1}^{n}(X_i)$.
-	X is essentially a binomial RV: $X \in \binomdist(\binary^n, p)$, thus $E[X]=p\cdot n$. It represents the number of times you get head with the aforesaid $n$ throws.
-	
-	So, given an error limit $\varepsilon$, we define the Chernoff bound as:
-	\begin{equation}\label{chernoff}   %True definition
-	\Pr(\abs{X-E[X]} \geq t)\leq e^{-2t^2/n}
-	\end{equation}
-	where $t := \varepsilon n$.
-	
-	In the binomial case, [\ref{chernoff}] translates to:
-	\begin{equation*}
-	\Pr\left(\abs{\sum_{i=1}^{n}(X_i) - p \cdot n} > t \right) = \Pr\left(\abs{\frac{1}{n}\sum_{i=1}^{n}(X_i) - p} > \frac{t}{n} \right)
-	\end{equation*}
-	\\
-	Then, replacing $t$ with $\varepsilon n$, we get %Custom
-	\begin{equation}
-		\Pr\left(\abs{\frac{1}{n}\sum_{i=1}^{n}(X_i) - p} > \varepsilon \right) \leq 2e^{-2n^3\varepsilon^2}
-	\end{equation} % TODO check binomial c.b.
-	
-	\ex If you want to know how many Facebook users have more than 100 friends, you can't simply count, but you can obtain a good approximation sampling a reasonable number of profiles.
-	
-	It's important to observe that the size of the sample we need in order to obtain a good approximation depends on the error we tolerate, not on the total population.
-	
-	There are many possible formulations of the Chernoff bound, another one that can be useful is the following:
-	\begin{equation}\label{chernoff2}
-	\Pr(\abs{X-E[X]} \geq \varepsilon \cdot n) \leq 2e^{-\frac{\varepsilon^{2}}{3}n}
-	\end{equation}
-	
-	\ex Let be $E[X]=\frac{50}{100}$ and $\varepsilon=\frac{1}{100}$, the probability that $X \geq \frac{51}{100}$ or $X \leq \frac{49}{100}$ is less then or equal to $2e^{-\frac{1}{30000}n}$.
+	Reminder! Power series of the $e^x$ function: $\displaystyle e^x = \sum_{i=0}^{\infty}\frac{x^n}{n!}$.

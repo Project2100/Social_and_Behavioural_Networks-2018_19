@@ -2,38 +2,45 @@
 
 \chapter{Locality Sensitive Hashing}
 	
-	The goal of hashing techniques is to reduce a big "object" to a small "signature" or "fingerprint".\\
-	In general, what happens in locality sensitive hashing (or LSH) is to have some notion of similarity, and then define a "scheme" which computes it. The process of creating a scheme usually involves some sort of preprocessing step, and a function family which, by choosing one or another function according a probability distribution, statistically classifies the objects in the same way as the similarity function does.\\
-	The bottom line of LSH schemes is: similar objects hash to similar values (this is "\textit{locality}").
+	The goal of hashing techniques is to reduce a big ``object" to a small ``signature" or ``fingerprint".\\
+	In general, what happens in locality sensitive hashing (or LSH) is to have some notion of similarity, and then define a ``scheme" which computes it. The process of creating a scheme usually involves some sort of preprocessing step, and a function family which, by choosing one or another function according a probability distribution, statistically classifies the objects in the same way as the similarity function does.\\
+	The bottom line of LSH schemes is: similar objects hash to similar values (this is ``\textit{locality}").
 	
 	Here are some common similarities:
-	\begin{itemize}
 	
-	\item \textbf{Jaccard similarity}: Given two sets of objects A and B, their Jaccard similarity is defined as follows:
+    \begin{defn}[Jaccard similarity]
+        Given two sets of objects A and B, their Jaccard similarity is defined as follows:
+        \begin{equation}
+        \jaccsim(A, B) = \frac{|A\cap B|}{|A\cup B|}
+        \end{equation}
+    \end{defn}
 	
-	\begin{equation}
-	\jaccsim(A, B) = \frac{|A\cap B|}{|A\cup B|}
-	\end{equation}
-	
-	\item \textbf{Hamming similarity}: Given two sets of objects A and B taken from a universal set U, their Hamming similarity is defined as follows:
-	
-	\begin{equation}
-	\hammsim(A, B) = \frac{|A\cap B| + |\complement_U(A\cup B)|}{|U|}
-	\end{equation}
-	
-	\end{itemize}
-	
+    \begin{defn}[Hamming similarity]
+        Given two sets of objects A and B taken from a universal set U, their Hamming similarity is defined as follows:
+        \begin{equation}
+        \hammsim(A, B) = \frac{|A\cap B| + \abs{\overline{A\cup B}}}{|U|}
+        \end{equation}
+    \end{defn}
+
+    \begin{obs}
+        Generally, the Jaccard similarity is more used then the Hamming similarity, because usually we have to compare sets whose size is much smaller than the size of the universe set $U$, this, using $\hammsim$, we would obtain a high similarity because of the big size of $\overline{A\cup B}$.
+    \end{obs}
+
+
 \section{A case study: Web-page indexing}\label{sec:web-page-indexing}
 	
 	A search engine crawls periodically the whole Internet and stores valuable information in its own index for search optimization purposes.
 	
-	An observation to make is the following: some kinds of documents, that are very similar to each other, are stored sparsely through the net; to save storage space, only one of a kind of document's info is stored in the index, whereas all others are linked to the first one, because of their similarity.
+    \begin{obs}
+        Some kinds of documents, that are very similar to each other, are stored sparsely through the net; to save storage space, only one of a kind of document's info is stored in the index, whereas all others are linked to the first one, because of their similarity.
+    \end{obs}
 	
-	To find a useful hashing scheme, A. Broder came up with an idea, and he succeeded in reducing the storage space needed by Altavista by a factor of 10.\\
+	To find a useful hashing scheme, A. Broder came up with an idea, and he succeeded in reducing the storage space needed by Altavista by a factor of 10.
+    
 	First off, let us fix some definitions:
 	\begin{itemize}
 	\item $U$: the set of all words, i.e. the English vocabulary
-	\item $U*$: the set of all strings composed of english words
+	\item $U^*$: the set of all strings composed of English words
 	\end{itemize}
 	
 	The starting point is to treat web pages as strings:
@@ -42,66 +49,79 @@
 	
 	$T_2:$ \textit{``The white board is white''}
 	
-	Then, let $distinct(T)$ return the set of distinct words appearing in a string (ref. \href{https://en.wikipedia.org/wiki/Bag-of-words_model}{Bag of Words model}).
+	Then, let $distinct(T)$ return the set of distinct words appearing in a string (ref. \href{https://en.wikipedia.org/wiki/Bag-of-words_model}{Bag of Words model}), and let $A:=distinct(T_1),\ B:=distinct(T_2)$.
+    
+    \begin{figure}[h!]
+        \centering
+        \includegraphics[scale=0.7]{bow_venn}
+        \caption{Venn diagram with the BoW representation of $T_1$ and $T_2$.}
+        \label{fig:bow_venn}
+    \end{figure}
 	
 	So for example, by using the Jaccard similarity:
     
     \begin{equation}
-    \jaccsim(distinct(T_1), distinct(T_2))= \frac{3}{5}
+    \jaccsim(A, B)= \frac{3}{5}
     \end{equation}
 	
 	Over a half: they look close. If we used the Hamming distance instead, we would (almost always) get a number very close to 1, because we're using a minuscule part of the universe set (in our case, the English dictionary), thus (almost) all words are absent from the sets.
 	
-	Now, our objective is to construct a scheme over web-pages that implement the Jaccard similarity.
-
+	Now, our objective is to construct a scheme over web-pages that implement the Jaccard similarity.\\
 	Our pre-processing step: Choose a permutation (or total ordering) $\pi \in \order(A \cup B)$ \uar. To construct said order is a simple task, as we can see with the following algorithm.
 	
-	\newpage
 	Algorithm for sampling a $\uar$ permutation $\pi$ of $[n]$, where $[n]$ is a numeric representation of $U$, and using it to compute the hash of $A$:
 	\begin{lstlisting}[caption={min hash or shingles algorithm},label={lst:min_hash}]
-	MinHash($A$):
-	    // preprocessing
-	    $S$ := $[n]$
-	    $\pi$ := empty sequence
-	    while $S \neq \emptyset$:
-	        pick $i \in S \uar$
-	        append $i$ to $\pi$
-	        remove $i$ from $S$
-	    end
-	    // computing hash
-	    $h_\pi(A)$ := minimum element of A, according to $\pi$
-	    return $h_\pi(A)$
+MinHash($A$):
+     // preprocessing
+     $S$ := $[n]$
+     $\pi$ := empty sequence
+     while $S \neq \emptyset$:
+         pick $i \in S \ \uar$
+         append $i$ to $\pi$
+         remove $i$ from $S$
+     end
+     // computing hash
+     $h_\pi(A)$ := minimum element of A, accordig to $\pi$
+     return $h_\pi(A)$
 	\end{lstlisting}
 	
-	Proof of uniform choice of $\pi$:
-	\begin{align*}
-		\Pr(X = \pi) &= \frac{1}{|S|}\cdot\frac{1}{|S|-1}\cdot\dots\cdot 1\\
-		&= \frac{1}{|S|!} \Rightarrow X \in \unifdist(\permut(A \cup B))
-	\end{align*}
+    \begin{proof}[Proof of uniform choice of $\pi$]
+        \begin{align*}
+        \Pr{X = \pi} &= \frac{1}{s}\cdot\frac{1}{s-1}\cdot\dots\cdot 1\\
+        &= \frac{1}{s!} \Rightarrow X \in \unifdist(\permut(A \cup B))
+        \end{align*}
+    \end{proof}
 	
-	So, from $\pi$, we defined the hashing function as:
-	\begin{equation}
-	h_\pi \in \mathcal{P}(U) \to U : h_\pi(A) = min_\pi(A)
-	\end{equation}
-	In other words, we take the ``minimum'' in A according to the ordering specified by $\pi$. A simple but useful observation would be:
-	\begin{equation}
-	\forall A \subseteq U \Rightarrow h_\pi(A) \in A
-	\end{equation}
+	So, from $\pi$, we obtained the following definition:
+    \begin{defn}[Hashing function]
+        \begin{equation}
+        h_\pi \in \mathcal{P}(U) \to U : h_\pi(A) = min_\pi(A)
+        \end{equation}
+    \end{defn}
 	
-	\ex
-	\begin{equation*}
-	\pi = (black, the, is, white, board) \wedge A = \{black, board\} \Rightarrow h_\pi(A) = black
-	\end{equation*}
+	In other words, we take the ``minimum'' in A according to the ordering specified by $\pi$.
+    
+    \begin{obs}
+        A simple but useful observation would be:
+        \begin{equation}
+        \forall A \subseteq U \Rightarrow h_\pi(A) \in A
+        \end{equation}
+    \end{obs}
+	
+	\begin{ex}
+       	\begin{equation*}
+            \pi = (black, the, is, white, board) \wedge A = \{the, black, board, is\} \Rightarrow h_\pi(A) = black
+        \end{equation*}
+    \end{ex}
 	
 	Thus, we say that $A$ is similar to $B$ iff $h_\pi(A)=h_\pi(B)$.\\
-	Recall that $A$ and $B$ are fixed, $\pi$ is the focus of this definition. What can be said about $\Pr(h_\pi(A)=h_\pi(B))$? Looking at a corresponding Venn diagram:
-	% TODO add Venn diagram
+	Recall that $A$ and $B$ are fixed, $\pi$ is the focus of this definition. What can be said about $\Pr{h_\pi(A)=h_\pi(B)}$? Looking at a corresponding Venn diagram [\ref{fig:bow_venn}]:
 	\begin{itemize}
-	\item $A \cap B = \emptyset \Rightarrow \Pr(h_p(A)=h_p(B)) = 0$; they have no words in common, so their hashes must be different, independently of the chosen order;
-	\item $A = B \Rightarrow \Pr(h_p(A)=h_p(B)) = 1$; this time, all words are in common, so their hashes must coincide, again, independently of the chosen order;
+	\item $A \cap B = \emptyset \Rightarrow \Pr{h_p(A)=h_p(B)} = 0$; they have no words in common, so their hashes must be different, independently of the chosen order;
+	\item $A = B \Rightarrow \Pr{h_p(A)=h_p(B)} = 1$; this time, all words are in common, so their hashes must coincide, again, independently of the chosen order;
 	\item Otherwise, since $\pi$ is chosen \uar, the probability that the hashes are equal has the same meaning of the probability of finding the lowest element of A and B in the intersection with respect of the union (and not in $U$ as a whole, as our previous observation suggests), which is the Jaccard similarity of $A$ and $B$ by its very definition:
 	\begin{align*}
-		\Pr(h_\pi(A)=h_\pi(B)) &= \frac{\Pr(\min(A) \in A \cap B \wedge \min(B) \in A \cap B)}{\Pr(\min(A) \in A \cup B \wedge \min(B) \in A \cup B)}\\
+		\Pr{h_\pi(A)=h_\pi(B)} &= \frac{\Pr{\min(A) \in A \cap B \wedge \min(B) \in A \cap B}}{\Pr{\min(A) \in A \cup B \wedge \min(B) \in A \cup B}}\\
 		&= \frac{\abs{A \cap B}}{\abs{A \cup B}} = \jaccsim(A, B).
 	\end{align*}
 	\end{itemize}
@@ -110,9 +130,9 @@
 	
 	Now, if $h_\pi$ is evaluated only once over a given permutation, only a binary response can be obtained. In order to obtain the probability value without resorting to compute unions and intersections, we can repeat evaluation over different permutations; this can be regulated by the \textbf{Chernoff-Hoeffding bound}:
 	
-	Let $A, B \subseteq U$, and $X_{1 \dots n} \in \coin(p)$ \iid, with $\Pr(X_i=1)=p$ and\\$\Pr(X_i=0)=1-p$, with each $X_i$ defined over a distinct element of\\$\Pi \subseteq \mathcal{P}erm(U)$, such that $X_i \mapsto 1 \Leftrightarrow A \sim_{\pi_i} B, 0\ otherwise$, then:
+	Let $A, B \subseteq U$, and $X_{1 \dots n} \in \coin(p)$ \iid, with $\Pr{X_i=1}=p$ and $\Pr{X_i=0}=1-p$, with each $X_i$ defined over a distinct element of $\Pi \subseteq \mathcal{P}erm(U)$, such that $X_i \mapsto 1 \Leftrightarrow A \sim_{\pi_i} B, 0\ otherwise$, then:
 	\begin{equation} \label{chernoff_hoeffding}
-	\Pr\left(\abs{avg_{i=1}^{n}(X_i - p)}\geq\varepsilon\right) \leq 2e^{-n\varepsilon^2}
+	\Pr{\abs{avg_{i=1}^{n}(X_i - p)}\geq\varepsilon} \leq 2e^{-n\varepsilon^2}
 	\end{equation}
 	In other words, the difference between the average of the $X_i$ (i.e., the average of the empirically observed results) and their exact probability is greater then $\varepsilon$ only with a very small probability.
 	
@@ -122,10 +142,10 @@
 		1 & \text{if}\ h_{\pi_i}(A)=h_{\pi_i}(B)\\
 		0 & \text{otherwise}\\
 		\end{cases} $
-	and $\Pr(X_i=1)=\jaccsim(A,B)=p$; we can apply the Chernoff bound on $X_i$ to compute our $n$.\\
+	and $\Pr{X_i=1} = \jaccsim(A,B)=p$; we can apply the Chernoff bound on $X_i$ to compute our $n$.\\
 	If our database has $m$ pages (sets) to store, we can chose $n = \frac{\lg{\frac{2m}{\delta}}}{\varepsilon^2}$ to get a high probability of making zero errors; $\delta$ and $\varepsilon$ are parameters we can set to adjust the size of $n$: even if the bound gives us a high probability for a quite small $n$, we can choose an even smaller $n$ if we can accept big errors for very few pages.
 	
-	We can now observe that the min hash algorithm [\ref{lst:min_hash}] if efficient: instead of comparing two entire pages, it only compares $n$ integers.
+	We can now observe that the min hash algorithm [\ref{lst:min_hash}] is efficient: instead of comparing two entire pages, it only compares $n$ integers.
 
 \section{A case study: Comparing DNAs}
 	In the previous case study, we considered small subsets of the universe set: each web page has only few words with respect to the whole English language.\\
@@ -145,25 +165,28 @@
 		0 & \text{otherwise}\\
 	\end{cases} $. \label{hamming_hash}
 	
-	\ex We have two DNA sequences $A$ and $B$ such that \\$A:=$
-	\begin{tabular}{|c|c|c|c|c|c|c|c|}
-		\hline
-		0 & 0 & 0 & 1 & 1 & 0 & 0 & 1 \\
-		\hline
-	\end{tabular}, $B:=$
-	\begin{tabular}{|c|c|c|c|c|c|c|c|}
-		\hline
-		0 & 1 & 1 & 0 & 0 & 1 & 1 & 1 \\
-		\hline
-	\end{tabular} and $n:=8$, so we can write $A$ and $B$ as $A=\{4,5,8\}, B=\{2,3,6,7,8\}$ using the positions with a $1$ inside (starting from $1$).\\
-	If we randomly choose $i=8$, we obtain $h_i(A)=h_i(B)=1$, so we can conclude that $A$ and $B$ are similar.
+	\begin{ex}
+        We have two DNA sequences $A$ and $B$ such that $A:=$
+        \begin{tabular}{|c|c|c|c|c|c|c|c|}
+            \hline
+            0 & 0 & 0 & 1 & 1 & 0 & 0 & 1 \\
+            \hline
+        \end{tabular},
+        $B:=$
+        \begin{tabular}{|c|c|c|c|c|c|c|c|}
+            \hline
+            0 & 1 & 1 & 0 & 0 & 1 & 1 & 1 \\
+            \hline
+        \end{tabular} and $n:=8$, so we can write $A$ and $B$ as $A=\{4,5,8\},\\ B=\{2,3,6,7,8\}$ using the positions with a $1$ inside (starting from $1$).\\
+        If we randomly choose $i=8$, we obtain $h_i(A)=h_i(B)=1$, so we can conclude that $A$ and $B$ are similar.
+    \end{ex}
+    
 	
 	Now we can see that the probability that two hashes are equal is the Hamming similarity:
 	\begin{align*}
-		\Pr(h_i(A)=h_i(B)) &= \frac{\Pr(A[i]=B[i])}{n} \\
-		&= \frac{\Pr((A[i] = B[i] = 1) \vee (A[i] = B[i] = 0 ))}{n} \\
-		&= \frac{\abs{A \cap B} + \overline{\abs{A \cup B}}}{n} \\
-		&= \hammsim(A,B)
+		\Pr{h_i(A)=h_i(B)} &= \frac{\Pr{A[i]=B[i]}}{n} \\
+		&= \frac{\Pr{(A[i] \text{ and } B[i] \text{ are both } 1) \vee (A[i] \text{ and } B[i] \text{ are both } 0 )}}{n} \\
+		&= \frac{\abs{A \cap B} + \overline{\abs{A \cup B}}}{n} = \hammsim(A,B)
 	\end{align*}
 	
 	It's possible to obtain a good estimate of the similarity by repeating the test an appropriate number of time, given by the Chernoff Bound.
@@ -201,7 +224,7 @@
 	\end{align*}
 	thus defining 4 partitions over $U$.
 	
-	\ex Similarly, we can apply the function based on the Hamming Similarity we saw in [\ref{hamming_hash}] to the same set $U=[3]$ and see we get new partitions. We chhose $i = 2$ \uar, the function maps each subset of $U$ to a hash as follows:
+	\ex Similarly, we can apply the function based on the Hamming Similarity we saw in [\ref{hamming_hash}] to the same set $U=[3]$ and see we get new partitions. We choose $i = 2$ \uar, the function maps each subset of $U$ to a hash as follows:
 	\begin{align*}
 	\{2\}, \{2.1\}, \{2,3\}, \{1,2,3\} &\mapsto 1 \text{ (all sets containing $i$ have hash 1)} \\
 	\emptyset, \{1\}, \{3\}, \{1,3\} &\mapsto 0 \text{ (all remaining sets have hash 0)}
@@ -218,8 +241,8 @@
 	
 	% Insight: A hash function seems to complicate definitions more than a simple equivalence relation, but it models programs/algorithms more effectively, which is our focus here
 	
-	\obs Given a similarity $\phi$, a LSH scheme is a family of hash functions $H$, coupled with a probability distribution $D$ over $H$ such that, chosen a function $h$ from the family $H$ according to $D$, $h$ satisfies the property $\Pr(h(a)=h(b)) = \phi(a,b) \forall a,b \in U$. \\
-	In other words, let $S \in U^2 \to [0, 1]$ be a similarity, and H be a RV over a family of hash functions over U, then H is a LSH scheme iff $\Pr(H(a)=H(b)) = S(a,b) \forall a,b in U$
+	\obs Given a similarity $\phi$, a LSH scheme is a family of hash functions $H$, coupled with a probability distribution $D$ over $H$ such that, chosen a function $h$ from the family $H$ according to $D$, $h$ satisfies the property $\Pr{h(a)=h(b)} = \phi(a,b) \forall a,b \in U$. \\
+	In other words, let $S \in U^2 \to [0, 1]$ be a similarity, and H be a RV over a family of hash functions over U, then H is a LSH scheme iff $\Pr{H(a)=H(b)} = S(a,b) \forall a,b in U$
 	
 	% Brainlamp: I can extend the domain of H to the whole hashfunction class by setting the outsiders' probability to 0...
 	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -244,7 +267,7 @@
 	Before going on, let's recap what we have discussed so far: \\
 	A LSH scheme for a similarity $S$ is a prob. dist. over $U$'s partitions such that 
 	\begin{equation}
-		\forall A, B \in  U \Rightarrow \Pr_p(A\sim_p B) = S(A, B) = \Pr_h(h(A)=h(B))
+		\forall A, B \in  U \Rightarrow \Pr{A\sim_p B}_p = S(A, B) = \Pr{h(A)=h(B)}_h
 	\end{equation}
 	where $p$ is a partitioning of $U$ and $\sim_p$ means $A$ and $B$ are in the same partition.
 	
@@ -256,5 +279,5 @@
 	\textit{Challenge}: Can we find a LSH scheme for an arbitrary S function? NO
 	
 	\ex \label{ex:transitivity} Given a universe set $U = \{a, b, c\}$ and a similarity function $S$ s. t.	$S \in U^2 \rightarrow [0, 1] : S(a, b) \mapsto 1, S(b, c) \mapsto 1, S(a, c) \mapsto 0$ we don't have an LSH, since we're violating transitivity:
-	Translating into probabilities and using equality's transitivity, we obtain: $\Pr(h(a), h(c))=1$, which contradicts the third mapping.
+	Translating into probabilities and using equality's transitivity, we obtain: $\Pr{h(a), h(c)}=1$, which contradicts the third mapping.
 	

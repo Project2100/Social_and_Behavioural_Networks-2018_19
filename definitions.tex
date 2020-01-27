@@ -1,5 +1,74 @@
-\newcommand{\ex}{\emph{Example}: }
-\newcommand{\obs}{\textbf{Observation}: }
-\newcommand{\lem}{\textbf{Lemma}: }
-\newcommand{\cor}{\textbf{Corollary}: }
-\newcommand{\thm}{\textbf{Theorem}: }
+%Some quick defs - sets
+\newcommand{\nonneg}{\mathbb{N}}
+\newcommand{\integer}{\mathbb{Z}}
+\newcommand{\real}{\mathbb{R}}
+\newcommand{\singleton}{\mathbbm{1}}
+\newcommand{\binary}{\mathbbm{2}}
+%Some quick defs - prob distributions
+\newcommand{\probdist}{\mathcal{R}and}
+\newcommand{\unifdist}{\mathcal{U}nif}
+\newcommand{\binomdist}{\mathcal{B}inom}
+\newcommand{\berdist}{\mathcal{B}er}
+%Some quick defs - abbreviations
+\newcommand{\iid}{\textsc{iid}}
+\newcommand{\uar}{\textsc{uar}}
+%Some quick defs - similarities
+\newcommand{\jaccsim}{\mathcal{J}acc}
+\newcommand{\hammsim}{\mathcal{H}amm}
+%Some quick defs - other
+\newcommand{\permut}{\mathcal{P}erm}
+\newcommand{\indep}{\perp\!\!\!\perp}
+\newcommand{\expect}{\mathcal{E}}
+\newcommand{\Var}{\mathrm{Var}}
+\newcommand{\powerset}{\mathcal{P}}
+\renewcommand{\Pr}[1]{\text{Pr}\left\{#1\right\}}   % probability
+\def\Prs_#1#2{\text{Pr}_{#1}\left\{{#2}\right\}}  % probability with sub
+\newcommand{\st}{\;\ifnum\currentgrouptype=16 \middle\fi|\;}
+
+% Some redundant names
+\newcommand{\coin}{\berdist}
+\newcommand{\order}{\permut}
+
+% Nicer lists
+\renewcommand{\labelitemiii}{$\circ$}
+\renewcommand{\labelenumii}{\theenumii}
+\renewcommand{\theenumii}{\theenumi.\arabic{enumii}.}
+\renewcommand{\labelenumiii}{\theenumiii}
+\renewcommand{\theenumiii}{\theenumii\arabic{enumiii}.}
+
+% Apply colored underline or overline to math expressions
+\def\mathunderline#1#2{\color{#1}\underline{{\color{black}#2}}\color{black}}
+\def\mathoverline#1#2{\color{#1}\overline{{\color{black}#2}}\color{black}}
+
+% Theorems
+\newtheorem{thm}{Theorem}[section]
+\newtheorem{cor}{Corollary}[thm]
+\newtheorem{claim}{Claim}[thm]
+\newtheorem{lem}[thm]{Lemma}
+\newtheorem{defn}{Definition}[section]
+\theoremstyle{definition}
+\newtheorem{obs}{Observation}[section]
+\theoremstyle{remark}
+\newtheorem{ex}{Example}[section]
+\theoremstyle{remark}
+\newtheorem{qst}{Question}[section]
+
+% adds commands \abs and \norm (from https://tex.stackexchange.com/questions/43008/absolute-value-symbols)
+\DeclarePairedDelimiter\abs{\lvert}{\rvert}%
+\DeclarePairedDelimiter\norm{\lVert}{\rVert}%
+\makeatletter
+\let\oldabs\abs
+\def\abs{\@ifstar{\oldabs}{\oldabs*}}
+\let\oldnorm\norm
+\def\norm{\@ifstar{\oldnorm}{\oldnorm*}}
+\makeatother
+
+% other math commands
+\DeclareMathOperator*{\argmin}{arg\,min}
+\DeclareMathOperator*{\argmax}{arg\,max}
+\DeclareMathOperator*{\avg}{avg}
+\DeclareMathOperator*{\xor}{\oplus}
+
+% other symbols
+\newcommand{\cmark}{\ding{51}}
+\newcommand{\xmark}{\ding{55}}

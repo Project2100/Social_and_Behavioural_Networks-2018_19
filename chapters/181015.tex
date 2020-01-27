@@ -41,7 +41,7 @@
 	
 	%%%%%%%%%%%%%%%%%
 	
-	Let T be a tree, each node has a chance of being "exposed" by a probability p, and if so, reveals all ancestors
+	Let T be a tree, each node has a chance of being ``exposed" by a probability p, and if so, reveals all ancestors
 	
 	estimate the size of the tree
 	
@@ -58,7 +58,7 @@
 	
 	%%%%%%%%%%%%%%%%%%%%%%%
 	
-	Theorem: the algorithm correctly estimates n if $n > \omega(\max(1/\delta^2, k/\delta))$
+	Theorem: the algorithm correctly estimates n if $n > omega(max(1/delta^2, k/delta))$
 	
 		
 		IMPORTANT: Estimates can be redone, but reconstructing another revealed tree is impractical, so we're estimating a characteristic of  a tree by observing a sample revealed one and making estimates
@@ -98,7 +98,7 @@
 	
 	Note: we can do the first substitution because of linearity (?)
 	
-	"Multiplicative approximation": $\displaystyle \Pr(|\hat\delta - \delta| \geq \varepsilon \delta) = \Pr(|\frac{Y}{|X|} - \delta| \geq \varepsilon \delta) = \Pr(|Y - \delta |X|| \geq \varepsilon \delta |X|) = \Pr(|Y - E(Y)| \geq \varepsilon E(Y)) \leq 2e^{-\frac{\varepsilon^2}{3}E(Y)}, \forall \varepsilon \in (0, 1)$
+	``Multiplicative approximation": $\displaystyle \Pr{|\hat\delta - \delta| \geq \varepsilon \delta} = \Pr(|\frac{Y}{|X|} - \delta| \geq \varepsilon \delta) = \Pr(|Y - \delta |X|| \geq \varepsilon \delta |X|) = \Pr(|Y - E(Y)| \geq \varepsilon E(Y)) \leq 2e^{-\frac{\varepsilon^2}{3}E(Y)}, \forall \varepsilon \in (0, 1)$
 	
 	This is the Multiplicative Chernoff Bound: Let y1 ... yn IID Coins, then (see above, last inequality)
 	
@@ -110,7 +110,7 @@
 	
 	$Y' = \sum_{v \in T}Y_v \Rightarrow E(Y') = \delta n$
 	
-	$\Pr(Chernoff\ on\ Y') \leq 2e^{-\frac{\varepsilon^2}{3}\delta n}$
+	$\Pr{Chernoff\ on\ Y'} \leq 2e^{-\frac{\varepsilon^2}{3}\delta n}$
 	
 	Using the bound over $|X|$, then $\leq \eta$
 	
@@ -122,7 +122,7 @@
 	
 	
 	
-	"An additive approximation is useless"
+	``An additive approximation is useless"
 	
 	
 	goodnes sof alogrithm:
@@ -141,7 +141,7 @@
 	Assumption: The unknown tree is such that none of its nodes has more than K children.
 	%That actually has lots of applications! makes much sense
 	
-	Let $v$ be a node of the unknown tree with K children, then $\Pr($at least 1 children in K is exposed$) \geq 1-\varepsilon^{-1}min(1, \delta K_v)$
+	Let $v$ be a node of the unknown tree with K children, then $\Pr{\text{at least 1 children in K is exposed}} \geq 1-\varepsilon^{-1}min(1, \delta K_v)$
 	
 	$K_v$: expected number of children revealed
 	
@@ -171,7 +171,7 @@
 	
 	\
 	
-	Lemma: Let Z be the set of nodes of which at least 1 child is exposed; then $\Pr(|Z| \geq 1/2(1-1/e)\min(K^{-1}, \delta)(n-1))\geq 1-e^{-\Theta(n\min(1/K, \delta))}$
+	Lemma: Let Z be the set of nodes of which at least 1 child is exposed; then $\Pr{|Z| \geq 1/2(1-1/e)\min(K^{-1}, \delta)(n-1)}\geq 1-e^{-\Theta(n\min(1/K, \delta))}$
 	
 	Proof: Let I be the set of internal nodes of T; Let D subset I contain nodes with at least 1/delta children; $E(|Z|) = \sum_{v \in I}E(Z_v) \geq (1 - 1/e)\min(1, K_v\delta) = (...)(|D| + \delta\sum_{v \in I-D}K_v)$
 
@@ -199,7 +199,7 @@
 	
 	ex: describe SAT by means of truth tables - rows are exponential in variable number
 	
-	"Modular set functions"
+	``Modular set functions"
 	
 	given $X=[n] f \in 2^X \to \mathbb{R}$
 	
@@ -213,7 +213,7 @@
 	
 	(Matroid) Ex tutte parti con al più k elementi (a partire da U)
 	
-	"Ad placement"
+	``Ad placement"
 	arriva un utente sul sito tipo Google, scegli quali ad mostrare in modo da guadagnare il più possibile
 	
 	modello Independent Cascade Model
@@ -227,7 +227,7 @@
 	
 	how to optimize f in ordder to maximize it
 	
-	caso particolare "submodular set function" - analogo discreto delle funzioni convesse - can be misleading
+	caso particolare ``submodular set function" - analogo discreto delle funzioni convesse - can be misleading
 	
 	given X, f is submodular iff $\forall S, T \in X, f(S)+f(T) \geq f(S\cap T) + f(S\cup T)$
 	
@@ -246,11 +246,9 @@
 	
 	
 	proof that f (or c?) is submodular
-
-	base case n=1: couple S T can assume 4 combinations:
-	
-	$case s, t = \{1\} \Rightarrow union an intersection f(\cdot)= 1	
-	1 in T, 1 \notin S then 1 in union, 1 \notin intersection
+	base case n=1: couple S T can assume 4 combinations: $
+	case s, t = \{1\} \Rightarrow union an intersection f(\cdot)= 1	
+	1 in T, 1 not in S then 1 in union, 1 not in intersection
 	dual is dual
 	s, t = \emptyset
 	$
@@ -264,10 +262,10 @@
 	represent modulars as points of convex multidimensional functions
 	
 	
-	"maxcover" data una classe di sottoinsiemi di X,. S-1, si trovino k insiemi in X tail che , insieme, coprano il massinmo numero di elementi
+	``maxcover" data una classe di sottoinsiemi di X,. S-1, si trovino k insiemiinX tail che , insieme, coprano il massinmo numero di elementi
 	
 	
-	Before proving, greedy algorithm, parameterized by f, X and k: trovare k sottoinsiemi di X che massimizzano f
+	Before proving, ALGORITHM (greedy), parameterized by f, X and k: trovare k sottoinsiemi di X che massimizzano f
 	
 	$
 	S_0 <- \emptyset
@@ -320,7 +318,7 @@
 	
 	E.g.: coverage functions, X is a set system $c(X) = \left| \bigcup_{S \in X} S \right|$
 
-	"given a subset of sets, the coverage value would be the cardinality of the union"
+	``given a subset of sets, the coverage value would be the cardinality of the union"
 	
 	claim: coverage function is submodular
 	proof: $c(S)+c(T) \geq c(s\cup t) + c(s \cap t)$
@@ -329,7 +327,7 @@
 	
 	\
 	
-	if $f_1, ..., f_k \in 2^X \to \mathbb{R} \text{ are submodular}, \alpha_1, ..., \alpha_k \geq 0 \Rightarrow \sum_{i=1}^{k}\alpha_i f_i \text{ is submodular }$
+	if $f_1, ..., f_k \in 2^X \to \mathbb{R} are submodular, \alpha_1, ..., \alpha_k \geq 0 \Rightarrow \sum_{i=1}^{k}\alpha_i f_i is submodular$
 	
 	proof: the i-th case is easily proven, then sum up; nonnegativity is essential here
 	
@@ -344,10 +342,7 @@
 	return S_k
 	$
 	
-	if f is submodular, nonnegative and monotone, then:
-	\[
-		f(S_K)\geq(1-1/e)max_{S \in \binom{X}{K}}f(S)
-	\]
+	if f is submodular, nonnegative and monotone, then $\displaystyle f(S_K)\geq(1-1/e)max_{S \in \binom{X}{K}}f(S)$
 	
 	\
 	

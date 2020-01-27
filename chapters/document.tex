@@ -1,0 +1,64 @@
+\begin{thm}
+    If there are $|T| \geq cn\Delta\log n$ traces, the first-edge algorithm can reconstruct the unknown graph $G=(V, E)$ with probability $p \geq 1 - \frac{1}{n^{2(c-1)}}$, where $n = |V|$, $\Delta = \max_v \deg(v)$ and $c$ is a constant.
+\end{thm}
+\begin{proof}
+	An edge $\{u, v\}$ will be in the graph if and only if $u$ and $v$ appears at the beginning of at least one trace. We will prove that it happens with high probability.
+	
+	Consider the following event.
+	\begin{quotation}
+		$\xi_1 =$ ``A given edge $\{u, v\} \in E$ is inferred using the trace $t$.''
+	\end{quotation}
+	
+	The probability of $\xi_1$ is given by
+	\begin{align}
+	\emph{Pr}\{\xi_1\} &= \emph{Pr}\{t[0] = x\}\emph{Pr}\{t[1] = y, y\in \{u, v\}\setminus\{x\}\ |\ t[0] = x\},\  x\in \{u, v\}\\
+	&= \frac{2}{n}\frac{1}{\deg(x)}, x \in \{u, v\}\\
+	&\geq \frac{2}{n\Delta}.
+	\end{align}
+	
+	In other words it is the probability of one of the two nodes $u, v$ to appear as first node in the trace multiplied by the probability that the other appears as second node in the trace. Since the source is selected uniformly at random, every node has the same probability $\frac{1}{n}$ to be picked; for us, either $u$ or $v$ will do. Next, assume without loss of generality (wlog) that $u$ is picked as first node. The second node will now be drawn from the neighbors of $u$ (convince yourself that there can't be a node $y$ after the first node in the trace without it being one of its neighbors). The probability that the neighbor picked is $u$ is $\frac{1}{\deg(u)}$ that can be overestimated using $\Delta$.
+	
+	Now, the complementary event of $\xi_1$ is ``the edge $\{u,v\}$ is not inferred using trace $t$'' and its probability is $(1 - \frac{2}{n\Delta})$. For the edge not to be inferred at all, there should be no trace from which that edge can be extracted.
+	\begin{equation}
+	\Pr{\emph{An edge in the graph is not inferred}} = \left(1- \frac{2}{n\Delta}\right)^{|T|} \leq \left(1- \frac{2}{n\Delta}\right)^{cn\Delta\log n} 
+	\end{equation}
+	
+	We will show that this probability is tiny. To do so, we must use the following lemma.
+	
+	\begin{lem}
+		\begin{equation}
+		1 - x \leq e^{-x}
+		\end{equation} 
+	\end{lem}
+	\begin{proof}
+	Studying the function we see that $$e^{-x} = (-e^{-x})' = (e^{-x})'' > 0$$ so its tangent in every point is below the function. Taking the tangent in $x_0=0$ we have
+	\begin{align*}
+	e^{-x} &\geq (e^{-x_0})'x + e^{-x_0}\\
+		   & = -e^{-x_0} + 1\\
+		   & = -x + 1\\
+		   & = 1 - x.
+	\end{align*}
+	\end{proof}
+	
+	Going back to our proof we have
+	\begin{align}
+	\Pr{\emph{Edge \{u, v\} in the graph is not inferred}} &= \left(1-\frac{2}{n\Delta}\right)^{|T|} \\
+	&\leq \left(1- \frac{2}{n\Delta}\right)^{cn\Delta\log n}\\
+	& \leq \left(e^{-\frac{2}{n\Delta}}\right)^{cn\Delta\log n}\\
+	& = e^{\log n^{-2c}}\\
+	& = \frac{1}{n^{2c}}.
+	\end{align}
+
+Finally, we want to compute the probability that the algorithm fails. Let $$\xi_{a,b} = ``\emph{Edge \{a, b\} is not inferred by the algorithm''}.$$
+
+Then
+\begin{align}
+\Pr{\emph{The algorithm fails}} &= \emph{Pr}\left\{\bigcup_{\{a, b\} \in E} \xi_{a,b}\right\}\\
+&\leq \sum_{\{a, b\} \in E} \Pr{\xi_{a,b}} \tag{by union bound}\\
+& = |E| \Pr{\xi_{a,b}} \\
+& \leq n^2 \frac{1}{n^{2c}}\\
+& = \frac{1}{n^{2(c-1)}}. 
+\end{align}
+
+Notice that we can make this probability tiny as we want by increasing $c$, i.e. by increasing the number of traces.
+\end{proof}

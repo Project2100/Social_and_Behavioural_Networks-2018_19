@@ -5,3 +5,6 @@ main.out
 main.toc
 main.fls
 main.fdb_latexmk
+main.bbl
+main.blg
+/chapters/prova.tex

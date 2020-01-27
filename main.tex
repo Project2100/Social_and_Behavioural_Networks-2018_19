@@ -3,9 +3,26 @@
 
 \documentclass{report}
 
+\usepackage[a4paper, margin=1in]{geometry}
 \usepackage{import}
 
-\usepackage{notation}
+% mathbb command, complement symbol and others
+\usepackage{amssymb}
+\usepackage{pifont}
+
+% More blackboard symbols
+\usepackage{bbm}
+\usepackage{mathrsfs}
+
+% binom macro
+\usepackage{amsmath}
+
+% Theorem symbols
+\usepackage{amsthm}
+
+% Multicolumn and multirow equations and tables
+\usepackage{multicol}
+\usepackage{multirow}
 
 % Apply paragraph spacing
 \setlength{\parskip}{1em}
@@ -13,19 +30,8 @@
 % Put all formulae in display style for fractions, binomial coefficients, etc.
 \everymath{\displaystyle}
 
-% Theorem symbols
-\usepackage{amsthm}
-
-% adds commands \abs and \norm (from https://tex.stackexchange.com/questions/43008/absolute-value-symbols)
+% addsnew math commands
 \usepackage{mathtools}
-\DeclarePairedDelimiter\abs{\lvert}{\rvert}%
-\DeclarePairedDelimiter\norm{\lVert}{\rVert}%
-\makeatletter
-\let\oldabs\abs
-\def\abs{\@ifstar{\oldabs}{\oldabs*}}
-\let\oldnorm\norm
-\def\norm{\@ifstar{\oldnorm}{\oldnorm*}}
-\makeatother
 
 % links
 \usepackage{hyperref}
@@ -36,23 +42,41 @@
     urlbordercolor={0 0 1},
     pdfborderstyle={/S/U/W 1}
 }
+\usepackage{cleveref}
 
 % listings style for pseudo-code and similiar
+\usepackage[table,xcdraw]{xcolor}
+\definecolor{backgray}{RGB}{238, 238, 238}
+\definecolor{commgray}{RGB}{124,124,124}
 \usepackage{listings}
 \lstset{ 
-	basicstyle=\ttfamily,
+    basicstyle=\linespread{1.1}\ttfamily\footnotesize,
+    frame=tlbr,
+    framesep=0.2cm,
+    framerule=0pt,
 	captionpos=b,
-	language=Pascal,
-	mathescape=true
+	language=Delphi,
+	mathescape=true,
+    backgroundcolor=\color{backgray},
+    commentstyle=\color{commgray}
 }
+
+% algorithms
+\usepackage{algorithm2e}
+
+% images
+\usepackage{graphicx}
+\usepackage{wrapfig}
+\graphicspath{ {./images/} }
+\usepackage{pgfplots}
 
 \subimport{.}{definitions.tex}
 
-\title{Uniroma1(2018-19) - Social and Behavioural Networks}
-\author{Original author: Andrea Proietto\\[3ex]
-Contributors: Giovanni Ficarra}
-
-\date{October 2018}
+\title{
+    Social and Behavioural Networks \\
+    \large Uniroma1 2018-19 and 2019-20
+}
+\author{Andrea Proietto, Giovanni Ficarra, Donato Crisostomi}
 
 % Questions:
 % - Revise Chernoff-Hoeffding, can't get a definitive formula
@@ -63,16 +87,36 @@ Contributors: Giovanni Ficarra}
 
 \tableofcontents
 
-\subimport{chapters/}{preamble.tex}
+% \subimport{chapters/}{preamble.tex}
 
 \subimport{chapters/}{intro.tex}
+
+\subimport{chapters/}{chernoff.tex}
+
+\subimport{chapters/}{graph-models.tex}
+
+\subimport{chapters/}{meme.tex}
 	
 \subimport{chapters/}{lsh.tex}
 
-\subimport{chapters/}{next.tex}
+\subimport{chapters/}{lsh2.tex}
 
-\subimport{chapters/}{181015.tex}
+\subimport{chapters/}{lp.tex}
 
-\subimport{chapters/}{181105.tex}
+\subimport{chapters/}{submodular.tex}
+
+\subimport{chapters/}{clustering.tex}
+
+\subimport{chapters/}{motifs.tex}
+
+\subimport{chapters/}{communication-complexity.tex}
+
+\subimport{chapters/}{experts.tex}
+
+% \subimport{chapters/}{181015.tex}
+
+% \subimport{chapters/}{181105.tex}
+
+% \subimport{chapters/}{prova.tex}
 
 \end{document}
