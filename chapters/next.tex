@@ -137,7 +137,7 @@
 	\end{align*}
 	which in turn is LSH-able
 	
-\section{181008}  % TODO la lasciamo questa sezione?
+\section{More about PGF}  % TODO la lasciamo questa sezione? ex 181008
 	
 	%% So it actually matches the previous wikipedian def
 	\textit{Recap}: Given a universe $U$, a function $S \in U^2 \to [0, 1]$ is said to be a \textbf{LSHable similarity} iff exists a prob. distr. over (a family/subset of) the hash functions in $U$, such that: 
@@ -250,84 +250,121 @@
 
 	What can we do if there is no LSH for the similarity we want/need to use? We can approximate a function without a LSH with an LSHable one.
 	
-	\ex We can approximate $S_\gamma$ with $\jaccsim$ with an error of $\frac{1}{\gamma}$.
+	\ex \label{ex:appr_1} We can approximate $S_\gamma$ with $\jaccsim$ with an error of $\frac{1}{\gamma}$.
 	
-	Let f a PGF, $\alpha \in [0, 1]$, ...?
+	% TODO check
+	\thm (???) Let $f$ be a PGF, $\alpha \in [0, 1]$. \\
+	\begin{flalign*}
+		& \alpha f = \alpha f(S)\ |\ (1 - \alpha)T &&\\
+		& T \in U^2 \to [0, 1] : \forall {t, t'} \in \binom{U}{2} \ T(t, t') = 0 \text{ but } T(t, t) = 1 &&\\
+		& h(t)=-t &&
+	\end{flalign*}
 	
-	%&
-	$\alpha f = \alpha f(S)\ |\ (1 - \alpha)T$
-	%&
+	For the $1$ case we wanted a banal partition, now with $0$ we want a punctual partition, so we need a hash function that assigns a distinct value to each argument. (You can actually use the identity) \\
+	Not a good scheme, because we're not shrinking data.
 	
-	$T \in U^2 \to [0, 1] : \forall {t, t'} \in \mathcal{P}_2(U) T(t, t') = 0$
+	% TODO ???
+	% GOTO %&
 	
-	for the 1 case we wanted a nbanal partition, now with 0 we want a punctual partition, so we need a hash function that assigns a distinct value to each argument. (You can actually use the identity)
+	\textbf{Definition}: Let $S: U^2 \to [0,1]$ be a similarity, then its \textbf{distortion} is the minimum* $\delta \geq 1$ s.t. $\exists$ an LSHable similarity $S'$ s.t. $\forall {A, B} \in \binom{U}{2}$ \\ $\frac{1}{\delta} \cdot S(A, B) \leq S'(A, B) \leq S(A, B)$, where minimum* is the lower bound (if $U$ isn't finite, there is no actual minimum).
 	
-	Not a good scheme, because we're not shrinking data
+	\obs $S'$ is the LSHable similarity closest to $S$; the more $\delta$ is near to $1$, the closer $S'$ is to $S$ (i.e. $\delta$ is the \textit{approximation factor}); if $\delta$ tends to $1$, then $S$ is LSHable.
 	
-	GOTO %&
+	\ex \label{ex:appr_2} In the example \ref{ex:appr_1}, where we used $\jaccsim$ to approximate $S_\gamma$, we had $\delta \to \frac{1}{\gamma}$.
 	
-\subsubsection{Approximation examples}
+	\textit{Question}: How can I know if there is a better approximation than the one I found?
 	
-	Consider $S_\gamma$: $\gamma \geq 1 \Leftrightarrow S_\gamma$ is LSH-able
+	\lem \label{l:center} (Center lemma) Let $S$ be a LSHable similarity s.t. $\exists \mathcal{X} \subseteq U : \forall \{x, x'\} \in \binom{\mathcal{X}}{2} \ S(x, x')=0$, then $\forall y \in U \ avg_{x \in \mathcal{X}}(S(X, Y)) \leq \frac{1}{\abs{\mathcal{X}}}$.
 	
-	Focus on $\gamma < 1$
+	\obs $\mathcal{X}$ is a set of the most different objects in $U$ and $y$ is a center in $U$; so the meaning of the lemma is that the average of the distances between each point and the center is $\leq \frac{1}{\abs{\mathcal{X}}}$.
 	
-	Definition: "Distortion of a similarity"
+	\obs $\mathcal{X}$ is actually a (possibly incomplete) section of the partition of $U$ induced by $h$.
 	
-	Let S be a similarity, then its distortion is "the minimum*(meaning inferior extremum) delta geq 1 : exists LSHABLE S' (forall {A, B} in P2U, $1/\delta \cdot S(A, B) \leq S'(A, B) \leq S(A, B)$)"
+	\obs (important) From the lemma, it trivially follows that \\ $\exists \ x^* \in \mathcal{X} : S(x^*, Y \leq \frac{1}{\abs{\mathcal{X}}})$.
 	
-	delta tends to 1 -> S is lshable
+	\
 	
-	using jaccard to approximate sgamma we wold obtain 1/gamma
+	\textit{Proof} of the Center lemma:
+	\begin{itemize}
+	\item Fix $y \in U$;
+	\item If the hash function $h$ has positive probability in the (chosen) LSH for $S$, then $\forall {x, x'} \in \binom{\mathcal{X}}{2} \ h(x)\neq h(x')$ (otherwise we would have $S(x, x')>0$);
+	\item Thus, $\forall$ hash functions with positive probability, there can exist at most one $x \in \mathcal{X}$ s.t. $h(x)=h(y)$ (by transitivity of equality);
+	\item Than we have:
+		\begin{flalign*}
+			\sum_{x \in \mathcal{X}}S(x, y)
+			&= \sum_{x \in \mathcal{X}}\Pr_h(h(x)=h(y)) &&\\
+			&= \sum_{x \in \mathcal{X}}\sum_{h}\Pr(h\ \text{is chosen}) \cdot
+				\underbrace{[h(x)=h(y)]}_{\text{pr. that $x=y$ with the choosen $h$}} &&\\
+			&= \sum_h \Pr(h \text{ is chosen}) \cdot
+				\sum_{x \in \mathcal{X}}[h(x)=h(y)] &&\\
+			&\leq \sum_h \Pr(h \text{ is chosen}) = 1 &&
+		\end{flalign*}
+	(Note that he square brackets here are a boolean evaluation operator);
+	\item Thus, $\sum_{x \in \mathcal{X}}S(x, y) \leq 1$, that implies that $avg(S(X, Y)) \leq \frac{1}{\abs{\mathcal{X}}}$, and the lemma is proven.
+	\end{itemize}
+		
+	\ex We will now prove what we said about $S_\gamma$'s approximation in examples [\ref{ex:appr_1}] and [\ref{ex:appr_2}], using the lemma we have just demonstrated [\ref{l:center}]:
+	\begin{itemize}
+	\item Let us give some definitions:
+		\begin{itemize}
+			\item $S := S_\gamma \text{, with } 0 < \gamma < 1$,
+			\item $U := 2^{[n]}=\{S|S\subseteq [n]\}$,  %insieme delle parti?
+			\item $\mathcal{X} := \mathcal{P}_1([n])=\{ \{1\}, \{2\}, ..., \{n\} \}$;
+		\end{itemize}
+	\item So, by definition of $S_\gamma$, we have $S_\gamma(\{i\},\{j\}) = 0 \ \forall i \neq j \in [n]$, since $\{i\} \cap \{j\} = \emptyset$;
+	\item Let us assume that $T$ (that will be our $S'$) finitely distorts $S_\gamma$, and $T$ is LSHable;
+	\item Then $T(\{i\},\{j\}) = 0 \ \forall \{i, j\} in \binom{[n]}{2}$, since $S' \leq S_\gamma = 0$;
+	\item Since $T$ is LSHable we can apply the center lemma:
+	 	\begin{flalign*}
+	 		& \exists \{i\} \in \mathcal{X} \text{ s.t. } T(\underbrace{\{i\}}_\text{our $x^*$}, \underbrace{[n]}_\text{our $y$}) \leq \frac{1}{\abs{\mathcal{X}}} = \frac{1}{n} &&\\
+	 		& S_\gamma(\{i\}, [n]) = \frac{1}{1 + \gamma \cdot (n-1)} = \frac{1}{\gamma \cdot n + (1-\gamma)} &&\\
+	 		& \text{so } \exists i \in [n] \text{ s.t. } S_\gamma(\{i\}, [n]) \geq \frac{1}{\gamma \cdot n + (1-\gamma)} &&\\
+	 		& \text{but } T(\{i\}, [n]) \leq \frac{1}{n} &&\\
+	 		& \text{thus } \frac{1}{\delta} \frac{1}{\gamma \cdot n + (1-\gamma)} = \frac{1}{\delta} S_\gamma(\{i\}, [n]) \leq T(\{i\}, [n]) \leq \frac{1}{n} &&\\
+	 		& \text{hence } \frac{1}{\gamma + \frac{1-\gamma}{n}} = \frac{n}{\gamma \cdot n + (1-\gamma)} \leq \delta &&\\
+	 		& \liminf_{n \to \infty} \delta \geq \frac{1}{\gamma} \text{ QED} &&
+	 	\end{flalign*}
+	 	i.e. the more $n$ grows, the more $\delta$ approaches $\frac{1}{\gamma}$;
+	\item Now we know that the distortion of $S_\gamma$ is $\frac{1}{\gamma}$.
+	\end{itemize}
 	
-	delta is the approximation factor
-	
-	%%%%%%%%%%%%%%%%%%
-	
-	Centerlemma: Let S be a LSHable similarity:
-	\[
-		\exists \chi \subseteq U : \forall \{x, x'\} \in \mathcal{P}_2(\chi) S(x, x')=0
-	\]
+	\ex Now we would like to apply the same method to the \textbf{cosine similarity} (a.k.a. \textit{inner product similarity}).
+	\begin{itemize}
+		\item Let's start again with some definitions:
+		\begin{itemize}
+			\item $U := \{ \vec{x} \ | \ \vec{x} \in \mathbb{R}_+^n, \ \abs{\abs{\vec{x}}}_2=1 \}$ \ \
+			(i.e., $U$ is a positive hypersphere with the center in the origin and the radius equal to 1),
+			\item $C \in U^2 \to [0,1]$ s.t. $C(\vec{x}, \vec{y}) = \left\langle \vec{x}, \vec{y} \right\rangle = \sum_{i=1}^n x_iy_i$;
+		\end{itemize}
+		\item Now, we want to know if $C$ has an LSH and, if not, what is its distortion;
+		\item Another definition: \\
+			$\mathcal{X}=\{ \vec{x}_1, \vec{x}_2, ..., \vec{x}_n \}$
+			where $x_i(j)=\begin{cases}
+				1 & \text{if}\ i=j\\
+				0 & \text{otherwise}\\
+			\end{cases} $ \\
+			i.e. $\vec{x}_i=(0,...,0,1,0,...,0)$ with the only 0 in position $i$;
+		\item So we have that $\abs{\abs{\vec{x}}}_2=\sqrt{1^2+0^2(n-1)}=1$;
+		\item Moreover $C(\vec{x_i}, \vec{x_j})=0 \ \forall i\neq j$;
+		\item Let $\vec{y}=\left( \underbrace{\frac{1}{\sqrt{n}}, \frac{1}{\sqrt{n}}, ..., \frac{1}{\sqrt{n}}}_\text{n times} \right)$, then $\abs{\abs{\vec{y}}}_2 = \sqrt{\sum_{i=1}^n y_i^2} = \sqrt{\sum_{i=1}^n \frac{1}{n}}=1$;
+		\item So, $C(\vec{x_i}, \vec{y})= \sum_{j=1}^n \left( x_i(j) \cdot y_i(j) \right) = x_i(i) \cdot y_i(i) = \frac{1}{\sqrt{n}}$;
+		\item Then $\delta \geq \sqrt{n}$, so, unlike before, the distortion is big and grows bigger with $n$.
+	\end{itemize}
 
-	Then:
+	\ex \textbf{Weighed Jaccard} is a generalization of $\jaccsim$ for vectors: \\ $\mathcal{WJ}=\frac
+		{\sum_i \min(x_i, y_i)}{\sum_i \max(x_i, y_i)}$.
 	
-	$\forall y \in U avg_{x \in \chi}(S(X, Y) \leq) \frac{1}{|\chi|}$; (it trivially follows that $\exists x* \in \chi : S(x*, Y \leq \frac{1}{|\chi|})$)
-	
-	Proof: (Fix $y \in U$) If the hash function h has positive probability in the (chosen) lsh for S, then $\forall {x, x'} \in \mathcal{P}_2(\chi) (h(x)\neq h(x'))$
-	
-	[$\chi$ is actually a (possibly incomplete) section of the partition of U induced by h]
-	
-	thus, forall hash functions with positive probability, there can exist at most one x in calx st hx=hy (transitivity of equality)
-	
-	$\sum_{x \in \chi}S(x, y) = \sum_{x \in \chi}\Pr_h(h(x)=h(y)) = \sum_{x \in \chi}\sum_{h}\Pr(h\ is\ chosen)[h(x)=h(y)]$
-	
-	IMPORTANT: The brackets here are a boolean evaluation operator
-	
-	$= \sum pr h is chosen \sum eval hx = hy \leq \sum_h \Pr(h\ is\ chosen) \leq 1$
-	
-	Thus, $\sum_{x \in \chi}S(x, y) \leq 1 \Rightarrow avg(S(X, Y)) \leq \frac{1}{|\chi|}$, proven
+	\ex \textbf{Sim Hash} is an LSH scheme similar to the cosine similarity:
+	\begin{itemize}
+		\item $\mathcal{CS}(\vec{x},\vec{y})=
+			\cos(\theta_{\vec{x},\vec{y}}) $;
+		\item $\mathcal{SH}(\vec{x},\vec{y})=
+			1-\frac{\theta_{\vec{x},\vec{y}}}{\pi} $;
+		\item $\mathcal{SH}$ is high if the angle $\theta$ is small;
+		\item $\frac{\theta_{\vec{x},\vec{y}}}{\pi}$ is the probability that an hyperplane divides $\vec{x}$ and $\vec{y}$, where the hyperplane is a threshold between similar and dissimilar elements of the universe, so it creates a partition of the universe in two sets.
+	\end{itemize}
 	
 	
-	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 	
 	
-	$S:= S_\gamma , 0 < \gamma < 1, U=2^{[n]}={S|S\subseteq [n]}$ %insieme delle parti?
 	
-	$\chi := \mathcal{P}_1([n])$
-	$y = [n]$
-	
-	 - let us assume that T finitely distorts sgamma, and T is lshable
-	then $T({},{}) = 0 forall {i, j} in P_2(mathbbm(n))$
-	
-	 - $\exists \{i\} in \chi : T(\{i\}, [n]) \leq \frac{1}{|\chi|} = \frac{1}{n}$
-	 
-	 $S_\gamma(\{i\}, [n]) = \frac{1}{1 + \gamma(n-1)} = \frac{1}{\gamma n + (1-\gamma)}$
-	 
-	 ...
-	 zenterlemma application
-	 ...
-	
-	
-	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-	
-	$ U = {}$
