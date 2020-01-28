@@ -21,13 +21,8 @@
 \usepackage{multicol}
 \usepackage{multirow}
 
+% Bold small caps, may be tempoprary
 \usepackage{bold-extra}
-
-% Apply paragraph spacing
-%\setlength{\parskip}{1em}
-
-% Put all formulae in display style for fractions, binomial coefficients, etc.
-%\everymath{\displaystyle}
 
 % addsnew math commands
 \usepackage{mathtools}
@@ -48,7 +43,7 @@
 \usepackage{cleveref}
 
 % listings style for pseudo-code and similiar
-\usepackage[table,xcdraw]{xcolor}
+\usepackage[table, xcdraw]{xcolor}
 \definecolor{backgray}{RGB}{238, 238, 238}
 \definecolor{commgray}{RGB}{124,124,124}
 \usepackage{listings}
@@ -62,6 +57,19 @@
 	mathescape=true,
     backgroundcolor=\color{backgray},
     commentstyle=\color{commgray}
+}
+
+
+% Custom sections for visual reminders
+\usepackage{xcolor}
+\usepackage{framed}
+\newcounter{todocount}
+\definecolor{shadecolor}{rgb}{1,1,0}
+\newcommand{\todo}[1]{
+    \stepcounter{todocount}
+    \begin{shaded}
+    \textsc{To-do} \arabic{todocount}: #1
+    \end{shaded}
 }
 
 % algorithms
@@ -100,9 +108,5 @@
 \subimport{chapters/}{08_network_motifs.tex}
 \subimport{chapters/}{09_communication_complexity.tex}
 \subimport{chapters/}{10_expert_learning.tex}
-
-% \subimport{chapters/}{181015.tex}
-
-% \subimport{chapters/}{181105.tex}
 
 \end{document}
