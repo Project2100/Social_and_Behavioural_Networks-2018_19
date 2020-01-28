@@ -22,23 +22,27 @@
 \usepackage{multirow}
 
 % Apply paragraph spacing
-\setlength{\parskip}{1em}
+%\setlength{\parskip}{1em}
 
 % Put all formulae in display style for fractions, binomial coefficients, etc.
-\everymath{\displaystyle}
+%\everymath{\displaystyle}
 
 % addsnew math commands
 \usepackage{mathtools}
 
-% links
-\usepackage{hyperref}
+% Package for hyperlinks
+\PassOptionsToPackage{hyphens}{url}\usepackage{hyperref}
 \hypersetup{
-    colorlinks=false,
-    linkbordercolor={0 0 1},
-    citebordercolor={0 0 1},
-    urlbordercolor={0 0 1},
-    pdfborderstyle={/S/U/W 1}
+    colorlinks,
+    linkcolor={red!70!black},
+    citecolor={blue!50!black},
+    urlcolor={blue!80!black}
 }
+
+\usepackage{pifont} % Hyperlink dingbat
+\newcommand{\linkicon}{\ding{226}}
+
+% cref macro
 \usepackage{cleveref}
 
 % listings style for pseudo-code and similiar
@@ -81,39 +85,22 @@
 \begin{document}
 
 \maketitle
-
 \tableofcontents
 
-% \subimport{chapters/}{preamble.tex}
-
-\subimport{chapters/}{intro.tex}
-
-\subimport{chapters/}{chernoff.tex}
-
-\subimport{chapters/}{graph-models.tex}
-
-\subimport{chapters/}{meme.tex}
-	
+\subimport{chapters/}{01_introduction.tex}
+\subimport{chapters/}{02_behavioural_models.tex}
+\subimport{chapters/}{03_information_spreading.tex}
 \subimport{chapters/}{lsh.tex}
-
 \subimport{chapters/}{lsh2.tex}
-
 \subimport{chapters/}{lp.tex}
-
 \subimport{chapters/}{submodular.tex}
-
 \subimport{chapters/}{clustering.tex}
-
 \subimport{chapters/}{motifs.tex}
-
 \subimport{chapters/}{communication-complexity.tex}
-
 \subimport{chapters/}{experts.tex}
 
 % \subimport{chapters/}{181015.tex}
 
 % \subimport{chapters/}{181105.tex}
-
-% \subimport{chapters/}{prova.tex}
 
 \end{document}

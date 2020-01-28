@@ -1,0 +1,191 @@
+\chapter{Introduction}
+    
+The objectives of the course are:
+\begin{enumerate}
+    \item Find efficient solutions for social network analysis;
+    \item Define models that describe users' behaviour;
+    \item Find ways to infer missing data in a social network.
+\end{enumerate}
+
+It is desirable that such models adapt concretely to real cases, while still being efficient and understandable. Efficiency is usually measured in memory and execution time, or also in the model's capability of being executed in parallel on more computers, using frameworks such as Pregel or Map-Reduce.
+
+
+\section{Recurring concepts}
+
+Some formulae arise very often throughout the lectures, and are grouped here for reference. Also, some jargon is introduced:
+
+\begin{itemize}
+    \item The words ``pick" and ``sample" are used interchangeably, meaning a uniformly random choice whenever a probability distribution is not specified by context;
+    \item A \emph{node}, or \emph{vertex}, can be any entity on the web: a blog, a website or a social network profile; in some prespectives it can also be a person;
+    \item Some recurrent equalities and inequalities used in most proofs:
+        \begin{equation}\label{eq:e-x}
+            1 - x \leq e^{-x}
+        \end{equation}
+        \begin{equation}\label{eq:ln-1-x}
+            \ln(1 - x) \leq -x
+        \end{equation}
+        \begin{equation}\label{eq:limit-1/e}
+            \lim_{x \to +\infty} \left(1 - \frac{1}{x}\right)^x = \frac{1}{e}
+        \end{equation}
+    \item Let $E_i$ be mutually independent events, then
+        \begin{equation}\label{eq:prob}
+            \Pr{\bigcap_{i=0}^n E_i} \leq \prod_{i=0}^{n}\Pr{E_i}
+        \end{equation}
+    \item Power series of the $e^x$ function:
+        \begin{equation}\label{eq:epow}
+            e^x = \sum_{i = 0}^{\infty} \frac{x^n}{n!}
+        \end{equation}
+\end{itemize}
+
+
+\section{Probability basics}
+    
+\begin{defn}[Expected value]\label{def:expected-value}
+    Let $X$ be a random variable with a finite number $n$ of finite outcomes $x_1, x_2, \ldots, x_n$ occurring with probabilities $p_1, p_2, \ldots, p_n$ respectively. Then The expected value of $X$ is
+    \begin{equation}
+        \expval(X) = \sum_{i = 1}^{n} x_i \cdot p_i.
+    \end{equation}
+    Note that $\expval(X)$ is called the \textit{expected value} because it means the midpoint where all outcomes, compounded with their weight, contribute to the equilibrium.
+    
+    \begin{qst}
+        Can we still talk about expected value when the outcomes are not numeric? What could be a good bijection between a generic sample space $\Omega$ and $\nonneg$?
+    \end{qst}
+\end{defn}
+
+\begin{defn}[Sampling]\label{def:sampling}
+    It is a simple algorithmic approach used for abstracting and estimating the percentage of elements of a certain type in a large set.
+    
+    \ex If there is a huge number of black and white marbles in a (very big) bowl and you'd like to know the ratio of black marbles, you can't count all of them, so you extract a sample of marbles many times, until you have sufficient confidence in the obtained result.
+\end{defn}
+
+\begin{defn}[Bayes' Theorem]
+    Bayes’ theorem (or law or rule) describes the probability of an event, based on prior knowledge of conditions that might be related to the event.
+    \begin{equation}\label{eq-bayes}
+        \Pr{(A \cap B)} = \Pr{(A)} \cdot \Pr{(B | A)}
+    \end{equation}
+\end{defn}
+
+
+\subsection{Pregel framework}
+
+Brief description:
+\begin{itemize}
+    \item Each node can communicate only with its neighbors;
+    \item The computation is asynchronous;
+    \item Each node can use few local memory (since there are many nodes);
+    \item The nodes of a network (graph) are distributed on many computers, so it's important to group them based on communities to reduce the number of communications among computers, and to accurately choose a threshold between the memory to assign to each node and the number of nodes we want to put into each single machine.
+\end{itemize}
+
+\begin{ex}[Find connected components of a graph using Pregel]
+    Each node contains a unique number at the beginning (an ID), then every one send its ID to its neighbors, and when a node receives a new number replace its ID with the received one, if it's geater than its own. \\
+    When the values stop changing every connected component has the same value.
+    The maximum number of iterations is given by the diameter of the graph.
+\end{ex}
+
+
+\subsection{Union bound}
+
+\begin{defn}[Union Bound]
+    Let $A$ and $B$ be two events, then
+    \begin{equation}\label{eq:union-bound}
+        \Pr{A \vee B} \leq \Pr{A} + \Pr{B}
+    \end{equation}
+\end{defn}
+
+\begin{proof}
+    The theorem directly follows from the fact that probabilities are non-negative and from the following property:
+    \begin{equation}\label{eq:prob-or}
+        \Pr{A \vee B} = \Pr{A} + \Pr{B} - \Pr{A \wedge B}
+    \end{equation}
+\end{proof}
+
+\begin{defn}[Generalized Union Bound]
+    Let $E_i$ be a countable set of events, then
+    \begin{equation}\label{eq:union-bound-gen}
+        \Pr{\bigcup_{i=0}^n E_i} \leq \sum_{i=0}^{n}(\Pr{E_i})
+    \end{equation}
+\end{defn}
+
+If the events are mutually disjoint, then the equality is strict.
+
+
+\subsection{Moment generating functions}
+	
+Moments, in a mathematical-analytical sense, are ``quantitative measures" that describe characteristic of a shape. for example, a generic function's first moment is its slope (the first derivative, in analytic sense).
+
+Given a random variable $X$, then its moment generating function is
+\begin{equation}
+    M_X(t) = e^{tX}, t \in \real
+\end{equation}
+
+
+\section{Inequalities on random variables}
+
+
+\subsubsection{Markov's inequality}
+	
+Let $X$ be a non-negative random variable (RV) in a sample space $\Omega$, and $a$ an outcome in $\Omega$, then:
+
+\begin{equation}\label{eq:markov}
+    \Pr{X \geq a} \leq \frac{\mathbb{E}[X]}{a}
+\end{equation}
+
+\begin{proof}
+    \begin{align*}
+        \expval(X) &= \int_{0}^{\infty} x \Pr{X = x}dx    & \text{(Def. of expected value)}         & \\
+                   &= \int_{a}^{\infty} x \Pr{X = x}dx + \int_{a}^{\infty} x \Pr{X = x}dx &         & \\
+                   &\geq \int_{a}^{\infty} x \Pr{X = x}dx &                                         & \\
+                   &\geq \int_{a}^{\infty} a \Pr{X = x}dx & \text{($x \geq a \;\forall x$)}         & \\
+                   &= a \Pr{X \geq a}                     & \text{(Def. of cumulative probability)} & \qedhere\\
+    \end{align*}
+\end{proof}
+
+Informally, the Markov inequality tells something about an extreme event in a probability distribution of which we know only the expectation: if $\expval(X)$ is small, then it is very unlikely for $X$ to be very large\footnote{\linkicon \href{https://youtu.be/vjYanZ1nsZg}{\textsf{``L18.2 The Markov Inequality'' [MIT OpenCourseWare] --- YouTube}}}\footnote{\linkicon \href{https://ocw.mit.edu/resources/res-6-012-introduction-to-probability-spring-2018/part-i-the-fundamentals/}{\textsf{Part I: The Fundamentals | Introduction to Probability | MIT OpenCourseWare}}}.
+
+Another formulation of this inequality can be obtained by expressing $a$ as $b \expval(X)$, yielding:
+\begin{equation}\label{eq:markov2}
+    \Pr{X \geq b \cdot \expval(X)} \leq \frac{1}{b}
+\end{equation}
+
+
+\subsubsection{Chebyshev's inequality}
+
+This inequality can come out as a corollary to Markov's. Let $X$ be an integrable RV defined as $(Y - \expval(Y))^2$ for some other RV $X$, and consider the squared constant $a^2$; using equation \ref{eq:markov} yields:
+\[
+    \Pr{(X - \expval(X))^2 \geq a^2} \leq \frac{\expval((X - \expval(X))^2)}{a^2}
+\]
+which can get simplified in two forms, the latter being more popular having $\sigma^2 = \text{Var}(X)$:
+\begin{equation}\label{eq:chebyshev2}
+    \Pr{\abs{X - \expval(X))} \geq a} \leq \frac{\text{Var}(X)}{a^2}
+\end{equation}
+\begin{equation}\label{eq:chebyshev}
+    \Pr{\abs{X - \expval(X))} \geq a \sigma} \leq \frac{1}{a^2}
+\end{equation}
+
+
+\subsection{Chernoff bound}
+
+The \emph{Chernoff bound} is an inequality about probability distributions that are defined as a sum of independent RVs, and allows to control how much said distribution is close to its expected value. For example, it can be used to find how many Facebook users have more than 100 friends: counting all of them would be inefficient, but a good esimate can be obtained by sampling a reasonable number of profiles; such number will be governed by the Chernoff bound. It's important to note that the sample size required to obtain a good approximation also depends on the error we accept to tolerate, and not on the total population.
+
+\begin{defn}[Chernoff bound]
+Let $X$ be the RV obtained by adding together $X_1, \dots, X_n$ Bernoulli RVs that are \iid. Given an outcome $t$, the general statement is:
+\begin{equation}\label{chernoff2}
+    \Pr{\abs{X - \expval(X)} \geq t} \leq 2e^{-\frac{t^2}{3n}}
+\end{equation}
+\end{defn}
+
+In most cases presented in this course, it will be used on binomial distributions which can be seen as the sum of $n$ \iid{} Bernoulli RVs. Let $X_1, \dots, X_n \in \coin(p)$ be such undelying RVs, with $\Pr{X_i = 1} = p$. Then $X = \sum_{i = 1}^{n} X_i$ and $\expval(X) = np$. Given an error limit $\varepsilon$, and replacing $t$ with $\varepsilon n$, inequality \ref{chernoff2} is rewritten as:
+
+\begin{equation}
+    \Pr{\abs{\frac{1}{n}\sum_{i = 1}^{n} X_i - p} \geq \varepsilon} \leq 2e^{-\frac{1}{3}n\varepsilon^2}
+\end{equation}
+
+
+\ex Let $X$ be a RV such that $\expval(X) = \frac{50}{100}$ and define the error margin $\varepsilon = \frac{1}{100}$. The probability that $X \geq \frac{51}{100}$ or $X \leq \frac{49}{100}$ is at most $2e^{-\frac{1}{30000}n}$.
+    
+\ex Let the true expected value be $p = \frac{1}{2}$, and the additive error be $\varepsilon = \sqrt{\frac{\ln(1/\delta)}{n}}$. Then:
+\[
+    \Pr{\abs{\text{empirical average} - \text{true expected value}} > \varepsilon} \leq 2e^{-2n\varepsilon^2} = 2e^{-2n \frac{\ln(1/\delta)}{n}} = 2 \delta^2
+\]
+    
+Observe that the resulting approximation doesn't depend on the probability $p$.
