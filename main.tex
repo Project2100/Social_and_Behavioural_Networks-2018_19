@@ -21,6 +21,8 @@
 \usepackage{multicol}
 \usepackage{multirow}
 
+\usepackage{bold-extra}
+
 % Apply paragraph spacing
 %\setlength{\parskip}{1em}
 
@@ -31,12 +33,12 @@
 \usepackage{mathtools}
 
 % Package for hyperlinks
-\PassOptionsToPackage{hyphens}{url}\usepackage{hyperref}
+\PassOptionsToPackage{hyphens}{url}\usepackage[unicode]{hyperref}
 \hypersetup{
     colorlinks,
-    linkcolor={red!70!black},
-    citecolor={blue!50!black},
-    urlcolor={blue!80!black}
+    linkcolor   = {red!70!black},
+    citecolor   = {blue!50!black},
+    urlcolor    = {blue!80!black}
 }
 
 \usepackage{pifont} % Hyperlink dingbat
@@ -90,14 +92,13 @@
 \subimport{chapters/}{01_introduction.tex}
 \subimport{chapters/}{02_behavioural_models.tex}
 \subimport{chapters/}{03_information_spreading.tex}
-\subimport{chapters/}{lsh.tex}
-\subimport{chapters/}{lsh2.tex}
-\subimport{chapters/}{lp.tex}
-\subimport{chapters/}{submodular.tex}
-\subimport{chapters/}{clustering.tex}
-\subimport{chapters/}{motifs.tex}
-\subimport{chapters/}{communication-complexity.tex}
-\subimport{chapters/}{experts.tex}
+\subimport{chapters/}{04_locality-sensitive_hashing.tex}
+\subimport{chapters/}{05_linear_programming.tex}
+\subimport{chapters/}{06_submodular_functions.tex}
+\subimport{chapters/}{07_clustering.tex}
+\subimport{chapters/}{08_network_motifs.tex}
+\subimport{chapters/}{09_communication_complexity.tex}
+\subimport{chapters/}{10_expert_learning.tex}
 
 % \subimport{chapters/}{181015.tex}
 

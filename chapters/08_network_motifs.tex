@@ -1,4 +1,3 @@
-%!TEX root=../main.tex
 \chapter{Network motifs}\label{sec:motifs}
 
 Graphs representing networks, including biological networks and social networks, contain wide variety of subgraphs. One important local property of networks are so-called \emph{network motifs}, which are defined as recurrent and statistically significant sub-graphs or patterns.
@@ -26,7 +25,7 @@ We would like to compute the \emph{global clustering coefficient}:
 %
 Let's compute this on an example.
 %
-\begin{figure}[h!]
+\begin{figure}
 	\centering
 	\includegraphics[width=.4\textwidth]{graph-triangle-example.png}
 	\caption{Graph example}\label{fig:graph-example-triangles}
@@ -34,7 +33,7 @@ Let's compute this on an example.
 
 In the graph shown in \cref{fig:graph-example-triangles} there are $5$ connected triples and $1$ triangle, so the global clustering coefficient would be $3/5$.
 %
-\begin{figure}[h!]
+\begin{figure}
 	\centering
 	\includegraphics[width=\textwidth]{conn-triples.png}
 \end{figure}
@@ -112,7 +111,7 @@ thus, intuitively, $(A^3)_{uv}$ contains the number of paths of length $3$ that 
 
 To find triangles we can compute $A^3$ and, for every node, get its diagonal entry in the matrix, effectively giving us the number of paths of length $3$ that go from that node to itself.
 
-\begin{figure}[h!]
+\begin{figure}
 	\centering
 	\includegraphics[width=.4\textwidth]{triangle.png}
 	\caption{A triangle.}\label{fig:triangle-graph}
@@ -213,7 +212,7 @@ Algorithm_3(G):
     \begin{proof}
         Refer to figure [\ref{fig:triangles-l1}].
         
-        \begin{figure}[h!]
+        \begin{figure}
             \centering
             \includegraphics[width=.4\textwidth]{triangles_l1.png}
             \caption{A visual proof of lemma [\ref{lem:triangles-1}]}
@@ -316,7 +315,7 @@ Algorithm_1b(G, H):
 
 Let's consider different examples of motifs with 4 nodes, shown in figure [\ref{fig:4-motifs}].
 
-\begin{figure}[h!]
+\begin{figure}
     \centering
     \includegraphics[width=0.9\textwidth]{4-motifs}
     \caption{Examples of 4-motifs}

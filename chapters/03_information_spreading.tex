@@ -1,5 +1,7 @@
-\chapter[Information spreading]{Information spreading \raisebox{.3\baselineskip}{\normalsize\footnotemark}}
-\footnotetext{Most of this chapter is taken from \href{https://github.com/Halolegend94/uni_social_behavioral_networks/blob/master/chapters/ch01-meme-flow.tex}{this repo} by \href{https://github.com/Halolegend94}{Cristian Di Pietrantonio}.}
+\chapter[Information spreading]{Information spreading}
+
+\textbf{\textsc{Content note}}: \emph{Most of this chapter is taken from \href{https://github.com/Halolegend94/uni_social_behavioral_networks/blob/master/chapters/ch01-meme-flow.tex}{this repo} by \href{https://github.com/Halolegend94}{Cristian Di Pietrantonio}.}
+\vspace{2ex}
 
 On the web, information is published by one or more \emph{sources} and often spreads quickly to other parties. The most popular kind of information that spreads quickly is a meme. From \href{https://en.wikipedia.org/wiki/Meme}{Wikipedia}:
 
@@ -136,7 +138,7 @@ Now our aim is to demonstrate that every ${u,v} \in E(G)$ appears at the beginni
         &\leq \left(1 - \frac{2}{n \Delta}\right)^t&\\
         &\leq \left(e^{-\frac{2}{n \Delta}}\right)^t&\tag{by [\ref{eq:e-x}]}\\
         &\leq \left(e^{-\frac{2}{n \Delta}}\right)^{2n \Delta \ln(n)}& \tag{because $2n \Delta \ln(n)$ is the smallest value that $t$ may assume}\\
-        &=e^{-4 \ln(n)} = \frac{1}{n^4}&\tag{by [\ref{eq:log-prop}]}
+        &=e^{-4 \ln(n)} = \frac{1}{n^4}&
     \end{flalign*}
     Therefore the lemma is demonstrated, since we proved that the probability of the complement of our claim is $1/n^4 = 1 - (1-1/n^4)$.
 \end{proof}

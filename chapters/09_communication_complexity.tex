@@ -168,7 +168,9 @@ removed. Since we start with $n$ labels, the total
 cost is $O(n (k-1) \log n)$ bits.
 \end{proof}
 
-\subsection{A $O\left(n^{3/2} \log^{1/2} n\right)$-bits algorithm}
+\subsection{A better algorithm}
+
+The algorithm that will be presented has a communication cost of $O\left(n^{3/2} \log^{1/2} n\right)$-bits.
 
 Let us assume, for simplicity, that the computers share a common random source --- in particular, let us assume that they can all freely access a  function $h: \binom{V}2 \rightarrow \left\{0,1\right\}$ chosen uniformly at random in the set $\left\{g \mid g: \binom{V}2 \rightarrow \left\{0,1\right\}\right\}$.
 

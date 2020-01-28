@@ -12,7 +12,7 @@
     \end{itemize}
 
 
-\section{Erdős–Rényi model}\label{sec:gnp}
+\section{Erd\H{o}s–Rényi model}\label{sec:gnp}
     
     This is a model for generating random graph, that has many applications due to its simplicity, but doesn't fit real world networks: each node has more or less the same degree, based on a fixed probability, while real networks have a gaussian distribution of the degrees.
     
@@ -50,7 +50,7 @@ Sample G(n,p):
     \end{cases}$ \\
     and the $x_j$ are mutually independent.
     
-    Thanks to the mutual independence of the $x_j$, we can apply the Chernoff Bound [\ref{chernoff}] to prove our claim:
+    Thanks to the mutual independence of the $x_j$, we can apply the Chernoff Bound [\ref{chernoff2}] to prove our claim:
     \begin{flalign*}
         &X = \sum x_j = \frac{n}{2} \pm \sqrt{n \ln \frac{1}{\delta}} \text{ with probability } 1 - O(\delta)&
     \end{flalign*}
@@ -233,7 +233,10 @@ Sample G(n,p):
         \begin{enumerate}
             \item add node $i$ to $G_i$;
             \item add a ``\textit{half edge}'' coming out from node $i$;
-            \item choose a node $j$ randomly, with probability proportional to its degree, i.e., $\Pr{\text{neighbor of $N$ is $i$}} = \frac{deg(i)}{\sum_{k=1}^{N} deg(k)}$, where the denominator is a normalization factor;
+            \item choose a node $j$ randomly, with probability proportional to its degree:
+            \[
+                \Pr{\text{neighbor of $N$ is $i$}} = \frac{deg(i)}{\sum_{k=1}^{N} deg(k)}
+            \], where the denominator is a normalization factor;
             \item close the \textit{half edge} from $i$, by connecting it to $j$.
         \end{enumerate}
     \end{itemize}

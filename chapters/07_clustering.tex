@@ -1,4 +1,3 @@
-%!TEX root=../main.tex
 \chapter{Clustering}\label{sec:clustering}
 
 In clustering problems, we have a dataset of points in a multi-dimensional space, and we want to partition this dataset into a certain number of clusters, such that a certain distance or cost functions is minimized within the clusters and maximized among them.
@@ -32,7 +31,7 @@ In real cases, often the number of clusters $k$ is not known \textit{a priori}, 
 \begin{ex}
     In the example in figure [\ref{fig:hierarchical-clustering-ex}] we can see that, after the algorithm groups the elements in levels of clusters, the user must decide which level to use, of if an intermediate number of clusters is preferable.
     
-    \begin{figure}[h!]
+    \begin{figure}
         \centering
         \includegraphics[width=0.7\textwidth]{hierarchical-clustering}
         \caption{An example of hierarchical clustering.}
@@ -62,7 +61,7 @@ The goal is to put similar nodes together and different nodes separated, that is
 \begin{ex}
     Let's look at an example of correlation clustering in picture [\ref{fig:corr-clustering-ex}], where negative edges are dashed.
     
-    \begin{figure}[h!]
+    \begin{figure}
         \centering
         \includegraphics[width=0.3\textwidth]{corr-clustering}
         \caption{An example of correlation clustering.}
@@ -72,7 +71,7 @@ The goal is to put similar nodes together and different nodes separated, that is
     In this case, we put the nodes $A, B, D, E$ together in cluster $C_1$ and we let node $C$ alone in cluster $C_2$, since the first nodes are all similar to each other, while the other is dissimilar from all the others.
 \end{ex}
 
-\begin{figure}[h!]
+\begin{figure}
     \centering
     \includegraphics[width=\textwidth]{clust-special}
     \caption{Special cases in correlation clustering.}
@@ -98,7 +97,7 @@ These examples allow us to make some observations:
     In whatever way we find triangles made of two positive edges and a negative edge, the $cost$ will be at least 1 for each such triangle, and for that reason those triangles are called ``\textit{bad triangles}'' (we will give a formal definition later).\\
     Furthermore, the $cost$ for each bad triangle is at least 1 even if there is a shared node between the bad triangles (see figure [\ref{fig:clust-bad-triangles}]a.), but it is 1/2 if there is a shared edge (see figure [\ref{fig:clust-bad-triangles}]b.).
 
-    \begin{figure}[h!]
+    \begin{figure}
         \centering
         \includegraphics[width=\textwidth]{clust-bad-triangles}
         \caption{Cost of bad triangles.}
@@ -134,7 +133,7 @@ randomized_pivot($V, E^+, E^-$):
     Let's look at some example of execution of Randomized Pivot.
     
     In figure [\ref{fig:clust-rp-1}] we can see all the steps performed by Randomized Pivot to obtain a good approximation of the correlation clustering problem: it produces three clusters, but with one error: there is a positive edge between clusters $C_2$ and $C_2$.
-    \begin{figure}[h!]
+    \begin{figure}
         \centering
         \includegraphics[width=0.5\textwidth]{clust-rp-1}
         \caption{Approximated solution of Randomized Pivot.}
@@ -142,7 +141,7 @@ randomized_pivot($V, E^+, E^-$):
     \end{figure}
 
     In figure [\ref{fig:clust-rp-2}] we can see that, if it exists, Randomized Pivot successes to obtain the optimal solution with $cost=0$: it creates a cluster for each clique, as previously said in observation [\ref{obs:clust-2}].
-    \begin{figure}[h!]
+    \begin{figure}
         \centering
         \includegraphics[width=0.5\textwidth]{clust-rp-2}
         \caption{Optimal solution of Randomized Pivot.}
@@ -156,7 +155,7 @@ randomized_pivot($V, E^+, E^-$):
         \item the algorithm chooses the root of the star as pivot, so the $cost$ is  even $\binom{n-1}{2} \approx n^2$.
     \end{enumerate} }
     Note that the second (and worst) possibility happen with probability $1/n$, so it's not so unlikely.
-    \begin{figure}[h!]
+    \begin{figure}
         \centering
         \includegraphics[width=0.5\textwidth]{clust-rp-3}
         \caption{Worst case of approximated solution of Randomized Pivot.}
@@ -196,7 +195,7 @@ randomized_pivot($V, E^+, E^-$):
         The proof directly follows from the definition of $cost_j^+$ and $cost_j^-$: as we can see in figure [\ref{fig:clust-costs}], $cost_j^+$ covers the first part of the definition of $cost$ [\ref{eq:clust-cost}], that is, the cases in which the algorithm puts two similar nodes in different clusters (edges marked with $*$ in the picture), and $cost_j^-$ covers the second part of the definition, i.e., the cases in which two dissimilar nodes are put in the same cluster (edges marked with $**$ in the picture). Thus, all the errors (red edges) are covered either by $cost_j^+$ or by $cost_j^-$.
     \end{proof}
 
-    \begin{figure}[h!]
+    \begin{figure}
         \centering
         \includegraphics[width=0.35\textwidth]{clust-costs}
         \caption{Example of application of the definition of $cost_j^+$ and $cost_j^-$.}
@@ -324,19 +323,19 @@ randomized_pivot($V, E^+, E^-$):
             Note that we need $\xi$ because we know that, if it happens, the algorithm will find at least a triangle in $A$, otherwise none, and this allows us to divide the probabilities in two parts, by lat of total probability.
         
             Then,
-            \begin{flalign*}
+            \begin{align*}
                 \sum_{\substack{T \in \mathscr{T}\\T \supset \{i,j\}}} y_T &= \sum_{\substack{T \in \mathscr{T}\\T \supset \{i,j\}}} \frac{p_T}3&\\
                 &=\frac13 \cdot \sum_{\substack{T \in \mathscr{T}\\T \supset \{i,j\}}} \Pr{T \text{ is hit}}&\\
                 &=\frac13 \cdot \sum_{\substack{T \in \mathscr{T}\\T \supset \{i,j\}}} \Big( \Pr{T \text{ is hit} \mid \xi} \cdot \Pr{\xi} +  \Pr{T \text{ is hit} \mid \overline{\xi}\,} \cdot \Pr{\,\overline{\xi}\,} \Big)&\tag{by total probability}\\
                 &=\frac13 \cdot \sum_{\substack{T \in \mathscr{T}\\T \supset \{i,j\}}} \Big( \Pr{T \text{ is hit} \mid \xi} \cdot \Pr{\xi} + 0 \cdot \Pr{\,\overline{\xi}\,}\Big)&\\
                 &=\frac13 \cdot \sum_{\substack{T \in \mathscr{T}\\T \supset \{i,j\}}} \Big( \Pr{T \text{ is hit} \mid \xi} \cdot \Pr{\xi}\Big)&\\
                 &\le \frac13 \cdot \sum_{\substack{T \in \mathscr{T}\\T \supset \{i,j\}}} \Pr{T \text{ is hit} \mid \xi}.&
-            \end{flalign*}
+            \end{align*}
             Under the conditioning $\xi$, there will be one node that ends up being the first  pivot chosen in $A$; suppose it is $v_k$ (that is, let $k$ be such that $v_k \in A$ and $v_{k'} \not\in A$ fo each $1 \le k' < k$ --- observe that such a $k$ must exists if $\xi$ happens).
             Moreover, let $B = V_k \cap A$ be the subset of nodes of $A$ that are part of the residual graph when $v_k$ is chosen as a pivot.
         
             Then,
-            \begin{flalign*}
+            \begin{align*}
                 \sum_{\substack{T \in \mathscr{T}\\T \supset \{i,j\}}} y_T &\le \frac13 \cdot \sum_{\substack{T \in \mathscr{T}\\T \supset \{i,j\}}} \Pr{T \text{ is hit} \mid \xi}&\\
                 &=\frac13 \cdot \sum_{S \subseteq A} \left(\Pr{B = S \mid \xi} \cdot \sum_{\substack{T \in \mathscr{T}\\T \supset \{i,j\}}} \Pr{T \text{ is hit} \mid B = S \wedge \xi}\right)&\tag{$*^1$}\\
                 &=\frac13 \cdot \sum_{S \subseteq A} \left(\Pr{B = S \mid \xi} \cdot \left(\sum_{\substack{T \in \mathscr{T}\\ \{i,j\} \subset T  \subseteq S}} \Pr{T \text{ is hit} \mid B = S \wedge \xi} + \sum_{\substack{T \in \mathscr{T}\\ \{i,j\} \subset T  \not\subseteq S}} \Pr{T \text{ is hit} \mid B = S \wedge \xi}\right)\right)&\tag{$*^2$}\\
@@ -346,7 +345,7 @@ randomized_pivot($V, E^+, E^-$):
                 &=\frac13 \cdot \sum_{S \subseteq A} \left(\Pr{B = S \mid \xi} \cdot (|S| -2) \cdot  \frac3{|S|} \right)&\\
                 &\le\frac13 \cdot \sum_{S \subseteq A} \Big(\Pr{B = S \mid \xi} \cdot 3 \Big)&\tag{we upper bound $\frac{|S|-2}{|S|}$ with 1}\\
                 &=\sum_{S \subseteq A} \left(\Pr{B = S \mid \xi} \right) = \Pr{B \subseteq A\mid \xi}= 1.&
-            \end{flalign*}
+            \end{align*}
             
             In $(*^1)$ we apply the law of total probability again, to split the probabilities according to the value of $B$; in $(*^2)$ we break the sum in two parts, with triangles completely in $S$ and \textit{not} completely in $S$, the latter will never be hit by the algorithm, by definition of hit [\ref{def:clust-hit}], (so their probabilities are 0 in $(*^3)$), the former have probability $3/|S|$ of being hit, since each of their vertexes has the same probability of being chosen as the pivot (since it's picked $\uar$), and we use it in $(*^4)$.
             

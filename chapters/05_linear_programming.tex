@@ -1,5 +1,7 @@
-\chapter[Linear programming for approximation algorithms]{Linear programming for approximation algorithms \raisebox{.3\baselineskip}{\normalsize\footnotemark}}
-\footnotetext{Part of this chapter is taken from \href{https://github.com/Halolegend94/uni_social_behavioral_networks/blob/master/chapters/ch05-densest-subgraph.tex}{this repo} by \href{https://github.com/Halolegend94}{Cristian Di Pietrantonio}.}\label{sec:linear-programming}
+\chapter[Linear programming for approximation algorithms]{Linear programming for approximation algorithms}\label{sec:linear-programming}
+
+\textbf{\textsc{Content note}}: \emph{Part of this chapter is taken from \href{https://github.com/Halolegend94/uni_social_behavioral_networks/blob/master/chapters/ch05-densest-subgraph.tex}{this repo} by \href{https://github.com/Halolegend94}{Cristian Di Pietrantonio}.}
+\vspace{2ex}
 
 In this chapter Linear Programming is introduced as a tool to build approximation algorithms. In particular, we use the \textit{Densest Subgraph} problem (DSG for short) as a practical example, because some practitioners believe that it is a good primitive to find community of people; also, this problem is in $P$ and we will solve it through linear programming.
 
@@ -120,7 +122,7 @@ We are interested in this problem since it allows to find communities into socia
     This is a particular approximation problem, since it can actually be solved exactly in polynomial time.
 \end{obs}
 
-\begin{figure}[h!]
+\begin{figure}
     \centering
     \includegraphics[scale=0.7]{densest-subgraph}
     \caption{An example of densest subgraph $G[S]$.}
@@ -538,19 +540,17 @@ By this we shown that the analysis of Greedy can be seen as a primal-dual proof,
     \end{figure}
 
     First of all, we apply the primal LP [\ref{lp-greedy-primal}] to the graph in the picture [\ref{fig:dsp-ex}] and we obtain
-    \begin{equation*}
-        \begin{aligned}
-            &\max X_{\{1,2\}} + X_{\{1,2\}} \left( + 0X_1 + 0X_2 + 0X_3 \right)\\
-            &\begin{cases}
-                X_{\{1,2\}} - X_1 & \leq 0 \\
-                X_{\{1,2\}} - X_2 & \leq 0 \\
-                X_{\{2,3\}} - X_2 & \leq 0 \\
-                X_{\{2,3\}} - X_3 & \leq 0 \\
-                X_1 + X_2 + X_3   & \leq 1
-            \end{cases}\\
-            &X_{\{i, j\}}, X_i \geq 0 \ \ \forall\ \{i,j\} \in E(G)
-        \end{aligned}
-    \end{equation*}
+    \begin{align*}
+        &\max X_{\{1,2\}} + X_{\{1,2\}} \left( + 0X_1 + 0X_2 + 0X_3 \right)\\
+        &\begin{cases}
+            X_{\{1,2\}} - X_1 & \leq 0 \\
+            X_{\{1,2\}} - X_2 & \leq 0 \\
+            X_{\{2,3\}} - X_2 & \leq 0 \\
+            X_{\{2,3\}} - X_3 & \leq 0 \\
+            X_1 + X_2 + X_3   & \leq 1
+        \end{cases}\\
+        &X_{\{i, j\}}, X_i \geq 0 \ \ \forall\ \{i,j\} \in E(G)
+    \end{align*}
     From this, we obtain the matrix form described in [\ref{primal-matrix}], that we represent here, together with the dual matrix presented in [\ref{dual-matrix}]:\\
     \begin{minipage}{0.4\textwidth}
         \begin{flalign*}
