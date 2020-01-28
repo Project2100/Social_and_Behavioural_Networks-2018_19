@@ -6,7 +6,7 @@ In a distributed computing framework like MapReduce it is not only important to 
 \section{String equality}\label{sec:string-eq}
 In the following we see an algorithm to compute strings equality.
 
-\begin{lstlisting}[caption={Greedy algorithm},label={lst:fS-greedy}]
+\begin{lstlisting}[caption={Greedy algorithm},label={lst:fS-greedycc}]
 $\bar{X}$: bits string of computer $A$
 $\bar{Y}$: bits string of computer $B$
 Algo(X,Y):
@@ -176,7 +176,10 @@ Let us assume, for simplicity, that the computers share a common random source -
 
 \smallskip
 
-The algorithm \cite{cks15} that we will describe can be made to work in the {\em simultaneous message} model (that is, the communication can end after a single round.)\footnote{A result of Newman \cite{newman91} can be used to translate any simultaneous message algorithm into a $O(1)$-rounds protocol, using private randomness and the same $O\left(n^{3/2} \log^{1/2} n\right)$ bits of communication. Thus, the assumption that the computers share a common random source can be avoided.}
+%\cite{cks15}
+%\cite{newman91}
+
+The algorithm \textsc{Cite 1} that we will describe can be made to work in the {\em simultaneous message} model (that is, the communication can end after a single round.)\footnote{A result of Newman \textsc{Cite 2} can be used to translate any simultaneous message algorithm into a $O(1)$-rounds protocol, using private randomness and the same $O\left(n^{3/2} \log^{1/2} n\right)$ bits of communication. Thus, the assumption that the computers share a common random source can be avoided.}
 
 \smallskip
 
