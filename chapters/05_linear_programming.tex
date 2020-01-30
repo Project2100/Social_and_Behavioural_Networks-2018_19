@@ -173,174 +173,187 @@ What we will be proving is that the optimal solution $OPT_{LP}$ of this LP is eq
 \pagebreak
 
 \begin{lem}\label{l:dsp-feasibility}
-    For any graph $G(V,E)$ and for any $\emptyset \neq S \subset V$, there exists a feasible solution to the linear problem having value $f(S)=\frac{|E(S)|}{|S|}$ (the density of the graph).
+    For any graph $G(V,E)$ and for any $\emptyset \subset S \subset V$, there exists a feasible solution to the linear problem having value $f(S) = \frac{|E(G[S])|}{|S|}$, which is the subgraph's density.
 \end{lem}
+
 \begin{proof}
-    We will give a solution and show that it meets the requirements.
+    We will give a solution and show that it meets the requirements. Define:
     
-    Let $Y_i :=
-    \begin{cases}
-    \frac{1}{|S|} & i \in S,\\
-    0 & i \not\in S
-    \end{cases}$.\\
-    Remember that the $Y_i$s were the variables representing how much of each node in the graph we are taking, this definition states that we split the unit among the nodes in the set $S$.
+    \[
+        Y_i := \begin{cases}
+            \frac{1}{|S|}   & \text{if } i \in S \\
+            0               & \text{else}
+        \end{cases}
+    \]
     
-    Then let $X_{\{i, j\}} = 
-    \begin{cases}
-    \frac{1}{|S|} & \{i, j\} \subseteq S,\\
-    0 & \{i, j\} \not\subseteq S
-    \end{cases}$.
+    Remember that the variables $Y_i$ represent how much of each node in the graph we are taking, this definition states that we split the unit among the nodes in the set $S$. Then let:
     
-    To show this solution is feasible we check that every constraint is satisfied.\\
-    Let's start with Inequality \ref{eq:dsg_denominator_constraint}:
-    $\sum_{i} Y_i = |S| \frac{1}{|S|} = 1$, 
-    so far, so good.
+    \[
+        X_{\{i, j\}} = \begin{cases}
+            \frac{1}{|S|}   & \text{if } \{i, j\} \subseteq S \\
+            0               & \text{else}
+        \end{cases}
+    \]
+    Remember that, for simplicity of notation: $\{i, j\} \in E(G[S]) \implies \{i, j\} \subseteq S$ % And the opposite is not true!
     
-    Let's proceed with Inequality \ref{eq:x_size_constraint}, starting with a generic $\{i, j\} \in E$. We have two cases:
+    For this solution to be feasible, all constraints are checked. Start with Inequality \ref{eq:dsg_denominator_constraint}:
+    \[
+        \sum_{i} Y_i = |S| \frac{1}{|S|} = 1
+    \]
+    
+    which is satisfied. Then proceed with Inequality \ref{eq:x_size_constraint}, starting with a generic $\{i, j\} \in E$. We have two cases:
     \begin{itemize}
         \item $\{i, j\} \not\subseteq S$: In this case we want to guarantee that
-        \begin{equation}
-            \begin{cases}
-                X_{\{i, j\}} \leq Y_i\\
-                X_{\{i, j\}} \leq Y_j
-            \end{cases}
-            \implies X_{\{i, j\}} \leq \min{\{Y_i, Y_j\}},
-        \end{equation}
-        but both sides of the two equations are zero, since $\{i, j\} \not\subseteq S$.
+            \begin{equation}
+                \begin{cases}
+                    X_{\{i, j\}} \leq Y_i\\
+                    X_{\{i, j\}} \leq Y_j
+                \end{cases}
+                \implies X_{\{i, j\}} \leq \min{\{Y_i, Y_j\}},
+            \end{equation}
+            but both sides of the two equations are zero, because both $i$ and $j$ are not in $S$.
         
-        \item $\{i, j\} \subseteq S$: Then
-        \begin{equation}
-            \frac{1}{|S|} = X_{\{i, j\}} \leq  \min{\{Y_i, Y_j\}} = \frac{1}{|S|}.
-        \end{equation}
+        \item $\{i, j\} \subseteq S$: In the same vein, both sides of the two equations evaluate to $\frac{1}{|S|}$.
     \end{itemize}
     
-    By that, we demonstrated that the solution is feasible. At this point it's easy to compute its value:
-    \begin{equation}
-    \sum_{\{i, j\} \in E(G)} X_{\{i, j\}}= \abs{E(S)} \frac{1}{|S|} = f(S).
-    \end{equation}
+    By that, we proved that the solution is feasible. At this point it's easy to evaluate the objective function:
+    \[
+        \sum_{\{i, j\} \in E(G)} X_{\{i, j\}} = \abs{E(G[S])} \frac{1}{|S|} = f(S)
+    \]
 \end{proof}
 
 \begin{cor}
-    Let $OPT_{LP}$ be the value of the optimal feasible solution to the LP, and let $S^*$ be the densest subgraph of $G$, then
-    \begin{equation}
-        OPT_{LP} \geq OPT = f(S^*) = \frac{\abs{E(S^*)}}{\abs{S^*}}.
-    \end{equation}
+    Let $OPT_{LP}$ be the value of the optimal feasible solution to the LP, and let $S^*$ be the densest subgraph of $G$, then:
+
+    \[
+        f(S) = OPT_{LP} \geq OPT = f(S^*) = \frac{\abs{E(S^*)}}{\abs{S^*}}.
+    \]
     
-    What we have shown is that the LP's optimal value is never worst than the original densest subgraph problem's optimum.
+    In other words, the consequence of constructing the solution used to prove \ref{l:dsp-feasibility} is that the LP's optimal value is never worse than the original densest subgraph problem's optimum.
 \end{cor}
 
 \begin{lem}\label{l:dsp-geq-lp}
-    Let $\{X_{\{i, j\}}, Y_i\}$ be an optimal solution to the Linear Program \ref{lp-densest-subgraph}, having value $v$, then $\exists S \subseteq V\ f(S) \geq v$.
+    Let $\{X_{\{i, j\}}, Y_i\}$ be an optimal solution to the Linear Program \ref{lp-densest-subgraph}, having value $v$. Then $\exists S \subseteq V : f(S) \geq v$.
 \end{lem}
+
 \begin{proof}[Proof by Charikar]
-    To prove this lemma, we will proceed step by step claiming some properties that will help us to reach our aim.
+    To prove this lemma, we will proceed step by step claiming some properties that will help us to reach our goal.
     
     \begin{claim}\label{cl:dsp-1}
-        The following property holds:
-        \begin{equation}
-        \forall \{i, j\} \in E\ X_{\{i, j\}} = \min{\{Y_i, Y_j\}}.
-        \end{equation}
+        For an optimal solution, the following property holds:
+        \[
+            \forall \{i, j\} \in E(G) \quad X_{\{i, j\}} = \min(Y_i, Y_j)
+        \]
     \end{claim}
-    \begin{proof}[Proof of claim \ref{cl:dsp-1}]
-        Suppose by contradiction that this was not the case, then $\exists\ X_{\{i, j\}} < \min{\{Y_i, Y_j\}}$.
-        But now we can increase the value of $X_{\{i, j\}}$ up to the minimum and so the objective function's value increases and the solution remains feasible. It follows that $X_{\{i, j\}}$ wasn't optimal value (contradiction).
+    \begin{proof}
+        Assume that this was not the case: $\exists\ X_{\{i, j\}} < \min{\{Y_i, Y_j\}}$. Then the value of $X_{\{i, j\}}$ can be increased up to $\min(Y_i, Y_j)$, which in turn increases the objective function's value while keepoing the solution feasible. It entails that $X_{\{i, j\}}$ wasn't the optimal value, which is a contradiction.
     \end{proof}
 
-    Now we proceed with the Lemma's proof. Let
-    \begin{flalign}
-        S(r) &:= \{ i \st i \in V(G) \wedge Y_i \geq r\},&\label{dsp-sr}\\
-        E(r) &:= \{ \{i, j\} \st \{i, j\} \in E(G) \wedge X_{\{i, j\}} \geq r\}.&\label{dsp-er}
-    \end{flalign}
-    We are defining a parametric set, that contains all the nodes $i$ such that $Y_i \geq r$ in the optimal solution. $S(0)$ contains all the nodes but, as $r$ increases, the number of nodes included becomes smaller and smaller.
+    Now, fix a parameter $r$ and let:
+    \begin{align}
+        S(r) &:= \{ i \in V(G) : Y_i \geq r\}                   & \label{dsp-sr} \\
+        H(r) &:= \{ \{i, j\} \in E(G) : X_{\{i, j\}} \geq r\}   & \label{dsp-er}
+    \end{align}
+
+    We are defining a parametric set, that contains all the nodes $i$ such that $Y_i \geq r$ in the optimal solution. $S(0)$ contains all the nodes, and as $r$ increases, it shrinks increasingly. $H(r)$ is the edges' analogue.
     
     \begin{claim}\label{cl:dsp-2}
-        No matter which $r$ we pick, it will select a set of nodes and also all the edges induced by that set of nodes:
-        \begin{equation}
-        \forall r,\ 0 \leq r \leq \max{\{Y_i\}},\ \{i, j\} \in E(r) \Longleftrightarrow \{i, j\} \subseteq S(r).
-        \end{equation}
+        No matter which $r$ we pick, it will select a set of nodes such that the selected edges are induced by that set of nodes:
+        \[
+            \forall\ 0 \leq r \leq \max{\{Y_i\}} \qquad \{i, j\} \in H(r) \iff \{i, j\} \subseteq S(r)
+        \]
+        Or alternatively:
+        \[
+            \forall\ 0 \leq r \leq \max{\{Y_i\}} \qquad H(r) = E(G[S(r)])
+        \]
     \end{claim}
-    \begin{proof}[Proof of claim \ref{cl:dsp-2}]
-        \begin{flalign*}
-            \{i, j\} \in E(r) &\implies X_{\{i, j\}} \geq r&\tag{by [\ref{dsp-er}]}\\
-            & \implies \min{\{Y_i, Y_j\}} \geq r&\tag{by claim [\ref{cl:dsp-1}]}\\
-            & \implies Y_i \geq r \wedge Y_j \geq r&\\
-            & \implies \{i, j\} \subseteq S(r)&\tag{by [\ref{dsp-sr}]}
-        \end{flalign*}
-        Now the other direction.
-        \begin{flalign*}
-        \{i, j\} \subseteq S(r)&\implies r \leq X_{\{i, j\}} = \min{\{Y_i, Y_j\}}&\tag{by claim [\ref{cl:dsp-1}]}\\
-        & \implies \{i, j\} \in E(r).&\tag{by [\ref{dsp-er}]}
-        \end{flalign*}
+
+    \begin{proof}
+        The proof is split in the two directions:
+        \begin{itemize}
+            \item ($\implies$):
+                \begin{align*}
+                    \{i, j\} \in E(r) & \implies X_{\{i, j\}} \geq r            & \tag{by [\ref{dsp-er}]}           \\
+                                      & \implies \min{\{Y_i, Y_j\}} \geq r      & \tag{by claim [\ref{cl:dsp-1}]}   \\
+                                      & \implies Y_i \geq r \wedge Y_j \geq r   &                                   \\
+                                      & \implies \{i, j\} \subseteq S(r)        & \tag{by [\ref{dsp-sr}]}
+                \end{align*}
+            \item ($\impliedby$):
+                \begin{align*}
+                    \{i, j\} \subseteq S(r) & \implies r \leq X_{\{i, j\}} = \min{\{Y_i, Y_j\}} & \tag{by claim [\ref{cl:dsp-1}]}\\
+                                            & \implies \{i, j\} \in E(r)                        & \tag{by [\ref{dsp-er}]}
+                \end{align*}
+        \end{itemize}
     \end{proof}
 
-    Now we introduce an ordering of the $Y$s and two integrals that will be useful later: let $\pi$ be a permutation such that $0 =: Y_{\pi_{(0)}} \leq Y_{\pi_{(1)}} \leq Y_{\pi_{(2)}} \leq Y_{\pi_{(2)}} \leq \ldots \leq \leq Y_{\pi_{(n)}}$, with $n = |V|$.
+    Now we introduce an ordering of the variables $Y_i$ and two integrals that will be useful later: let $\pi$ be a permutation over them which preserves the values' natural ordering:
+    \[
+        0 =: Y_{\pi_{(0)}} \leq Y_{\pi_{(1)}} \leq Y_{\pi_{(2)}} \leq Y_{\pi_{(2)}} \leq \ldots \leq Y_{\pi_{(|V| - 1)}} =: \max{\{Y_i\}}
+    \]
+    Observe the following integral which gives a property of the nodes:
     
-    Let's look at the following integral which gives a property of the nodes.
-    
-    \begin{figure}[h!]
+    \begin{figure}[ht]
         \centering
-        \includegraphics[scale=0.4]{dsp-integral}
-        \caption{A representation of the integral $\int_0^{\max{\{Y_i\}}} |S(r)|dr$.}
+        \includegraphics[scale = 0.4]{dsp-integral}
+        \caption{A representation of the integral $\int_0^{\max{\{Y_i\}}} |S(r)| dr$.}
         \label{fig:dsp-integral}
     \end{figure}
     
     \begin{claim}\label{cl:dsp-3}
-        \begin{equation}
-            \int_0^{\max{\{Y_i\}}} |S(r)|dr =\sum_{i=1}^n Y_i.
-        \end{equation}
+        \[
+            \int_0^{\max{\{Y_i\}}} |S(r)| dr =\sum_{i = 1}^n Y_i.
+        \]
     \end{claim}
-    \begin{proof}[Proof of claim \ref{cl:dsp-3}]
-        First of all, let's note that the integral in [\ref{cl:dsp-3}] can be graphically represented as in the picture [\ref{fig:dsp-integral}], where each gray rectangle is the integral for a certain value of $r$, i.e., an addend of the sum that makes up the integral (see $(*^1)$).
+
+    \begin{proof}
+        First of all, let's note that the integral in [\ref{cl:dsp-3}] can be graphically represented as in the picture [\ref{fig:dsp-integral}], where each gray rectangle is the integral for a certain value of $r$, i.e., an addend of the sum that makes up the integral:
         
-        \begin{flalign*}
-            \int_0^{\max{\{Y_i\}}} |S(r)|dr &= \sum_{i=1}^{n} \underbrace{\left(\left( n-1+1 \right) \cdot \left( Y_{\pi_{(i)}} - Y_{\pi_{(i-1)}} \right)\right)}_{(*^1)}&\\
-            &= \sum_{i=1}^{n} \left(\left( n-1+1 \right) \cdot Y_{\pi_{(i)}} \right) + \sum_{i=1}^{n} \left(\left( n-1+1 \right) \cdot Y_{\pi_{(i-1)}} \right)&\\
-            &= \sum_{i=1}^{n} \left(\left( n-1+1 \right) \cdot Y_{\pi_{(i)}} \right) + \sum_{i=0}^{n-1} \left(\left( n-1 \right) \cdot Y_{\pi_{(i)}} \right)&\tag{$*^2$}\\
-            &= \sum_{i=1}^{n} \left(\left( n-1+1 \right) \cdot Y_{\pi_{(i)}} \right) + \sum_{i=1}^{n} \left(\left( n-1 \right) \cdot Y_{\pi_{(i)}} \right)&\tag{$*^3$}\\
+        \begin{align*}
+            \int_0^{\max{\{Y_i\}}} |S(r)| dr &= \sum_{i = 1}^{n} ( \overbrace{(n - 1 + 1)}^{\text{height}} \cdot \overbrace{(Y_{\pi_{(i)}} - Y_{\pi_{(i-1)}})}^{\text{width}} )& \tag{by geom. interpretation of integral}\\
+            &= \sum_{i=1}^{n} \left(\left( n-1+1 \right) \cdot Y_{\pi_{(i)}} \right) - \sum_{i=1}^{n} \left(\left( n-1+1 \right) \cdot Y_{\pi_{(i-1)}} \right)& \\
+            &= \sum_{i=1}^{n} \left(\left( n-1+1 \right) \cdot Y_{\pi_{(i)}} \right) - \sum_{i=0}^{n-1} \left(\left( n-1 \right) \cdot Y_{\pi_{(i)}} \right)&\tag{by index shifting}\\
+            &= \sum_{i=1}^{n} \left(\left( n-1+1 \right) \cdot Y_{\pi_{(i)}} \right) - \sum_{i=1}^{n} \left(\left( n-1 \right) \cdot Y_{\pi_{(i)}} \right)&\tag{$*^3$}\\
             &= \sum_{i=1}^n Y_{\pi_{(i)}} = \sum_{i=1}^n Y_i&
-        \end{flalign*}
+        \end{align*}
         
-        The step marked by $(*^2)$ is due to the fact that we can remove the last term of the sum by just working on the indices.\\
         The step marked by $(*^3)$ is due to the fact that for $i=0$ and for $i=n$ the value of the term is $0$, so we can sum from $1$ to $n$ as in the first sum, to obtain compatible addends.
     \end{proof}
     
-    Let's do the same for the edges.
-    
     \begin{claim}\label{cl:dsp-4}
         \begin{equation}
-            \int_0^{\max{\{Y_i\}}} |E(r)|dr =
-            \sum_{i=1}^n X_{\{i, j\}}.
+            \int_0^{\max{\{Y_i\}}} |H(r)|dr = \sum_{i = 1}^n X_{\{i, j\}}.
         \end{equation}
     \end{claim}
-    \begin{proof}[Proof of claim \ref{cl:dsp-4}]
-        The proof is analogous to the one for the claim [\ref{cl:dsp-3}].
+
+    \begin{proof}
+        The proof is analogous to the one for the claim \ref{cl:dsp-3}.
     \end{proof}
     
     \begin{claim}\label{cl:dsp-5}
-        \begin{equation}
-            \exists r\ \in [0, \max{\{Y_i\}}] \text{ s.t. } |E(r)| \geq v|S(r)|.
-        \end{equation}
+        There exists a value for $r$ in $[0, \max{\{Y_i\}}]$ such that $|H(r)| \geq v|S(r)|$. It entails:
+        \[
+            f(S(r)) = \frac{|H(r)|}{|S(r)|} \geq v = \sum_{\{i,j\}} X_{\{i, j\}}
+        \]
+        meaning that, for a specific value for $r$, we have a DSG value that is at least $v$, whhich is our final goal.
     \end{claim}
-
-    Making this claim actually means saying that 
-    \begin{equation}
-    f(S(r)) = \frac{|E(r)|}{|S(r)|} \geq v = \sum_{\{i,j\}\in E(G)} X_{\{i, j\}},
-    \end{equation}
-    thus, for at least one value $r$, we have a DSG value that is at least $v$, what we wanted to prove.
     
-    \begin{proof}[Proof by contradiction of claim \ref{cl:dsp-5}] \
-        \begin{itemize}
-            \item Assume that, $\forall\ r \in [0, \max{\{Y_i\}}]$, it holds that $|E(r)| < v|S(r)|$;
-            \item Then, $\int_0^{\max{\{Y_i\}}}|E(r)| dr < v\int_0^{\max{\{Y_i\}}}|S(r)| dr$;
-            \item By claims [\ref{cl:dsp-3}] and [\ref{cl:dsp-4}], it follows that $\sum_{\{i, j\} \in E} X_{\{i, j\}} < v \sum_{i = 1}^n Y_i$;
-            \item But, by optimality of the LP solution, it is true that
-            $\sum_{i = 1}^n Y_i = 1\ \wedge\ \sum_{\{i, j\} \in E} X_{\{i, j\}} = v$;
-            \item It follows a contradiction, $ v < v$.
-        \end{itemize}
-        Thus, our assumption was false, and our claim was true.
+    \begin{proof}
+        The proof goes by contradiction. Assume that, $\forall\ r \in [0, \max{\{Y_i\}}]$, it holds that $|E(r)| < v|S(r)|$. Then:
+        \[
+            \int_0^{\max{\{Y_i\}}}|E(r)| dr < v\int_0^{\max{\{Y_i\}}}|S(r)| dr
+        \]
+        By claims [\ref{cl:dsp-3}] and [\ref{cl:dsp-4}], it follows that:
+        \[
+            \sum_{\{i, j\} \in E} X_{\{i, j\}} < v \sum_{i = 1}^n Y_i
+        \]
+        This contradicts the solution's optimality, which states that:
+        \[
+            \sum_{i = 1}^n Y_i = 1\ \wedge\ \sum_{\{i, j\} \in E} X_{\{i, j\}} = v
+        \]
+        and would thus yield $v < v \cdot 1$
     \end{proof}
 
-    At this point we have proved Lemma \ref{l:dsp-geq-lp} and, more importantly, that the LP we gave finds the exact optimal solution for the Densest Subgraph problem.
+    At this point we have proved that the LP we gave finds the exact optimal solution for the Densest Subgraph problem.
 \end{proof}
 
 As a side note, in this proof we used integrals to avoid to sum over all the possible values of the $Y_i$s. How can we actually find the set $S$ given the LP's optimal value $v$? How many candidate sets there can be? In principle infinitely many, but the only ones that matter are given by $r \in \{Y_i : 1 \leq i \leq n\}$ (because of how $S(r)$ is defined). So we try all the $n$ possible values of $r$ and pick the best one.
@@ -397,6 +410,8 @@ Greedy G(V,E):
     \begin{defn}[Maximum $\varphi$-degree]
         Given $\varphi$ and $v \in V$, let $\Delta_\varphi = \max_{v \in V}\{d_\varphi(v)\}$.
     \end{defn}
+
+    \pagebreak
     
     What we want to do now is to bound the quality of the optimal solution in terms of some property of all orientations of the graph $G$. The reason is that the algorithm will be analyzed by making it implicitly select an orientation during its execution. Since we are about to show we can bound the value of the optimal solution to DSG by some function of any orientation, this will allow us to give a bound on the quality of the algorithm.
     
