@@ -142,12 +142,12 @@ Now we want to express the densest subgraph problem as a (primal) linear problem
     \end{aligned}
 \end{equation}
 
-Starting from the objective function, we want something that says ``get as many edges as possible in the final graph''; so, it seems natural to maximizes the number of edges we can put in the final subset of nodes. Observe, though, that we cannot maximize $f(S)$ since it is not linear. One can take another approach and look only at the numerator. We define a variable $X_{\{i, j\}}$ to be the fractional amount of edge $\{i, j\}$ that is put inside the solution. The objective function is
+Starting from the objective function, we want something that says ``get as many edges as possible in the final graph''; so, it seems natural to maximize the number of edges we can put in the final subset of nodes. Observe, though, that we cannot maximize $f(S)$ since it is not linear. One can take another approach and look only at the numerator. We define a variable $X_{\{i, j\}}$ to be the fractional amount of edge $\{i, j\}$ that is put inside the solution. The objective function is
 \begin{equation}
     \max\sum_{\{i, j\} \in E}X_{\{i, j\}}.
 \end{equation}
 
-For each edge, we cannot pick that edge fractionally more than the amount with which we pick one of its endpoints. For example, if we pick $\{i, j\}$ for $\frac{1}{2}$ of its entirely, then it is the case that we had to pick both $i$ and $j$ for at least $\frac{1}{2}$. This can be expressed introducing a variable $Y_i$ for each node $i$, representing the fractional amount with which we pick node $i$; then, we can say that
+For each edge, we cannot pick that edge fractionally more than the amount with which we pick one of its endpoints. For example, if we pick $\{i, j\}$ for $\frac{1}{2}$ of its entirety, then it is the case that we had to pick both $i$ and $j$ for at least $\frac{1}{2}$. This can be expressed introducing a variable $Y_i$ for each node $i$, representing the fractional amount with which we pick node $i$; then, we can say that
 \begin{flalign}\label{eq:x_size_constraint}
     X_{\{i, j\}} &\leq Y_i,\\
     X_{\{i, j\}} &\leq Y_j.
@@ -169,6 +169,8 @@ What we will be proving is that the optimal solution $OPT_{LP}$ of this LP is eq
     \item $OPT_{LP} \geq f(S^*)$;
     \item $f(S^*) \geq OPT_{LP}$.
 \end{enumerate}
+
+\pagebreak
 
 \begin{lem}\label{l:dsp-feasibility}
     For any graph $G(V,E)$ and for any $\emptyset \neq S \subset V$, there exists a feasible solution to the linear problem having value $f(S)=\frac{|E(S)|}{|S|}$ (the density of the graph).
