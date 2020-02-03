@@ -65,11 +65,11 @@ algo0:
         \centering
         \begin{tabular}{|c|c|c|c|c|c|l}
             \hline
-            \multirow{5}{*}{experts} & \textbf{0} & 1 & 1 & 1 & 1 & \multicolumn{1}{l|}{\xmark} \\
-            \cline{2-7}              & 1 & \textbf{0} & 1 & 1 & 1 & \multicolumn{1}{l|}{\xmark} \\
-            \cline{2-7}              & 1 & 1 & \textbf{0} & 1 & 1 & \multicolumn{1}{l|}{\xmark} \\
-            \cline{2-7}              & 1 & 1 & 1 & \textbf{0} & 1 & \multicolumn{1}{l|}{\xmark} \\
-            \cline{2-7}              & 1 & 1 & 1 & 1 & \textbf{1} & \multicolumn{1}{l|}{\cmark} \\
+            \multirow{5}{*}{experts} & \textbf{0} & 1 & 1 & 1 & 1 & \multicolumn{1}{l|}{\error} \\
+            \cline{2-7}              & 1 & \textbf{0} & 1 & 1 & 1 & \multicolumn{1}{l|}{\error} \\
+            \cline{2-7}              & 1 & 1 & \textbf{0} & 1 & 1 & \multicolumn{1}{l|}{\error} \\
+            \cline{2-7}              & 1 & 1 & 1 & \textbf{0} & 1 & \multicolumn{1}{l|}{\error} \\
+            \cline{2-7}              & 1 & 1 & 1 & 1 & \textbf{1} & \multicolumn{1}{l|}{\correct} \\
             \hline algorithm         & 0 & 0 & 0 & 0 & 1 &                                      \\
             \cline{1-6} truth        & 1 & 1 & 1 & 1 & 1 &                                      \\
             \cline{1-6}
@@ -78,7 +78,7 @@ algo0:
         \label{tab:exp-alg0-tight}
     \end{table}
 
-    Note that the values in bold and italic corresponds to the guesses picked and copied by the algorithm, while the symbols \cmark and \xmark\ correspond to right or wrong guesses made by the algorithm, respectively.
+    Note that the values in bold and italic corresponds to the guesses picked and copied by the algorithm, while the symbols \correct and \error\ correspond to right or wrong guesses made by the algorithm, respectively.
     
     At each time $t$, a different expert makes a mistake, and the algorithm picks exactly that expert, so that it makes a mistake until the last step, when it finally find the ``perfect expert''.
 \end{proof}
