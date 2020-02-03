@@ -1,14 +1,12 @@
 %!TEX root=../main.tex
 \chapter{Expert learning}\label{sec:experts}
 
-Expert learning is an approach we use in machine learning (or more generally in forecasting making) when we take decisions based on experts' opinion. Here \textit{experts} are black boxes that produces predictions, or guesses, such as ML models or tipsters.
+Expert learning is an approach used in machine learning, or more generally in forecasting, when decisions are taken based on some experts' opinion. Here \emph{experts} are black boxes that generate predictions, or guesses\footnote{One might also call them oracles, but the notion of an \emph{oracle} in computer science is sensibly different}, such as ML models or tipsters. Usually, the objective is to discern between good and bad\footnote{as in, random, not malicious}predictors, and pick future guesses according to the best predictors.
 
-\begin{ex}
-    Next Sunday there will be a match between the teams $A$ and $B$, we want to know if $A$ will win the match. We read $n$ guesses on a newspaper, made by $n$ experts: $E_1$ says 1 (yes), $E_2$ says 0 (no), and so on: $E_3: 0, \ldots, E_n:1$. We want to discriminate between good predictors and random coin flips, to follow the advises of the best predictor.
-\end{ex}
+The general setting is the following: at time 1, we read the predictions of the experts and we make our guess, at time 2 we check if our guess was right, we look at the new predictions of the experts and we make our new guess, and so on, until time $T$; so, at each step, there are two phases: in the first we look the experts guesses, in the second we make our guess.
 
-The general setting is the following: at time 1, we read the predictions of the experts and we make our guess, at time 2 we check if our guess was right, we look at the new predictions of the experts and we make our new guess, and so on, until time $T$; so, at each step, there are two phases: in the first we look the experts guesses, in the second we make our guess.\\
 We use the following notation: the time goes from $1$ to $T$ and the current time is $t$, $G_i(t)$ is the guess made by expert $i$ at time $t$, $A(t)$ is the guess made by our algorithm at time $t$, $X(t)$ is the ground truth at time $t$ (we can know it only at time $t+1$). All of this is summarized in table [\ref{tab:experts}].
+
 \begin{table}[h]
     \centering
     \begin{tabular}{|cccccc|}
@@ -24,31 +22,30 @@ We use the following notation: the time goes from $1$ to $T$ and the current tim
     \label{tab:experts}
 \end{table}
 
-\begin{obs}
-    We don't know a priori which is the best expert, but we want to make predictions at least as good as theirs, so we need to understand which is the best expert while the times goes on.
-\end{obs}
-
 We say that expert $i$ ends up making $m_i$ mistakes if $\abs{\{ t \st t \in [T] \wedge G_i(t) \neq X(t) \}} = m_i$.\\
 We call $m^*$ the number of mistakes made by the best expert, i.e., $m^* := \min_{i \in [n]} m_i$.
 
 \section{Perfect expert}\label{sec:perfect-expert}
 
-Suppose that we know that there exists an expert who makes no errors, that is, $\exists\ i^* \in [n] \st m_i^* = 0$. We want to find an algorithm to make as few errors as possible.
+For the first models and algorithms, it is assumed that among the experts there is exactly one that does not fail (a true oracle, in some way): $\exists\ i^* \in [n] \st m_i^* = 0$. A first, naive approach would be the following method:
 
-We present an algorithm that tries to achieve this result (but actually fails):
 \begin{lstlisting}[caption={Algo 0}, label={lst:exp-algo0}]
 algo0:
     $S \gets [n]$   // trusted experts
     for each $t \geq 1$:
-        pick any $i \in S$
-        declare $A(t) := G_i(t)$
-        // $X$ is revealed, phase 1 ends and phase 2 begins
+        pick any $i \in S$ // phase 1
+        declare $A(t) := G_i(t)$ // phase 2
+
+        // $X$ is revealed
+
         $S \gets S - \{i \st G_i(t) \neq X(t)\}$
 \end{lstlisting}
 
+
 \begin{lem}\label{lem:exp-algo0-errors}
-    \texttt{Algo0} makes at most $n-1$ mistakes.
+    \texttt{Algo0} makes at most $n - 1$ mistakes.
 \end{lem}
+
 \begin{proof}
     Let $T_e = \{t_j \st A(t_j) \neq X(t_j)\}$ be the times in which the algorithm makes a mistake.\\
     Then, $\exists\ i \in [n]$ (an expert) such that:
@@ -68,13 +65,14 @@ algo0:
         \centering
         \begin{tabular}{|c|c|c|c|c|c|l}
             \hline
-            \multirow{5}{*}{experts} & \textit{\textbf{0}} & 1                   & 1                   & 1                   & 1                   & \multicolumn{1}{l|}{\xmark}     \\ \cline{2-7} 
-            & 1                   & \textit{\textbf{0}} & 1                   & 1                   & 1                   & \multicolumn{1}{l|}{\xmark}     \\ \cline{2-7} 
-            & 1                   & 1                   & \textit{\textbf{0}} & 1                   & 1                   & \multicolumn{1}{l|}{\xmark}     \\ \cline{2-7} 
-            & 1                   & 1                   & 1                   & \textit{\textbf{0}} & 1                   & \multicolumn{1}{l|}{\xmark}     \\ \cline{2-7} 
-            & 1                   & 1                   & 1                   & 1                   & \textit{\textbf{1}} & \multicolumn{1}{l|}{\cmark} \\ \hline
-            algorithm                & 0                   & 0                   & 0                   & 0                   & 1                   &                                 \\ \cline{1-6}
-            truth                    & 1                   & 1                   & 1                   & 1                   & 1                   &                                 \\ \cline{1-6}
+            \multirow{5}{*}{experts} & \textbf{0} & 1 & 1 & 1 & 1 & \multicolumn{1}{l|}{\xmark} \\
+            \cline{2-7}              & 1 & \textbf{0} & 1 & 1 & 1 & \multicolumn{1}{l|}{\xmark} \\
+            \cline{2-7}              & 1 & 1 & \textbf{0} & 1 & 1 & \multicolumn{1}{l|}{\xmark} \\
+            \cline{2-7}              & 1 & 1 & 1 & \textbf{0} & 1 & \multicolumn{1}{l|}{\xmark} \\
+            \cline{2-7}              & 1 & 1 & 1 & 1 & \textbf{1} & \multicolumn{1}{l|}{\cmark} \\
+            \hline algorithm         & 0 & 0 & 0 & 0 & 1 &                                      \\
+            \cline{1-6} truth        & 1 & 1 & 1 & 1 & 1 &                                      \\
+            \cline{1-6}
         \end{tabular}
         \caption{Counterexample for proving lemma [\ref{lem:exp-algo0-errors}]'s tightness}
         \label{tab:exp-alg0-tight}
