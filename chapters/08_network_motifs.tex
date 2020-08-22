@@ -272,7 +272,7 @@ If we want to count the number of motifs with more than three nodes, it becomes 
 Thus, our goal is to obtain an estimate $\hat{c}_H$ of $c_H$ such that $c_H - t \leq \hat{c}_H \leq c_H + t$ with probability $1-p$.\\
 Note that this resembles what we've done with Randomized Pivot algorithm for Correlation clustering (see [\ref{thm:clust-rp-approx}]).
 
-Since it would take an exponential amount of time to pick each subgraph of $k$ nodes and check if it is isomorphic to $H$, we'll use sampling (see [\ref{def:sampling}]).
+Since it would take an exponential amount of time to pick each subgraph of $k$ nodes and check if it is isomorphic to $H$, we'll extract a sample beforehand.
 
 \begin{lstlisting}[caption={Algorithm 1}, label={lst:motifs-alg1}]
 Algorithm_1(G, H):
@@ -353,13 +353,13 @@ To obtain an expected value of $c_H$, we need to remove this unbalancing, so we 
 
 Let $Y_F := \mathbbm{1}[\text{\texttt{Path sample} hits }F]$ (bernoullian random variable) and $X_F := Y_F \cdot \frac{1}{\sigma_F}$, then
 \begin{flalign*}
-    \Var(X_F) &= \Var(Y_F \cdot \frac{1}{\sigma_F}) =\\
-    &= \frac{1}{\left(\sigma_F\right)^2} \cdot \Var(Y_F)&\\
+    \variance(X_F) &= \variance(Y_F \cdot \frac{1}{\sigma_F}) =\\
+    &= \frac{1}{\left(\sigma_F\right)^2} \cdot \variance(Y_F)&\\
     &= \frac{1}{\left(\sigma_F\right)^2} \cdot \left( \sigma_F \cdot (1 - \sigma_F) \right)&\\
     &= \frac{1}{\left(\sigma_F\right)^2} \cdot \sigma_F -1&\\
     &\leq \frac{1}{\sigma_F} = O\left(n \cdot \Delta^3\right)&
 \end{flalign*}
-where $\Delta$ is the maximum degree of the graph. Thus, if the graph is sparse (the degree is constant), $\Var(X_F) = O(n)$.
+where $\Delta$ is the maximum degree of the graph. Thus, if the graph is sparse (the degree is constant), $\variance(X_F) = O(n)$.
 
 At this point, it's important to note that there is a problem in the algorithm [\ref{lst:motifs-alg2}]: when we choose a node $u_i$, a neighbor of $u_i$, $u_{i+1}$, and we look for a neighbor of $u_{i+1}$, we could pick $u_i$ again, thus picking a path with less than 4 nodes. But it isn't difficult to overcome this problem, for example by going back to the second step of the algorithm if $F$ does not contain 4 nodes.\\
 Thus, \texttt{Path sample} is a \textbf{rejection sampling} algorithm, i.e., one pick new elements at random and increment a counter if they match some criterion, otherwise the elements are thrown away.

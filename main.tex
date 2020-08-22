@@ -42,10 +42,13 @@
 % cref macro
 \usepackage{cleveref}
 
+% Strikethrough text
+\usepackage[normalem]{ulem}
+
 % listings style for pseudo-code and similiar
 \usepackage[table, xcdraw]{xcolor}
 \definecolor{backgray}{RGB}{238, 238, 238}
-\definecolor{commgray}{RGB}{124,124,124}
+\definecolor{commgray}{RGB}{124, 124, 124}
 \usepackage{listings}
 \lstset{ 
     basicstyle=\linespread{1.1}\ttfamily\footnotesize,
@@ -83,6 +86,8 @@
 \pgfplotsset{compat = 1.16}
 
 \usepackage{tikz}
+
+\usepackage{nonotation}
 
 \subimport{.}{definitions.tex}
 
