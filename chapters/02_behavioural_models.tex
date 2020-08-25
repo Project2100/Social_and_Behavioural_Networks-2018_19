@@ -18,7 +18,7 @@ This is a model for generating random graphs, that has many applications due to 
 Denote by $\ergen(n, p)$ a random process that produces a graph with $n$ nodes, in which each edge appears with probability $p$. This process can be described by the following algorithm:
 
 \begin{lstlisting}[caption = {The $\ergen(n,p)$ algorithm}, label = {lst:gnp}]
-Algorithm $\ergen(n,p)$:
+algorithm $\ergen(n,p)$:
     $V \gets [n]$
     $E \gets \emptyset$
     $\forall \{i, j\} \in \binom{V}{2}$:
@@ -243,7 +243,7 @@ In the social network context it means that it is exponentially more likely to p
 The actual algorithm $\pagen(n)$ constructing a graph using preferential attachemnt is of the inductive type:
 
 \begin{lstlisting}[caption = {The $\pagen(n)$ algorithm}, label = {lst:algopa}]
-Algorithm $\pagen(n)$:
+algorithm $\pagen(n)$:
     $V \gets \{1\}$
     $E \gets \{\{1, 1\}\}$
     $\forall i \in [n] \setminus \{1\}$
