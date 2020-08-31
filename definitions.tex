@@ -4,11 +4,17 @@
 \def\Prs_#1#2{\textup{Pr}_{#1}\left[{#2}\right]}  % probability with sub
 \newcommand{\st}{\;\ifnum\currentgrouptype=16 \middle\fi|\;}
 
+\newcommand{\lsh}{\textsc{lsh}}
 \newcommand{\pgf}{\textsc{pgf}}
+\newcommand{\dna}{\textsc{dna}}
+% erdos-renyi
 \newcommand{\ergen}{\mathcal{G}en_{\textsc{er}}}
+% preferntial attachment
 \newcommand{\pagen}{\mathcal{G}en_{\textsc{pa}}}
+% first-edge
 \newcommand{\ferec}{\mathcal{R}ec_{\textsc{fe}}}
 \newcommand{\randdist}{\mathcal{R}and}
+\newcommand{\pgfunc}{\mathcal{P}\!\textit{gf}}
 
 % Nicer lists
 \renewcommand{\labelitemiii}{$\circ$}
@@ -24,7 +30,7 @@
 % Theorems
 \newtheorem{thm}{Theorem}[section]
 \newtheorem{cor}{Corollary}[thm]
-\newtheorem{claim}{Claim}[thm]
+%\newtheorem{claim}{Claim}[thm]
 \newtheorem{lem}[thm]{Lemma}
 \newtheorem{defn}{Definition}[section]
 \theoremstyle{definition}
@@ -45,7 +51,7 @@
 \makeatother
 
 % other math commands
-\DeclareMathOperator*{\argmin}{arg\,min}
+%\DeclareMathOperator*{\argmin}{arg\,min}
 \DeclareMathOperator*{\argmax}{arg\,max}
 \DeclareMathOperator*{\avg}{avg}
 \DeclareMathOperator*{\xor}{\oplus}

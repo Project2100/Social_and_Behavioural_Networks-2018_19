@@ -11,11 +11,27 @@
 \usepackage{bbm}
 \usepackage{mathrsfs}
 
+% For bold math in headers
+\usepackage{bm}
+
 % binom macro
 \usepackage{amsmath}
 
 % Theorem symbols
 \usepackage{amsthm}
+
+\newtheorem{theorem}                    {Theorem}       [chapter]
+\newtheorem{lemma}          [theorem]   {Lemma}
+\newtheorem{corollary}      [theorem]   {Corollary}
+\newtheorem{claim}          [theorem]   {Claim}
+\newtheorem{observation}    [theorem]   {Observation}
+\newtheorem{proposition}    [theorem]   {Proposition}
+\theoremstyle{definition}
+\newtheorem{definition}     [theorem]   {Definition}
+\newtheorem{exercise}       [theorem]   {Exercise}
+\newtheorem{example}        [theorem]   {Example}
+\theoremstyle{remark}
+\newtheorem{solution}       [theorem]   {Solution}
 
 % Multicolumn and multirow equations and tables
 \usepackage{multicol}

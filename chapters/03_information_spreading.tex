@@ -28,13 +28,13 @@ In this information spreading model, nodes can receive or take information from 
 
 Once a meme has completely spread, all we can see is a bunch of nodes having published with an associated timestamp. What we would like to know is the \emph{social graph} that links these nodes, or in layman's terms who retrieves information from who. Obtaining a perfect reconstruction of the graph is usually an intractable problem, but a good approximation of it can be efficiently constructed based on \textit{cascades} or \textit{traces} of the memes.
 
-\begin{defn}[Trace]
-    A trace is a sequence of nodes ordered by their timestamp. Usually it is written as:
+\begin{definition}
+    A \emph{trace} is a sequence of nodes ordered by their timestamp. Usually it is written as:
     \[
         v_1 \stackrel{\tau_1}{\longrightarrow} v_2 \stackrel{\tau_2}{\longrightarrow} v_3 \cdots v_{n - 1} \stackrel{\tau_{n - 1}}{\longrightarrow} v_n
     \]
     where $v_i$ are vertices of the social graph and $t_i$ is the time elapsed from when $v_i$ is informed to when $v_{i + 1}$ is informed. Note that this does not imply at all that $v_{i + 1}$ is informed from $v_i$ in any way.
-\end{defn}
+\end{definition}
 
 The model's underlying structure is a simple, directed graph; vertices are the subjects that receive and/or send information/memes, while  each time one total spreading is simulated, an arbitrary weight function on the edges is used. A trace is built by performing the steps described in the algorithm \ref{lst:trace}.
 
@@ -85,12 +85,12 @@ A desirable goal is for the algorithm to give a correct reconstruction of G with
 
 In order to get a good bound, some useful lemmata are introduced:
 
-\begin{lem}\label{lem:feprob} Let $\{u, v\}$ be an edge of a graph $G$, and $c$ be a trace of $G$. Then the probability that such trace begins with $u \to v$ is:
+\begin{lemma}\label{lem:feprob} Let $\{u, v\}$ be an edge of a graph $G$, and $c$ be a trace of $G$. Then the probability that such trace begins with $u \to v$ is:
     \[
         \Pr[c \text{ starts with } u \to v] = \frac{1}{|V| \deg(u)}
     \]
     
-\end{lem}
+\end{lemma}
 
 \begin{proof}
     Observe that the source is chosen \uar{}. Also, if a neighboring vertex $v$ is the first to be informed after the source, then the edge connecting them is the lightest of all of the source's neighbours; since the weights are chosen independently, and the continuous property of the distribution makes value collision happen negligibly, this can happen \uar{} too: 
@@ -102,11 +102,11 @@ In order to get a good bound, some useful lemmata are introduced:
     \end{align*}
 \end{proof}
 
-\begin{lem}\label{lem:gen-feprob} A generalization of the previous lemma, using the underlying graph's maximum degree $\Delta$:
+\begin{lemma}\label{lem:gen-feprob} A generalization of the previous lemma, using the underlying graph's maximum degree $\Delta$:
     \[
         \forall \{u, v\} \in E(G) \quad \Pr[c \text{ starts with } u \to v \vee c \text{ starts with } v \to u] \geq \frac{2}{n \Delta}
     \]
-\end{lem}
+\end{lemma}
 
 \begin{proof}
     \begin{align*}
@@ -117,48 +117,49 @@ In order to get a good bound, some useful lemmata are introduced:
     \end{align*}
 \end{proof}
 
-Now our aim is to demonstrate that every $\{u, v\} \in E(G)$ appears at the beginning of a trace with positive probability, so that the expected value will be sufficiently high with enough traces.
 
-\begin{lem}\label{lem:fesetprob}
-    Let $\{u, v\}$ be an edge of a graph $G$, and $C$ be a set of its traces. Then:
+\begin{theorem}[First-edge correctness]\label{thm:first-edge}
+    Let $G = (V, E)$, $n = |V|$, $\Delta$ = max degree of $G$, and $C$ a set of $G$'s traces. The output of the First-edge algorithm $\ferec{}$ will be correct with probability no less than $1 - \frac{1}{n^{2(k - 1)}}$ if $\abs{C} \geq k n \Delta \ln(n)$ for some positive constant $k$:
     \[
-        |C| \geq 2n \Delta \ln(n) \implies \Pr[\forall c \in C : c \text{ does not start with } u \to v \wedge c \text{ does not start with } v \to u] \leq \frac{1}{n^4}
+        \abs{C} \geq k n \Delta \ln(n) \implies \Pr[\ferec(C) = E(G)] \geq 1 - \oneover{n^{2(k - 1)}}
     \]
-\end{lem}
-
-\begin{proof}
-    \begin{align*}
-            &\ \Pr[\forall c \in C : c \text{ does not start with } u \to v \wedge c \text{ does not start with } v \to u]  & \\
-           =&\ \Pr \left[ \bigwedge_{c \in C} c \text{ does not start with } u \to v \wedge c \text{ does not start with } v \to u \right] &  \\
-           =&\ \prod_{c \in C} \Pr[c \text{ does not start with } u \to v \wedge c \text{ does not start with } v \to u]    & \text{(by [\ref{eq:prob}])} \\
-           =&\ \prod_{c \in C} (1 - \Pr[c \text{ starts with } u \to v \vee c \text{ starts with } v \to u])                & \\
-        \leq&\ \left( 1 - \frac{2}{n \Delta} \right)^{|C|}                                                                  & \text{(by lemma [\ref{lem:gen-feprob}])}\\
-        \leq&\ e^{-\frac{2}{n \Delta} \cdot |C|}                                                                            & \text{(by [\ref{eq:e-x}])} \\
-        \leq&\ e^{-\frac{2 \cdot 2 n \Delta \ln(n)}{n \Delta}}                                                              & (|C| \geq 2n \Delta \ln(n)) \\
-           =&\ n^{-4}                                                                                                       & \\
-    \end{align*}
-\end{proof}
-
-\begin{thm}[First-edge correctness]\label{thm:first-edge}
-    Let $G = (V, E)$, $n = |V|$, $\Delta$ = max degree of $G$, and $C$ a set of $G$'s traces. The output of the First-edge algorithm $\ferec{}$ will be correct with probability no less than $1 - \frac{1}{n^2}$ if $t \geq 2 n \Delta \ln(n)$.
-    \[
-        |C| \geq 2n \Delta \ln(n) \implies \Pr[\ferec(C) = E(G)] \geq 1 - \oneover{n^2}
-    \]
-\end{thm}
+\end{theorem}
 
 \begin{proof}
 
-    Observe that if an edge is not captured by the algorithm, then there is no trace in $C$ starting with the former's incident edges, in any of the two directions, which is exactly the event encountered in lemma [\ref{lem:fesetprob}].
+    The final goal is to prove that every edge in $G$ appears at the beginning of a trace with positive probability, so that the expected value will be sufficiently high with enough traces.
 
+    \begin{lemma}\label{lem:fesetprob}
+        Let $\{u, v\}$ be an edge of a graph $G$, and $C$ be a set of its traces. Then:
+        \[
+            \abs{C} \geq k n \Delta \ln(n) \implies \Pr[\forall c \in C : c \text{ does not start with } u \to v \wedge c \text{ does not start with } v \to u] \leq \frac{1}{n^{-2 k}}
+        \]
+    \end{lemma}
 
-    Let $B_{u,v}$ be the event ``\textit{no trace begins with $u \to v$ or $v \to u$}'' = ``\textit{the algorithm doesn't learn about the edge {$u,v$}}''.
+    \begin{proof}
+        \begin{align*}
+             &\ \Pr[\forall c \in C : c \text{ does not start with } u \to v \wedge c \text{ does not start with } v \to u]     & \\
+            =&\ \Pr \left[ \bigwedge_{c \in C} c \text{ does not start with } u \to v \wedge c \text{ does not start with } v \to u \right] & \\
+            =&\ \prod_{c \in C} \Pr[c \text{ does not start with } u \to v \wedge c \text{ does not start with } v \to u]       & \text{(by [\ref{eq:prob}])} \\
+            =&\ \prod_{c \in C} (1 - \Pr[c \text{ starts with } u \to v \vee c \text{ starts with } v \to u])                   & \\
+            \leq&\ \left( 1 - \frac{2}{n \Delta} \right)^{\abs{C}}                                                              & \text{(by lemma [\ref{lem:gen-feprob}])}\\
+            \leq&\ e^{-\frac{2}{n \Delta} \cdot \abs{C}}                                                                        & \text{(by [\ref{eq:e-x}])} \\
+            \leq&\ e^{-\frac{2 \cdot k n \Delta \ln(n)}{n \Delta}}                                                              & \text{(by hypothesis on $\abs{C}$)} \\
+            =&\ n^{-2 k}                                                                                                        & \qedhere \\
+        \end{align*}
+    \end{proof}
+
+    Observe that if an edge is not captured by the algorithm, then there is no trace in $C$ starting with the former's incident edges, in any of the two directions, which is exactly the event encountered in the previous lemma [\ref{lem:fesetprob}]. With it in mind:
     \begin{align*}
             &\ \Pr[\ferec(C) \neq E(G)]         & \\
            =&\ \Pr \left[ \bigvee_{\{u, v\} \in E(G)} \forall c \in C : c \text{ does not start with } u \to v \wedge c \text{ does not start with } v \to u \right] & \\
-        \leq&\ \sum_{\{u,v\} \in E(G)} \Pr[\forall c \in C : c \text{ does not start with } u \to v \wedge c \text{ does not start with } v \to u] & \text{(by the \ref{eq:union-bound-gen})} \\
-        \leq&\ \sum_{\{u,v\} \in E(G)} n^{-4}   & \\
-        \leq&\ n^2 \cdot n^{-4}                 & (|E(G)| \leq |V(G)|^2) \\
-           =&\ n^{-2}                           & \\
+        \leq&\ \sum_{\{u,v\} \in E(G)} \Pr[\forall c \in C : c \text{ does not start with } u \to v \wedge c \text{ does not start with } v \to u] & \\
+            &                                   & \mathllap{\text{(by the \ref{eq:union-bound-gen})}} \\
+        \leq&\ \sum_{\{u,v\} \in E(G)} n^{-2 k} & \\
+        \leq&\ n^2 \cdot n^{-2 k}               & \mathllap{(|E(G)| \leq |V(G)|^2)} \\
+           =&\ n^{-2(1 - k)}                    & \\
     \end{align*}
+    
+    Notice that this probability can be minimized at will by increasing $c$, which in turn increases the number of required traces.
     
 \end{proof}
