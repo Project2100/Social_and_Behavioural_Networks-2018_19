@@ -430,7 +430,7 @@ As with the Erd\H{o}s-Rényi model, analysis starts from the distribution of its
         \begin{proof}
             It is possible to prove this lemma explicitly with a procedure similar to the one used for lemma [\ref{l:pref-att-2}], but here we will present a more compact (implicit) proof:
             \[
-                E_{X_t^{(2)}=x} \left[ E_{X_t^{(1)}=y \st X_t^{(2)}=x} \left[ x \cdot \left( 1 - \frac{2}{2t+1} \right) + \frac{y+1}{2t+1} \right] \right]
+                E_{X_t^{(2)}=x} \left[ E_{X_t^{(1)}=y : X_t^{(2)}=x} \left[ x \cdot \left( 1 - \frac{2}{2t+1} \right) + \frac{y+1}{2t+1} \right] \right]
             \]
             Note that this is possible because the expected value is linear and (in this case) also its value is linear with respect to $x$ and $y$.
         \end{proof}

@@ -15,6 +15,7 @@
 \usepackage{bm}
 
 % binom macro
+% align envs
 \usepackage{amsmath}
 
 % Theorem symbols
@@ -44,16 +45,14 @@
 \usepackage{mathtools}
 
 % Package for hyperlinks - unicode option for hungarian diacritics
-\PassOptionsToPackage{hyphens}{url}\usepackage[unicode]{hyperref}
+\PassOptionsToPackage{hyphens}{url}
+\usepackage[unicode]{hyperref}
 \hypersetup{
     colorlinks,
     linkcolor   = {red!70!black},
     citecolor   = {blue!50!black},
     urlcolor    = {blue!80!black}
 }
-
-%\usepackage{pifont} % Hyperlink dingbat
-\newcommand{\linkicon}{\ding{226}}
 
 % cref macro
 \usepackage{cleveref}

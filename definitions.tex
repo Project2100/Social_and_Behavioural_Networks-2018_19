@@ -1,36 +1,24 @@
 \newcommand{\expect}{\textrm{\textup{E}}}
 \newcommand{\variance}{\textrm{\textup{Var}}}
 \newcommand{\powerset}{\mathcal{P}}
-\def\Prs_#1#2{\textup{Pr}_{#1}\left[{#2}\right]}  % probability with sub
 \newcommand{\st}{\;\ifnum\currentgrouptype=16 \middle\fi|\;}
 
 \newcommand{\lsh}{\textsc{lsh}}
 \newcommand{\pgf}{\textsc{pgf}}
 \newcommand{\dna}{\textsc{dna}}
+\newcommand{\lp}{\textsc{lp}}
 % erdos-renyi
 \newcommand{\ergen}{\mathcal{G}en_{\textsc{er}}}
-% preferntial attachment
+% preferential attachment
 \newcommand{\pagen}{\mathcal{G}en_{\textsc{pa}}}
 % first-edge
 \newcommand{\ferec}{\mathcal{R}ec_{\textsc{fe}}}
 \newcommand{\randdist}{\mathcal{R}and}
 \newcommand{\pgfunc}{\mathcal{P}\!\textit{gf}}
 
-% Nicer lists
-\renewcommand{\labelitemiii}{$\circ$}
-\renewcommand{\labelenumii}{\theenumii}
-\renewcommand{\theenumii}{\theenumi.\arabic{enumii}.}
-\renewcommand{\labelenumiii}{\theenumiii}
-\renewcommand{\theenumiii}{\theenumii\arabic{enumiii}.}
-
-% Apply colored underline or overline to math expressions
-\def\mathunderline#1#2{\color{#1}\underline{{\color{black}#2}}\color{black}}
-\def\mathoverline#1#2{\color{#1}\overline{{\color{black}#2}}\color{black}}
-
 % Theorems
 \newtheorem{thm}{Theorem}[section]
 \newtheorem{cor}{Corollary}[thm]
-%\newtheorem{claim}{Claim}[thm]
 \newtheorem{lem}[thm]{Lemma}
 \newtheorem{defn}{Definition}[section]
 \theoremstyle{definition}
@@ -51,7 +39,6 @@
 \makeatother
 
 % other math commands
-%\DeclareMathOperator*{\argmin}{arg\,min}
 \DeclareMathOperator*{\argmax}{arg\,max}
 \DeclareMathOperator*{\avg}{avg}
 \DeclareMathOperator*{\xor}{\oplus}
@@ -59,3 +46,6 @@
 % other symbols
 \newcommand{\correct}{\ding{51}}
 \newcommand{\error}{\ding{55}}
+
+% Hyperlink dingbat
+\newcommand{\linkicon}{\ding{226}}

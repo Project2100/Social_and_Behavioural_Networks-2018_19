@@ -1,103 +1,115 @@
-\chapter[Linear programming for approximation algorithms]{Linear programming for approximation algorithms}\label{sec:linear-programming}
+\chapter{Linear programming for approximation algorithms}
 
 \textbf{\textsc{Content note}}: \emph{Part of this chapter is taken from \href{https://github.com/Halolegend94/uni_social_behavioral_networks/blob/master/chapters/ch05-densest-subgraph.tex}{this repo} by \href{https://github.com/Halolegend94}{Cristian Di Pietrantonio}.}
 \vspace{2ex}
 
 In this chapter Linear Programming is introduced as a tool to build approximation algorithms. In particular, we use the \textit{Densest Subgraph} problem (DSG for short) as a practical example, because some practitioners believe that it is a good primitive to find community of people; also, this problem is in $P$ and we will solve it through linear programming.
 
+You can read more about this \href{https://github.com/Halolegend94/uni_social_behavioral_networks/blob/master/main.pdf}{here}.
 
-\section[Linear Programming]{Linear Programming
-\raisebox{.3\baselineskip}{\normalsize\footnotemark}}
-\footnotetext{You can read more about this \href{https://github.com/Halolegend94/uni_social_behavioral_networks/blob/master/main.pdf}{here}.}\label{sec:linear-programming-intro}
+\section{Linear Programming}
 
-Linear Programming (\textit{LP}) is arguably the most important technique when it comes to approximation algorithms, and many approximations proved with other methods can be understood as linear programming proof.
+Linear programming, or \lp{} in short, is a method to achieve the best outcome, such as maximum profit or lowest cost, in a mathematical model whose requirements are represented by linear relationships. It is arguably the most important technique when it comes to approximation algorithms, and many heuristics built with other methods can be mapped to a corresponding \lp{} instance.
 
-\begin{defn}[Primal linear program]\label{primal}
-    A linear program is a convex program written in order to solve an optimization problem, whose aim is to maximize an \textbf{objective function} with $n$ variables, of the form
-    \begin{equation}
-    \max\ c_1 x_1 + c_2 x_2 + \ldots + c_n x_n
-    \end{equation}
-    with $x_i \in \mathbb{R}_{\geq 0}$, and $m$ constraints of the form
-    \begin{equation}
-    \begin{cases}
-    a_{11} x_1 + a_{12} x_2 + \ldots + a_{1n} x_n &\leq b_1\\
-    a_{21} x_1 + a_{22} x_2 + \ldots + a_{2n} x_n &\leq b_2\\
-    \ \ \ \vdots\\
-    a_{m1} x_1 + a_{m2} x_2 + \ldots + a_{mn} x_n &\leq b_m\\
-    \end{cases}
-    \end{equation}
-    Since this is a maximization problem, this is conventionally called a \textbf{primal}.
-\end{defn}
+More formally, linear programming is a technique for the optimization of a linear \emph{objective function}, subject to linear equality and linear inequality \emph{constraints}. Its feasible region is a convex polytope, which is a set defined as the intersection of finitely many half spaces, each of which is defined by a linear inequality. Its objective function is a real-valued affine (linear) function defined on this polyhedron. A linear programming algorithm finds a point in the polytope where this function has the smallest (or largest) value if such a point exists.
+
+\begin{definition}[Primal linear program]\label{def:lpprimal}
+    A \emph{primal} linear program has the specific purpose to maximize its objective function:
+    \begin{equation*}
+        \max(c_1 x_1 + c_2 x_2 + \ldots + c_n x_n)
+    \end{equation*}
+
+    where all of the variables are real and nonnegative; the constraints are of this form;
+    \begin{equation*}
+        \begin{cases}
+            a_{1 1} x_1 + a_{1 2} x_2 + \ldots + a_{1 n} x_n &\leq b_1 \\
+            a_{2 1} x_1 + a_{2 2} x_2 + \ldots + a_{2 n} x_n &\leq b_2 \\
+            \quad \vdots                                     &         \\
+            a_{m 1} x_1 + a_{m 2} x_2 + \ldots + a_{m n} x_n &\leq b_m \\
+        \end{cases}
+    \end{equation*}
+\end{definition}
 
 Note that, if there were no constraints, the optimization problem would have been trivial.
 
-Furthermore, the assumptions that the $x_i$ are non negative is made for simplicity and without loss of generality. In fact, if we had a negative variable, we could obtain it from positive variables, such as $y=x_1-x_2$.
+Furthermore, the assumption of nonnegative $x_i$ is made without loss of generality; to model a negative variable, it suffices to obtain it from other positive variables such as $y = x_1 - x_2$.
 
-A primal LP can be written in matrix form in the following way:
-\begin{equation}
-    \begin{aligned}\label{primal-matrix}
-        &\max\ \bar{c}^T \bar{x}\\
-        &\bar{A} \bar{x} \leq \bar{b}\\
-        &\bar{x} \geq \bar{0}
+A primal \textsc{lp} can also be written more compactly in matrix form:
+\begin{equation}\label{primal-matrix}
+    \begin{aligned}
+        &\max(\overline{c}^T \overline{x}) \\
+        &A \overline{x} \leq \overline{b} \\
+        &\overline{x} \geq \overline{0}
     \end{aligned}
 \end{equation}
-where $\bar{x} =
-\begin{pmatrix}
-    x_1 \\ x_2 \\ \ \vdots \\ x_n
-\end{pmatrix}, \bar{A} =
-\begin{pmatrix}
-    a_{11} & a_{12} & \cdots & a_{1n} \\
-    a_{21} & a_{22} & \cdots & a_{2n} \\
-    \ \vdots & \ \vdots &  & \ \vdots \\
-    a_{n1} & a_{n2} & \cdots & a_{mn}
-\end{pmatrix},\ \bar{b} =
-\begin{pmatrix}
-    b_1 \\ b_2 \\ \ \vdots \\ b_m
-\end{pmatrix},\ \bar{c} =
-\begin{pmatrix}
-    c_1 \\ c_2 \\ \ \vdots \\ b_n
-\end{pmatrix}$.
 
-\begin{defn}(Dual linear program)\label{dual}
-    A dual LP can be represented with the following matrix form:
-    \begin{equation}
-        \begin{aligned}\label{dual-matrix}
-            &\min\ \bar{y}^T \bar{b}\\
-            &\bar{y}^T\bar{A} \geq \bar{c}\\
-            &\bar{y} \geq \bar{0}
+
+where:
+
+\[
+    \overline{x} =
+    \begin{pmatrix}
+        x_1 \\ x_2 \\ \ \vdots \\ x_n
+    \end{pmatrix}
+    \quad
+    A =
+    \begin{pmatrix}
+        a_{11} & a_{12} & \cdots & a_{1n} \\
+        a_{21} & a_{22} & \cdots & a_{2n} \\
+        \ \vdots & \ \vdots &  & \ \vdots \\
+        a_{n1} & a_{n2} & \cdots & a_{mn}
+    \end{pmatrix}
+    \quad
+    \overline{b} =
+    \begin{pmatrix}
+        b_1 \\ b_2 \\ \ \vdots \\ b_m
+    \end{pmatrix}
+    \quad
+    \overline{c} =
+    \begin{pmatrix}
+        c_1 \\ c_2 \\ \ \vdots \\ b_n
+    \end{pmatrix}
+\]
+
+\begin{definition}(Dual linear program)\label{def:lpdual}
+    A \emph{dual} linear program, unlike a primal one, aims to minimize its objective function; its matrix form is:
+    \begin{equation}\label{dual-matrix}
+        \begin{aligned}
+            &\min(\overline{y}^T \overline{b}) \\
+            &\overline{y}^T A \geq \overline{c} \\
+            &\overline{y} \geq \overline{0}
         \end{aligned}
     \end{equation}
-    Note that it uses the same (transposed) coefficient and constant matrices of the primal, but the variable vector has dimension $m$ instead of $n$. So, to pass from the primal to the dual, we have to change $\max$ into $\min$ and to let any constraint become a variable and vice versa.
-\end{defn}
+    
+    Note that it uses the same (transposed) coefficient and constant matrices of a primal, but the variable vector has dimension $m$ instead of $n$. This means that changing $\max$ into $\min$ and letting any constraint become a variable and viceversa is required to pass from the primal to the dual.
+\end{definition}
 
-\begin{thm}[Weak Duality]\label{thm:weak-duality}
-    If $\bar{x}$ is a feasible solution to the primal and $\bar{y}$ is a feasible solution to the dual, then
+\begin{theorem}[Weak Duality]\label{thm:weak-duality}
+    If $\overline{x}$ is a feasible solution to the primal and $\overline{y}$ is a feasible solution to the dual, then
     \begin{equation}
-        \bar{c}^T \bar{x} \leq \bar{y}^T \bar{b}
+        \overline{c}^T \overline{x} \leq \overline{y}^T \overline{b}
     \end{equation}
-    I.e., $opt(\text{primal}) \leq  opt(\text{dual})$.
-\end{thm}
-
-If we have a primal, then we can guess a solution $\bar{x}$, check that it satisfies the constraints and evaluate how good it is by using the objective function; to know if the solution is optimal or close to optimal, we can write and solve the dual, then we would know the dual's optimum is greater or equal to the primal's. If one guesses a solution for the primal and guesses a solution for the dual, and their costs are close, then that solution is close to the optimal one.
+\end{theorem}
 
 \begin{proof}
-    \begin{flalign*}
-        &\bar{c}^T \bar{x} \leq (\bar{y}^T \bar{A})\bar{x} = \bar{y}^T (\bar{A}\bar{x}) \leq \bar{y}^T \bar{b}&
-    \end{flalign*}
+    \[
+        \overline{c}^T \overline{x} \leq (\overline{y}^T A)\overline{x} = \overline{y}^T (A \overline{x}) \leq \overline{y}^T \overline{b}
+    \]
     where the first inequality holds by definition of dual, and the second by definition of primal.
 \end{proof}
 
-\begin{thm}[Strong Duality]\label{thm:strong-duality}
-    If $\bar{x}$ is an optimal solution to the primal and $\bar{y}$ is an optimal solution to the dual, and if $\bar{c}^T$ and $\bar{y} \bar{b}$ are finite, then
+Given a primal \lp{}, the usual way to solve it is to guess a solution $\overline{x}$, check that it satisfies the constraints, and then evaluate how good it is by using the objective function. To know if the solution is sufficienlty close to optimal, the same process can be applied on the corresponding dual \lp{} with another solution $\overline{y}$. If the costs of both guesses are close, then the chosen solutions are indeed close to optimal.
+
+\begin{theorem}[Strong Duality]\label{thm:strong-duality}
+    If $\overline{x}$ is an optimal solution to the primal and $\overline{y}$ is an optimal solution to the dual, and if $\overline{c}^T \overline{x}$ and $\overline{y} \overline{b}$ are finite, then the solutions are the same:
     \begin{equation}
-        \bar{c}^T \bar{x} = \bar{y} \bar{b}
+        \overline{c}^T \overline{x} = \overline{y} \overline{b}
     \end{equation}
-    I.e., $opt(\text{primal}) = opt(\text{dual})$.
-\end{thm}
+\end{theorem}
 
-The strong duality tells us that if both primal and dual admit solution they have the same value for the optimum solution.
+In essence, when the solutions for a primal and its corresponding dual tend to equate each other, then they are the optimal solution.
 
-\obs It is a common approach to transform a combinatorial problem that one is faced with into a linear one, then solve the linear one (that requires polynomial time), and then transform the solution to the linear problem in a solution to the original problem.
+It is a common approach to transform a given combinatorial problem into a linear one, then solve the latter, which is proven to require polynomial time,\footnote{This is true because the variables are real. Linear programming with integers is known to be an \textsc{np}-complete problem} and then transform the solution to the linear problem in a solution to the original.
 
 
 \section{Densest subgraph}\label{sec:densest-subgraph}
@@ -106,56 +118,79 @@ The strong duality tells us that if both primal and dual admit solution they hav
 
 We are interested in this problem since it allows to find communities into social networks.
 
-\begin{defn}[Induced subgraph]
-    If $G(V,E)$ is a graph and $S \subset G$, then $G[S]$ (read ``$G$ induced on $S$'') is a graph with node set $S$ and edge set $\{ \{u,v\} \st \{u,v\} \in E \wedge u,v \in S \}$.
-\end{defn}
+\begin{definition}[Induced subgraph]
+    Given a graph $G(V, E)$ and a subset of its vertices $S$, the induced graph on $S$, denoted as $G[S]$, is the subgraph $H(S, \powerset_2(S) \cap E(G))$.
+\end{definition}
 
-\begin{defn}[Densest subgraph]\label{densest-subgraph}
-    The densest subgraph of $G(V,E)$ is one induced subgraph $G[S]$ with the largest average degree, i.e., with $S$ such that the density of the graph $f(S) = \frac{|E(S)|}{|S|}$ is maximized.
-\end{defn}
+\begin{definition}[Densest subgraph]\label{densest-subgraph}
+    The densest subgraph of $G(V, E)$ is an induced subgraph $G[S]$ on some subset $S$ with the largest average degree; in other words, $S$ is such that the density of the graph $f(S) = \frac{|E(S)|}{|S|}$ is maximized.
+\end{definition}
 
-\begin{obs}
-    Note that, by maximizing the density of the graph, we maximize the average degree of the graph $\frac{2 \abs{E(S)}}{\abs{S}}$.
-\end{obs}
+Note that, by maximizing the density of a subgraph, its average degree $\frac{2 \abs{E(S)}}{\abs{S}}$ is also maximized. This is a particular approximation problem, since it can actually be solved exactly in polynomial time.
 
-\begin{obs}
-    This is a particular approximation problem, since it can actually be solved exactly in polynomial time.
-\end{obs}
-
-\begin{figure}
+\begin{figure}[ht]
     \centering
-    \includegraphics[scale=0.7]{densest-subgraph}
-    \caption{An example of densest subgraph $G[S]$.}
+    \begin{tikzpicture}[node distance = 20mm]
+        \draw
+            (0, 1)  node (a) [draw, circle] {}
+            (0, -1) node (b) [draw, circle] {}
+            (-1, 0) node (c) [draw, circle] {}
+            (1, 0)  node (d) [draw, circle] {}
+            (3, 0)  node (e) [draw, circle] {}
+            (4, 1)  node (f) [draw, circle] {}
+            (4, -1) node (g) [draw, circle] {}
+            
+            (a) -- (b)
+            (a) -- (c)
+            (a) -- (d)
+            (b) -- (c)
+            (b) -- (d)
+            (c) -- (d)
+            (d) -- (e)
+            (e) -- (f)
+            (e) -- (g)
+            (f) -- (g);
+
+            \draw[dashed] (0, 0) circle (1.5);
+    \end{tikzpicture}
+    \caption{An example of densest subgraph $G[S]$}
     \label{fig:densest-subgraph}
 \end{figure}
 
-Now we want to express the densest subgraph problem as a (primal) linear problem (we will explain it in detail immediately after the statement):
+Here is a primal \lp{} model of this problem:
 \begin{equation}
     \begin{aligned}\label{lp-densest-subgraph}
-    &\max\sum_{\{i, j\} \in E(G)}X_{\{i, j\}}\\
+    &\max \left( \sum_{\{i, j\} \in E(G)}X_{\{i, j\}} \right) \\
     &\begin{cases}
-        X_{\{i, j\}} \leq Y_i & \forall\ \{i,j\} \in E(G)\\
-        X_{\{i, j\}} \leq Y_j & \forall\ \{i,j\} \in E(G)\\
-        \sum_{i=1}^n Y_i \leq 1
-    \end{cases}\\
-    &X_{\{i, j\}}, Y_i \geq 0 \ \ \forall\ \{i,j\} \in E(G)
+        X_{\{i, j\}} \leq Y_i   & \forall \{i, j\} \in E(G) \\
+        X_{\{i, j\}} \leq Y_j   & \forall \{i, j\} \in E(G) \\
+        \sum_{i=1}^n Y_i \leq 1 & \forall i \in V(G) \\
+    \end{cases} \\
+    &X_{\{i, j\}}, Y_i \geq 0  \qquad \forall \{i, j\} \in E(G) \quad \forall i \in V(G)
     \end{aligned}
 \end{equation}
 
+\todo{The lesson has been essentially structured around Charikar's paper ``Greedy approximation algorithms for finding dense components in a graph'' which, in one author's opinion, fails to relate at first glance this linear program to the problem. There is a more accessible thesis \href{https://gupea.ub.gu.se/bitstream/2077/49476/1/gupea_2077_49476_1.pdf}{here}, which starts from a linear program that is arguably more relatable to the original problem, and proceeds to convert it to this form, with the added bonus of showcasing how to linearize nonlinear objective functions and constraints. Might decide to replicate it here.
+
+However, the lemmata and proofs that follow are found only in Charikar's article}
+
 Starting from the objective function, we want something that says ``get as many edges as possible in the final graph''; so, it seems natural to maximize the number of edges we can put in the final subset of nodes. Observe, though, that we cannot maximize $f(S)$ since it is not linear. One can take another approach and look only at the numerator. We define a variable $X_{\{i, j\}}$ to be the fractional amount of edge $\{i, j\}$ that is put inside the solution. The objective function is
 \begin{equation}
-    \max\sum_{\{i, j\} \in E}X_{\{i, j\}}.
+    \max \left( \sum_{\{i, j\} \in E(G)}X_{\{i, j\}} \right)
 \end{equation}
 
 For each edge, we cannot pick that edge fractionally more than the amount with which we pick one of its endpoints. For example, if we pick $\{i, j\}$ for $\frac{1}{2}$ of its entirety, then it is the case that we had to pick both $i$ and $j$ for at least $\frac{1}{2}$. This can be expressed introducing a variable $Y_i$ for each node $i$, representing the fractional amount with which we pick node $i$; then, we can say that
-\begin{flalign}\label{eq:x_size_constraint}
-    X_{\{i, j\}} &\leq Y_i,\\
-    X_{\{i, j\}} &\leq Y_j.
-\end{flalign}
+\begin{equation}\label{eq:dsp_x_constraints}
+    \begin{aligned}
+        X_{\{i, j\}} &\leq Y_i \\
+        X_{\{i, j\}} &\leq Y_j
+    \end{aligned}
+\end{equation}
+
 
 Up until now the LP is unbounded. We now need to model the denominator by saying that the total amount with which nodes of the graph are picked must be limited; we can think of that amount being, say, 1 to normalize it. Making the denominator a constant allows us to linearize the objective function.
-\begin{equation}\label{eq:dsg_denominator_constraint}
-    \sum_{i=1}^n Y_i \leq 1.
+\begin{equation}\label{eq:dsp_y_constraint}
+    \sum_{i = 1}^n Y_i \leq 1.
 \end{equation}
 
 Finally, the variables must be non-negative:
@@ -163,26 +198,23 @@ Finally, the variables must be non-negative:
     X_{\{i, j\}}, Y_j \geq 0
 \end{equation}
 
-What we will be proving is that the optimal solution $OPT_{LP}$ of this LP is equal to the optimal solution of the original densest subgraph problem $f(S^*)$, where $S^*$ is the densest subgraph of $G$. To do so we need the following steps:
+The goal is to prove that the optimal solution $OPT_{LP}$ of this \lp{} is equal to the optimal solution of the original densest subgraph problem $f(S^*)$, where $S^*$ is the densest subgraph of $G$. To do so we need the following steps:
 \begin{enumerate}
-    \item There exists a feasible solution to the LP having value $f(S)$;
+    \item There exists a feasible solution to the \lp{} having value $f(S)$;
     \item $OPT_{LP} \geq f(S^*)$;
     \item $f(S^*) \geq OPT_{LP}$.
 \end{enumerate}
 
-\pagebreak
-
-\begin{lem}\label{l:dsp-feasibility}
-    For any graph $G(V,E)$ and for any $\emptyset \subset S \subset V$, there exists a feasible solution to the linear problem having value $f(S) = \frac{|E(G[S])|}{|S|}$, which is the subgraph's density.
-\end{lem}
+\begin{lemma}\label{lem:dsp-feasibility}
+    Given a graph $G(V, E)$, for any nontrivial subset $S$ of $V$, there exists a feasible solution to the \lp{} stated above, having value $f(S) = \frac{|E(G[S])|}{|S|}$, which is the subgraph's density.
+\end{lemma}
 
 \begin{proof}
-    We will give a solution and show that it meets the requirements. Define:
-    
+    Define:
     \[
         Y_i := \begin{cases}
-            \frac{1}{|S|}   & \text{if } i \in S \\
-            0               & \text{else}
+            \frac{1}{|S|}   & \textsc{if } i \in S \\
+            0               & \textsc{else}
         \end{cases}
     \]
     
@@ -190,53 +222,43 @@ What we will be proving is that the optimal solution $OPT_{LP}$ of this LP is eq
     
     \[
         X_{\{i, j\}} = \begin{cases}
-            \frac{1}{|S|}   & \text{if } \{i, j\} \subseteq S \\
-            0               & \text{else}
+            \frac{1}{|S|}   & \textsc{if } \{i, j\} \in E(G[S]) \\
+            0               & \textsc{else}
         \end{cases}
     \]
-    Remember that, for simplicity of notation: $\{i, j\} \in E(G[S]) \implies \{i, j\} \subseteq S$ % And the opposite is not true!
     
-    For this solution to be feasible, all constraints are checked. Start with Inequality \ref{eq:dsg_denominator_constraint}:
+    For this solution to be feasible, all constraints are checked. Starting with inequality \ref{eq:dsp_y_constraint}, notice that if a variable $Y_i$ models a vertex not in $S$, then it does not contribute to the sum in the constraint; conversely, if such vertex is in $S$, then it evaluates to the same constant value:
     \[
-        \sum_{i} Y_i = |S| \frac{1}{|S|} = 1
+        \sum_{i \in V(G)} Y_i = \sum_{i \in S} Y_i = \sum_{i \in S} \frac{1}{|S|} = |S| \frac{1}{|S|} = 1
     \]
     
-    which is satisfied. Then proceed with Inequality \ref{eq:x_size_constraint}, starting with a generic $\{i, j\} \in E$. We have two cases:
+    Then proceed with the inequalities of type \ref{eq:dsp_x_constraints}. Let $\{i, j\} \in E(G)$; again, there are two cases:
     \begin{itemize}
-        \item $\{i, j\} \not\subseteq S$: In this case we want to guarantee that
-            \begin{equation}
-                \begin{cases}
-                    X_{\{i, j\}} \leq Y_i\\
-                    X_{\{i, j\}} \leq Y_j
-                \end{cases}
-                \implies X_{\{i, j\}} \leq \min{\{Y_i, Y_j\}},
-            \end{equation}
-            but both sides of the two equations are zero, because both $i$ and $j$ are not in $S$.
+        \item $\{i, j\} \not\in E(G[S])$: In this case, $X_{\{i, j\}} = 0$ by definition, and the constraints are trivially satisfied;
         
-        \item $\{i, j\} \subseteq S$: In the same vein, both sides of the two equations evaluate to $\frac{1}{|S|}$.
+        \item $\{i, j\} \in E(G[S])$: This implies that $\frac{1}{|S|} \leq Y_i, Y_j$. Since the edge is assumed to be in the subgraph, then its endpoints must be in $S$, which entails that $Y_i, Y_j = \frac{1}{|S|}$, satisfying the constraints.
     \end{itemize}
     
-    By that, we proved that the solution is feasible. At this point it's easy to evaluate the objective function:
+    The solution is proven to be feasible. Evaluating the objective function:
     \[
-        \sum_{\{i, j\} \in E(G)} X_{\{i, j\}} = \abs{E(G[S])} \frac{1}{|S|} = f(S)
+        \sum_{\{i, j\} \in E(G)} X_{\{i, j\}} = \sum_{\{i, j\} \in E(G[S])} X_{\{i, j\}} = \sum_{\{i, j\} \in E(G[S])} \frac{1}{|S|} = \frac{\abs{E(G[S])}}{|S|} = f(S)
     \]
 \end{proof}
 
-\begin{cor}
-    Let $OPT_{LP}$ be the value of the optimal feasible solution to the LP, and let $S^*$ be the densest subgraph of $G$, then:
-
+\begin{corollary}
+    Let $OPT_{\lp}$ be the value of the optimal feasible solution to the \lp{} obtained from some subset $S \subseteq V$, and let $S^*$ be the densest subgraph of $G$, then:
     \[
         f(S) = OPT_{LP} \geq OPT = f(S^*) = \frac{\abs{E(S^*)}}{\abs{S^*}}.
     \]
-    
-    In other words, the consequence of constructing the solution used to prove \ref{l:dsp-feasibility} is that the LP's optimal value is never worse than the original densest subgraph problem's optimum.
-\end{cor}
+\end{corollary}
 
-\begin{lem}\label{l:dsp-geq-lp}
-    Let $\{X_{\{i, j\}}, Y_i\}$ be an optimal solution to the Linear Program \ref{lp-densest-subgraph}, having value $v$. Then $\exists S \subseteq V : f(S) \geq v$.
-\end{lem}
+In other words, the consequence of constructing the solution used to prove \ref{lem:dsp-feasibility} is that the \lp{}'s optimal value is never worse than the original densest subgraph problem's optimal value.
 
-\begin{proof}[Proof by Charikar]
+\begin{lemma}\label{l:dsp-geq-lp}
+    Let $\{X_{\{i, j\}}, Y_i\}$ be an optimal solution to the linear program in \ref{lp-densest-subgraph}, having value $v$. Then $\exists S \subseteq V : f(S) \geq v$.
+\end{lemma}
+
+\begin{proof}
     To prove this lemma, we will proceed step by step claiming some properties that will help us to reach our goal.
     
     \begin{claim}\label{cl:dsp-1}
@@ -246,127 +268,120 @@ What we will be proving is that the optimal solution $OPT_{LP}$ of this LP is eq
         \]
     \end{claim}
     \begin{proof}
-        Assume that this was not the case: $\exists\ X_{\{i, j\}} < \min{\{Y_i, Y_j\}}$. Then the value of $X_{\{i, j\}}$ can be increased up to $\min(Y_i, Y_j)$, which in turn increases the objective function's value while keepoing the solution feasible. It entails that $X_{\{i, j\}}$ wasn't the optimal value, which is a contradiction.
+        Assume that this was not the case: $\exists\ X_{\{i, j\}} < \min(Y_i, Y_j)$. Then the value of $X_{\{i, j\}}$ can be increased up to $\min(Y_i, Y_j)$, which in turn increases the objective function's value while keeping the solution feasible. It entails that $X_{\{i, j\}}$ wasn't the optimal value, which is a contradiction.
     \end{proof}
 
-    Now, fix a parameter $r$ and let:
+    Let $\{X_i, Y_i\}$ be an optimal solution, fix a parameter $r$ and let:
     \begin{align}
         S(r) &:= \{ i \in V(G) : Y_i \geq r\}                   & \label{dsp-sr} \\
         H(r) &:= \{ \{i, j\} \in E(G) : X_{\{i, j\}} \geq r\}   & \label{dsp-er}
     \end{align}
 
-    We are defining a parametric set, that contains all the nodes $i$ such that $Y_i \geq r$ in the optimal solution. $S(0)$ contains all the nodes, and as $r$ increases, it shrinks increasingly. $H(r)$ is the edges' analogue.
+    We are defining two parametric sets: $S(r)$ contains all the vertices $i$ such that $Y_i \geq r$, and as $r$ increases, it increasingly shrinks. $H(r)$ is the edges' analogue.
     
     \begin{claim}\label{cl:dsp-2}
-        No matter which $r$ we pick, it will select a set of nodes such that the selected edges are induced by that set of nodes:
+        For any value of $r$ between $0$ and $\max_i(Y_i)$, the edges in $H(r)$ will be exactly the ones induced on $S(r)$:
         \[
-            \forall\ 0 \leq r \leq \max{\{Y_i\}} \qquad \{i, j\} \in H(r) \iff \{i, j\} \subseteq S(r)
+            \forall\ 0 \leq r \leq \max_i(Y_i) \qquad \{i, j\} \in H(r) \iff (i, j \in S(r) \wedge \{i, j\} \in E(G))
         \]
         Or alternatively:
         \[
-            \forall\ 0 \leq r \leq \max{\{Y_i\}} \qquad H(r) = E(G[S(r)])
+            \forall\ 0 \leq r \leq \max_i(Y_i) \qquad H(r) = E(G[S(r)])
         \]
     \end{claim}
 
     \begin{proof}
-        The proof is split in the two directions:
-        \begin{itemize}
-            \item ($\implies$):
-                \begin{align*}
-                    \{i, j\} \in E(r) & \implies X_{\{i, j\}} \geq r            & \tag{by [\ref{dsp-er}]}           \\
-                                      & \implies \min{\{Y_i, Y_j\}} \geq r      & \tag{by claim [\ref{cl:dsp-1}]}   \\
-                                      & \implies Y_i \geq r \wedge Y_j \geq r   &                                   \\
-                                      & \implies \{i, j\} \subseteq S(r)        & \tag{by [\ref{dsp-sr}]}
-                \end{align*}
-            \item ($\impliedby$):
-                \begin{align*}
-                    \{i, j\} \subseteq S(r) & \implies r \leq X_{\{i, j\}} = \min{\{Y_i, Y_j\}} & \tag{by claim [\ref{cl:dsp-1}]}\\
-                                            & \implies \{i, j\} \in E(r)                        & \tag{by [\ref{dsp-er}]}
-                \end{align*}
-        \end{itemize}
+        \begin{align*}
+                       \{i, j\} \in H(r) 
+            \iff&\     X_{\{i, j\}} \geq r          & \tag{by [\ref{dsp-er}]} \\
+            \iff&\     \min(Y_i, Y_j) \geq r        & \tag{by claim [\ref{cl:dsp-1}]} \\
+            \iff&\     Y_i \geq r \wedge Y_j \geq r & \\
+            \implies&\ i, j \in S(r)                & \tag{by [\ref{dsp-sr}]}
+        \end{align*}
+
+        Knowing that $\{i, j\} \in H(r)$ also implies that $\{i, j\} \in E(G)$ completes the proof.
     \end{proof}
 
-    Now we introduce an ordering of the variables $Y_i$ and two integrals that will be useful later: let $\pi$ be a permutation over them which preserves the values' natural ordering:
+    The next steps require to deal with the continuous nature of $r$, for both of the parameterized subsets $S(r)$ and $H(r)$. Focusing on $S(r)$, let $\pi$ be a total ordering over the variables $Y_i$ in the solution, such that their values are sorted in increasing order, and define an additional variable $Y_0$ to be the constant 0:
     \[
-        0 =: Y_{\pi_{(0)}} \leq Y_{\pi_{(1)}} \leq Y_{\pi_{(2)}} \leq Y_{\pi_{(2)}} \leq \ldots \leq Y_{\pi_{(|V| - 1)}} =: \max{\{Y_i\}}
+        0 = Y_{\pi(0)} \leq Y_{\pi(1)} \leq Y_{\pi(2)} \leq \dots \leq Y_{\pi(|V|)} = \max_i(Y_i)
     \]
-    Observe the following integral which gives a property of the nodes:
-    
+
+    % Captions do not like \abs
     \begin{figure}[ht]
         \centering
         \includegraphics[scale = 0.4]{dsp-integral}
-        \caption{A representation of the integral $\int_0^{\max{\{Y_i\}}} |S(r)| dr$.}
+        \caption{A representation of the integral $\int_0^{\max_i(Y_i)} |S(r)| dr$.}
         \label{fig:dsp-integral}
     \end{figure}
+
+    In the perspective of such ordering, $S(r)$ can be plotted in a function graph on the real axis of $r$ where the values of $Y_i$ lie; such function graph is shown in figure \ref{fig:dsp-integral}. With some careful observations, it is possible to transition from a continuous interpretation of the area underlying the function to a discrete one:
+
+    \todo{Figure \ref{fig:dsp-integral} fails to convey a clear, most general case of this perspective, many improvements can be made}
     
     \begin{claim}\label{cl:dsp-3}
         \[
-            \int_0^{\max{\{Y_i\}}} |S(r)| dr =\sum_{i = 1}^n Y_i.
+            \int_0^{\max_i(Y_i)} \abs{S(r)} dr = \sum_{i = 1}^n Y_i
         \]
     \end{claim}
 
     \begin{proof}
-        First of all, let's note that the integral in [\ref{cl:dsp-3}] can be graphically represented as in the picture [\ref{fig:dsp-integral}], where each gray rectangle is the integral for a certain value of $r$, i.e., an addend of the sum that makes up the integral:
+        The area underlying the function $|S(r)|$ can be exactly partitioned into $n$ rectangles, where each one is the integral computed between two variables $Y_{\pi(i - 1)}$ and $Y_{\pi(i)}$. The width of such a rectangle will be $Y_{\pi(i)} - Y_{\pi(i - 1)}$, whereas the height shall be $n - i + 1$ as a consequence of the ordering on $Y_i$ enforced by $\pi$. Therefore:
         
         \begin{align*}
-            \int_0^{\max{\{Y_i\}}} |S(r)| dr &= \sum_{i = 1}^{n} ( \overbrace{(n - 1 + 1)}^{\text{height}} \cdot \overbrace{(Y_{\pi_{(i)}} - Y_{\pi_{(i-1)}})}^{\text{width}} )& \tag{by geom. interpretation of integral}\\
-            &= \sum_{i=1}^{n} \left(\left( n-1+1 \right) \cdot Y_{\pi_{(i)}} \right) - \sum_{i=1}^{n} \left(\left( n-1+1 \right) \cdot Y_{\pi_{(i-1)}} \right)& \\
-            &= \sum_{i=1}^{n} \left(\left( n-1+1 \right) \cdot Y_{\pi_{(i)}} \right) - \sum_{i=0}^{n-1} \left(\left( n-1 \right) \cdot Y_{\pi_{(i)}} \right)&\tag{by index shifting}\\
-            &= \sum_{i=1}^{n} \left(\left( n-1+1 \right) \cdot Y_{\pi_{(i)}} \right) - \sum_{i=1}^{n} \left(\left( n-1 \right) \cdot Y_{\pi_{(i)}} \right)&\tag{$*^3$}\\
-            &= \sum_{i=1}^n Y_{\pi_{(i)}} = \sum_{i=1}^n Y_i&
+               \int_0^{\max_i(Y_i)} \abs{S(r)} dr
+            &= \sum_{i = 1}^n (Y_{\pi(i)} - Y_{\pi(i - 1)}) (n - i + 1)                             & \text{(by geom. interpretation of integral)} \\
+            &= \sum_{i = 1}^n Y_{\pi(i)} (n - i + 1) - \sum_{i = 1}^n Y_{\pi(i - 1)} (n - i + 1)    & \\
+            &= \sum_{i = 1}^n Y_{\pi(i)} (n - i + 1) - \sum_{i = 0}^{n - 1} Y_{\pi(i)} (n - i)      & \text{(by index shift)} \\
+            &= \sum_{i = 1}^n Y_{\pi(i)} (n - i + 1) - \sum_{i = 1}^n Y_{\pi(i)} (n - i)            & \left( \begin{aligned} i = 0 &\implies Y_0 = 0 \\ i = n &\implies (n - n) = 0 \end{aligned} \right) \\
+            &= \sum_{i = 1}^n Y_{\pi(i)} = \sum_{i = 1}^n Y_i                                       & \text{(order does not matter)}
         \end{align*}
         
-        The step marked by $(*^3)$ is due to the fact that for $i=0$ and for $i=n$ the value of the term is $0$, so we can sum from $1$ to $n$ as in the first sum, to obtain compatible addends.
     \end{proof}
     
     \begin{claim}\label{cl:dsp-4}
         \begin{equation}
-            \int_0^{\max{\{Y_i\}}} |H(r)|dr = \sum_{i = 1}^n X_{\{i, j\}}.
+            \int_0^{\max_i(Y_i)} |H(r)|dr = \sum_{\{i, j\} \in E(G)} X_{\{i, j\}}.
         \end{equation}
     \end{claim}
 
     \begin{proof}
-        The proof is analogous to the one for the claim \ref{cl:dsp-3}.
+        Proven analogously as for claim \ref{cl:dsp-3}.
     \end{proof}
     
     \begin{claim}\label{cl:dsp-5}
-        There exists a value for $r$ in $[0, \max{\{Y_i\}}]$ such that $|H(r)| \geq v|S(r)|$. It entails:
+        There exists a value $r \in [0, \max_i(Y_i)]$ such that $\abs{H(r)} \geq v \abs{S(r)}$. This entails that, for such value $r$, there is a solution value that is at least the optimum $v$:
         \[
-            f(S(r)) = \frac{|H(r)|}{|S(r)|} \geq v = \sum_{\{i,j\}} X_{\{i, j\}}
+            f(S(r)) = \frac{|H(r)|}{|S(r)|} \geq v = \sum_{\{i,j\} \in E(G)} X_{\{i, j\}}
         \]
-        meaning that, for a specific value for $r$, we have a DSG value that is at least $v$, whhich is our final goal.
     \end{claim}
     
     \begin{proof}
-        The proof goes by contradiction. Assume that, $\forall\ r \in [0, \max{\{Y_i\}}]$, it holds that $|E(r)| < v|S(r)|$. Then:
-        \[
-            \int_0^{\max{\{Y_i\}}}|E(r)| dr < v\int_0^{\max{\{Y_i\}}}|S(r)| dr
-        \]
-        By claims [\ref{cl:dsp-3}] and [\ref{cl:dsp-4}], it follows that:
-        \[
-            \sum_{\{i, j\} \in E} X_{\{i, j\}} < v \sum_{i = 1}^n Y_i
-        \]
-        This contradicts the solution's optimality, which states that:
-        \[
-            \sum_{i = 1}^n Y_i = 1\ \wedge\ \sum_{\{i, j\} \in E} X_{\{i, j\}} = v
-        \]
-        and would thus yield $v < v \cdot 1$
-    \end{proof}
+        Assume that, for any valid $r$, it holds that $|H(r)| < v|S(r)|$. Then:
+        \begin{align*}
+            \int_0^{\max_i(Y_i)} |H(r)| dr          <&\ v \int_0^{\max_i(Y_i)} |S(r)| dr    & \\
+            \sum_{\{i, j\} \in E(G)} X_{\{i, j\}}   <&\ v \sum_{i = 1}^n Y_i                & \text{(by claims [\ref{cl:dsp-3}] and [\ref{cl:dsp-4}])} \\
+            v                                       <&\ v \cdot 1                           & \text{(by optimality of $\{X_{\{i, j\}}, Y_i\}$)}
+        \end{align*}
 
+        which is a contradiction.
+    \end{proof}
+    \todo{This isn't finished correctly yet}
     At this point we have proved that the LP we gave finds the exact optimal solution for the Densest Subgraph problem.
 \end{proof}
 
-As a side note, in this proof we used integrals to avoid to sum over all the possible values of the $Y_i$s. How can we actually find the set $S$ given the LP's optimal value $v$? How many candidate sets there can be? In principle infinitely many, but the only ones that matter are given by $r \in \{Y_i : 1 \leq i \leq n\}$ (because of how $S(r)$ is defined). So we try all the $n$ possible values of $r$ and pick the best one.
+\todo{Not sure on how to explain this}
+This \lp{} is proven to work as a good model for the Densest Subgraph problem. However, this begets a different question: is there an efficient method for finding the set $S$ using the program's optimal value $v$? Or to put it in another way, how many candidate sets $S$ can there be? In principle infinitely many, but the only ones that matter are given by $r \in \{Y_i : 1 \leq i \leq n\}$ (because of how $S(r)$ is defined). So we try all the $n$ possible values of $r$ and pick the best one.
 
-Let's note that solving this Linear Problem requires polynomial time, that is pretty good in general, but it is effectively impossible to use for graphs with more than 10000 nodes, such as the social graphs, so we will look for linear and sublinear approximations.
+Note that solving this \lp{} requires polynomial time; however if the graph of interest is a very large one, such as a social graph woth more than 10\ 000 nodes, this method becomes quite intractable. In such scenarios, linear and sublinear approximations are sought for.
 
 
 \subsection{A greedy algorithm to solve the densest subgraph problem}\label{sec:dsp-greedy}
 
-Here, we explore a greedy algorithm to approximate the optimal solution in linear time. Recall that $f(S)$ is the function defined in [\ref{densest-subgraph}].
+Here, a greedy algorithm to approximate the optimal solution in linear time is presented. Recall that $f(S)$ is the function defined in [\ref{densest-subgraph}].
 
-\begin{lstlisting}[caption={The Greedy algorithm to solve the densest subgraph problem},label={lst:dsp-greedy}]
-Greedy G(V,E):
+\begin{lstlisting}[caption = {The Greedy algorithm to solve the densest subgraph problem}, label = {lst:dsp-greedy}]
+algorithm $Greedy(G(V,E))$:
     $S_0 \gets V$
     for $i=1, \ldots, n-1$:
         let $v_{i-1} \in S$ be a node of minimum degree in $G[S_{i-1}]$
@@ -404,7 +419,7 @@ Greedy G(V,E):
     Let's introduce some other definitions that will be useful in the following proof.
     
     \begin{defn}[$\varphi$-degree]
-        Given $\varphi$ and $v \in V$, let $d_\varphi(v) = \abs{\{ e \st v \in e,\ e \text{ oriented towards } v \text{ by } \varphi \}}$.
+        Given $\varphi$ and $v \in V$, let $d_\varphi(v) = \abs{\{ e : v \in e,\ e \text{ oriented towards } v \text{ by } \varphi \}}$.
     \end{defn}
     
     \begin{defn}[Maximum $\varphi$-degree]
@@ -526,7 +541,7 @@ Suppose that Greedy outputs the set $S$, the \textbf{primal solution} is the fol
     \end{aligned}
 \end{equation}
 \begin{proof}[Proof of feasibility]
-    Given in the previous section, see the proof of Lemma [\ref{l:dsp-feasibility}].
+    Given in the previous section, see the proof of Lemma [\ref{lem:dsp-feasibility}].
 \end{proof}
 Suppose that Greedy produces $\varphi_G$, the \textbf{dual solution} is the following:
 \begin{equation}
@@ -572,9 +587,9 @@ By this we shown that the analysis of Greedy can be seen as a primal-dual proof,
     \begin{minipage}{0.4\textwidth}
         \begin{flalign*}
             &\text{Primal:}\\
-            &\max\ \bar{c}^T \bar{x}\\
-            &\bar{A} \bar{x} \leq \bar{b}\\
-            &\bar{x} \geq \bar{0}
+            &\max\ \overline{c}^T \overline{x}\\
+            &\overline{A} \overline{x} \leq \overline{b}\\
+            &\overline{x} \geq \overline{0}
         \end{flalign*}
     \end{minipage}
     \begin{minipage}{0.2\textwidth}
@@ -588,36 +603,36 @@ By this we shown that the analysis of Greedy can be seen as a primal-dual proof,
     \begin{minipage}{0.4\textwidth}
         \begin{flalign*}
             &\text{Dual:}\\
-            &\min\ \bar{y}^T \bar{b}\\
-            &\bar{y}^T\bar{A} \geq \bar{c}\\
-            &\bar{y} \geq \bar{0}
+            &\min\ \overline{y}^T \overline{b}\\
+            &\overline{y}^T\overline{A} \geq \overline{c}\\
+            &\overline{y} \geq \overline{0}
         \end{flalign*}
     \end{minipage}
 
-    In our example we have: $\bar{x} =
+    In our example we have: $\overline{x} =
     \begin{pmatrix}
         X_{\{1,2\}} \\ X_{\{2,3\}} \\ X_1 \\ X_2 \\ X_3
-    \end{pmatrix}, \bar{A} =
+    \end{pmatrix}, \overline{A} =
     \begin{pmatrix}
     1 & 0 & -1 & 0 & 0 \\
     1 & 0 & 0 & -1 & 0 \\
     0 & 1 & 0 & -1 & 0 \\
     0 & 1 & 0 & 0 & -1 \\
     0 & 0 & 1 & 1 & 1 \\
-    \end{pmatrix},\ \bar{b} =
+    \end{pmatrix},\ \overline{b} =
     \begin{pmatrix}
         0 \\ 0 \\ 0 \\ 0 \\ 1
-    \end{pmatrix},\ \bar{c} =
+    \end{pmatrix},\ \overline{c} =
     \begin{pmatrix}
         1 \\ 1 \\ 0 \\ 0 \\ 0
     \end{pmatrix}$.\\
-    Note that matrix $\bar{A}$ has one row for each constraint and one column for each variable.
+    Note that matrix $\overline{A}$ has one row for each constraint and one column for each variable.
     
-    Now we can compute the dual of our example: for the moment we take a vector $\bar{y}$ with one variable for each constraint in the primal
-    $\bar{y}^T = \begin{pmatrix} Y_1 & Y_2 & Y_3 & Y_4 & Y_5 \end{pmatrix}$, later we will assign more significant names to the variables.
+    Now we can compute the dual of our example: for the moment we take a vector $\overline{y}$ with one variable for each constraint in the primal
+    $\overline{y}^T = \begin{pmatrix} Y_1 & Y_2 & Y_3 & Y_4 & Y_5 \end{pmatrix}$, later we will assign more significant names to the variables.
     \begin{flalign*}
-        \min \ \bar{y}^T \bar{b} &\Rightarrow min \begin{pmatrix} Y_1 & Y_2 & Y_3 & Y_4 & Y_5 \end{pmatrix} \cdot \begin{pmatrix} 0 \\ 0 \\ 0 \\ 0 \\ 1 \end{pmatrix} = Y_5\\
-        \bar{y}^T\bar{A} \geq \bar{c} &\Rightarrow \begin{pmatrix} Y_1 + Y_2 \\ Y_3 + Y_4 \\ -Y_1 + Y_5 \\ -Y_2-Y_3+Y_5 \\ -Y_4+Y_5 \end{pmatrix} \geq \begin{pmatrix} 1 \\ 1 \\ 0 \\ 0 \\ 1 \end{pmatrix}
+        \min \ \overline{y}^T \overline{b} &\Rightarrow min \begin{pmatrix} Y_1 & Y_2 & Y_3 & Y_4 & Y_5 \end{pmatrix} \cdot \begin{pmatrix} 0 \\ 0 \\ 0 \\ 0 \\ 1 \end{pmatrix} = Y_5\\
+        \overline{y}^T\overline{A} \geq \overline{c} &\Rightarrow \begin{pmatrix} Y_1 + Y_2 \\ Y_3 + Y_4 \\ -Y_1 + Y_5 \\ -Y_2-Y_3+Y_5 \\ -Y_4+Y_5 \end{pmatrix} \geq \begin{pmatrix} 1 \\ 1 \\ 0 \\ 0 \\ 1 \end{pmatrix}
     \end{flalign*}
     
     From this formulation we can obtain our constraints:
@@ -676,7 +691,7 @@ Before proceeding with the updated algorithm, let's give some counterexamples th
         \item The graph has $n$ nodes and $\sqrt{n}$ layers $L_i$,
         \item Each layer $L_i$ contains $i$ nodes,
         \item $V = \bigcup_{i=1}^k L_i$,
-        \item $E = \{ \{v,w\} \st \exists\ v \in L_i \wedge w \in L_{i+1} \}$.
+        \item $E = \{ \{v,w\} : \exists\ v \in L_i \wedge w \in L_{i+1} \}$.
     \end{itemize}
     \begin{figure}[h!]
         \centering
@@ -700,7 +715,7 @@ $DS_\varepsilon(G(V,E))$:
     $i \gets 0$
     $S_0 \gets V$
     while $S_i \neq \emptyset$:
-        $A_i \gets \{ v \st v \in S_i \wedge \deg_{S_i}(v) \leq 2 \cdot (1+\varepsilon) \cdot f(S_i) = (1+\varepsilon) \cdot \avg_{w \in S_i} \deg_{S_i}(w) \}$
+        $A_i \gets \{ v : v \in S_i \wedge \deg_{S_i}(v) \leq 2 \cdot (1+\varepsilon) \cdot f(S_i) = (1+\varepsilon) \cdot \avg_{w \in S_i} \deg_{S_i}(w) \}$
         $S_{i+1} \gets S_{i} - A_i$
     return $\argmax_{S_i} f(S_i)$
 \end{lstlisting}

@@ -300,39 +300,44 @@ In this perspective:
 It would be useful to know for which values of $\gamma$ there exists an LSH for $S$; the next lemma helps us finding an answer:
 
 \begin{lemma}[Charikar] \label{lem:charikar}
-    If a similarity $S$ admits an LSH, then the function $d := 1 - S$ must satisfy the triangular inequality, i.e. it is a metric\footnote{In most cases, similarities are actually defined as inverses of some existing metric.}:
+    If a similarity $S$ admits a \lsh-scheme, then the function $d = 1 - S$ must satisfy the triangular inequality; thus, $d$ is a metric\footnote{In most cases, similarities are actually defined as inverses of some existing metric.}:
     \[
         \forall A, B, C \in U \quad d(A, B) \leq d(A, C) + d(B, C)
     \]
 \end{lemma}
 
 \begin{proof}
-    Let $E_{XY}$ be the event ``$h(X) \neq h(Y)$"; since $S$ admits a LSH, we have:
-    \begin{align*}
-        d(A,B) &= 1-S(A,B) = \Prs_h{E_{AB}} = p_1 + p_2 + p_3 + p_4 \\
-        d(A,C) &= 1-S(A,C) = \Prs_h{E_{AC}} = p_1 + p_3 + p_5 + p_7 \\
-        d(B,C) &= 1-S(B,C) = \Prs_h{E_{BC}} = p_1 + p_2 + p_5 + p_6
-    \end{align*}
-    with the probabilities $p_i$ defined as in the following table, where an $X$ under the ``may exist" column means that the corresponding probability is $0$ (it happens because transitivity generates contradictions, see example [\ref{ex:transitivity}]):
-
+    Let $A$, $B$ and $C$ be three objects; consider how their hashes may differ to each other in all possible ways as shown in the following table, and associate each combination to a probability $p_i$:
+    
     \vspace{1ex}
     \begin{tabular}{lllll}
-              & $E_{AB}$  & $E_{AC}$  & $E_{BC}$  & may exist    \\
-        $p_1$ & T         & T         & T         & $\checkmark$ \\
-        $p_2$ & T         & T         & F         & $\checkmark$ \\
-        $p_3$ & T         & F         & T         & $\checkmark$ \\
-        $p_4$ & T         & F         & F         & \ding{55}    \\
-        $p_5$ & F         & T         & T         & $\checkmark$ \\
-        $p_6$ & F         & T         & F         & \ding{55}    \\
-        $p_7$ & F         & F         & T         & \ding{55}    \\
-        $p_8$ & F         & F         & F         & $\checkmark$
+              & $A \not\sim B$ & $A \not\sim C$  & $B \not\sim C$  & may exist \\
+        $p_1$ & T          & T           & T           & \correct  \\
+        $p_2$ & T          & T           & F           & \correct  \\
+        $p_3$ & T          & F           & T           & \correct  \\
+        $p_4$ & T          & F           & F           & \error    \\
+        $p_5$ & F          & T           & T           & \correct  \\
+        $p_6$ & F          & T           & F           & \error    \\
+        $p_7$ & F          & F           & T           & \error    \\
+        $p_8$ & F          & F           & F           & \correct
     \end{tabular}
 
-    Hence we have
-    \begin{equation*}
-        d(A,C) + d(B,C) = 2p_1 + p_2 + p_3 + 2p_5 \geq p_1 + p_2 + p_3 = d(A,B)
-    \end{equation*}
-    and so $1-S$ doesn't comply with the triangular inequality.
+    Observe that some combinations cannot happen because of internal contradictions, violating proposition [\ref{ex:transitivity}]; they are marked with \error{} for reference. In such cases, their probability of happening will be $0$.
+    Computing the distances between the objects with $d$:
+    \begin{align*}
+        d(A, B) &= 1 - S(A, B) = \Pr[A \not\sim B] = p_1 + p_2 + p_3 + p_4 \\
+        d(A, C) &= 1 - S(A, C) = \Pr[A \not\sim C] = p_1 + p_2 + p_5 + p_6 \\
+        d(B, C) &= 1 - S(B, C) = \Pr[B \not\sim C] = p_1 + p_3 + p_5 + p_7
+    \end{align*}
+    
+    Using such mappings in the triangular inequality, and knowing that some of the probabilities are $0$:
+    \begin{align*}
+        d(A, B)         &\leq d(A, C) + d(B, C) \\
+        p_1 + p_2 + p_3 &\leq 2p_1 + p_2 + p_3 + 2p_5 \\
+        0               &\leq p_1 + 2p_5
+    \end{align*}
+
+    which is true for any values $p_1$ and $p_5$. Therefore, the triangular inequality is satisfied, $d$ is a metric, and $S$ admits a \lsh-scheme.
 \end{proof}
 
 \begin{corollary}
@@ -449,7 +454,7 @@ The proof is inductive and makes use of four lemmas presented here. The first on
 
 \begin{proof}
 
-    \todo{Something's off: \pgf{}s require a single $\alpha$ that is exponantiated in the definition, but here there are "multiple" alphas. Maybe there should be a "selecting function" that, by repeated applications, yields the similarity of interest? Can this be done correctly?
+    \todo{Something's off: \pgf{}s require a single $\alpha$ that is exponentiated in the definition, but here there are "multiple" alphas. Maybe there should be a "selecting function" that, by repeated applications, yields the similarity of interest? Can this be done correctly?
 
     Also, for the theorem's proof, this is too strong: a single similarity instead of a generic collection is enough, and the statement becomes much simpler to prove
 
@@ -460,9 +465,9 @@ The proof is inductive and makes use of four lemmas presented here. The first on
     \end{enumerate}
     Therefore:
     \begin{align*}
-        &\  \Prs_h{h(A) = h(B)} \\
+        &\  \Pr_h[h(A) = h(B)] \\
         =&\ \sum_{i = 0}^{\infty} p_i S_i(A, B) \\
-        =&\ \sum_{i = 0}^{\infty} \Pr[i = j] \Prs_h{h(A) = h(B) \mathrel{|} i = j} \qedhere
+        =&\ \sum_{i = 0}^{\infty} \Pr[i = j] \Pr_h[h(A) = h(B) \knowing i = j] \qedhere
     \end{align*}
     }
 \end{proof}
@@ -670,15 +675,20 @@ or in other terms, $\vec{x}_i=(0,...,0,1,0,...,0)$ with the only 0 in position $
 
 Some other related examples follow:
 
-\ex \textbf{Weighed Jaccard} is a generalization of $\jaccsim$ for vectors: \\ $\mathcal{WJ}=\frac
+\begin{example}
+    \emph{Weighed Jaccard} is a generalization of $\jaccsim$ for vectors: \\ $\mathcal{WJ}=\frac
     {\sum_i \min(x_i, y_i)}{\sum_i \max(x_i, y_i)}$.
+\end{example}
 
-\ex \textbf{Sim Hash} is an LSH scheme similar to the cosine similarity:
-\begin{itemize}
-    \item $\mathcal{CS}(\vec{x},\vec{y})=
-        \cos(\theta_{\vec{x},\vec{y}}) $;
-    \item $\mathcal{SH}(\vec{x},\vec{y})=
-        1-\frac{\theta_{\vec{x},\vec{y}}}{\pi} $;
-    \item $\mathcal{SH}$ is high if the angle $\theta$ is small;
-    \item $\frac{\theta_{\vec{x},\vec{y}}}{\pi}$ is the probability that an hyperplane divides $\vec{x}$ and $\vec{y}$, where the hyperplane is a threshold between similar and dissimilar elements of the universe, so it creates a partition of the universe in two sets.
-\end{itemize}
+\begin{example}
+    \textbf{Sim Hash} is an LSH scheme similar to the cosine similarity:
+    \begin{itemize}
+        \item $\mathcal{CS}(\vec{x},\vec{y})=
+            \cos(\theta_{\vec{x},\vec{y}}) $;
+        \item $\mathcal{SH}(\vec{x},\vec{y})=
+            1-\frac{\theta_{\vec{x},\vec{y}}}{\pi} $;
+        \item $\mathcal{SH}$ is high if the angle $\theta$ is small;
+        \item $\frac{\theta_{\vec{x},\vec{y}}}{\pi}$ is the probability that an hyperplane divides $\vec{x}$ and $\vec{y}$, where the hyperplane is a threshold between similar and dissimilar elements of the universe, so it creates a partition of the universe in two sets.
+    \end{itemize}
+\end{example}
+

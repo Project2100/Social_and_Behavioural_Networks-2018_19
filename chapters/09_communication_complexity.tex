@@ -7,8 +7,8 @@ In a distributed computing framework like MapReduce it is not only important to 
 In the following we see an algorithm to compute strings equality.
 
 \begin{lstlisting}[caption={Greedy algorithm},label={lst:fS-greedycc}]
-$\bar{X}$: bits string of computer $A$
-$\bar{Y}$: bits string of computer $B$
+$\overline{X}$: bits string of computer $A$
+$\overline{Y}$: bits string of computer $B$
 Algo(X,Y):
     let $S \subseteq [n]$ be the set of indexes sampled u.a.r.
     let computer $A$ compute $a = \xor_{i \in S} x_{i}$
@@ -30,11 +30,11 @@ We can thus use the algorithm iteratively $k$ times. If it never returns $DIFF$ 
 \end{thm}
 
 \begin{proof}
-    Let $T$ be the set of indexes in which $\bar{X}$ and $\bar{Y}$ differ.
+    Let $T$ be the set of indexes in which $\overline{X}$ and $\overline{Y}$ differ.
     \[
         T = \{ i | x_i \neq y_i\} 
     \]
-    Let $S'$ be the subset of indexes sampled \emph{u.a.r} by the algorithm where $\bar{X}$ and $\bar{Y}$ differ.
+    Let $S'$ be the subset of indexes sampled \emph{u.a.r} by the algorithm where $\overline{X}$ and $\overline{Y}$ differ.
     \[
         S' = S \cap T 
     \]
@@ -124,7 +124,7 @@ Let $V = \{1,\ldots, n\}$. Let $E \subseteq \binom V 2$. Let $V$ be partitioned 
 
 There are $k$ computers with unbounded memory and computational power. For each $i \in [k]$, computer $i$ knows the set $V_i$ and, for each $v \in V_i$, the set of neighbors of $v$, $N(v)$. More precisely, computer $i$ has the following set as input: $$\left\{(v, N(v)) \mid v \in V_i\right\}.$$
 
-Computers can communicate in a {\em point-to-point} manner --- that is, the generic computer $i \in [k]$ can send any string of bits $\bar{w} \in \{0,1\}^{\star}$ to the generic computer $j \in [k] - \{i\}$; the cost of sending a string is equal to its number of bits.
+Computers can communicate in a {\em point-to-point} manner --- that is, the generic computer $i \in [k]$ can send any string of bits $\overline{w} \in \{0,1\}^{\star}$ to the generic computer $j \in [k] - \{i\}$; the cost of sending a string is equal to its number of bits.
 
 \smallskip
 
