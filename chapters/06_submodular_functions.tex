@@ -1,203 +1,236 @@
-\chapter[Submodular functions]{Submodular functions\raisebox{.3\baselineskip}{\normalsize\footnotemark}}
-\footnotetext{Part of this chapter is taken from \href{https://github.com/Halolegend94/uni_social_behavioral_networks/blob/master/chapters/ch03-submodular.tex}{this repo} by \href{https://github.com/Halolegend94}{Cristian Di Pietrantonio}.}\label{sec:submodular-chapter}
+\chapter{Submodular functions}
 
-In this section we will present a class of functions, called submodular functions, that generate a class of optimization problems that can be solved with the same algorithm (under some other assumptions). To start this topic we first introduce a problem of this class, the Max cover problem.
+\textbf{\textsc{Content note}}: \emph{Part of this chapter is taken from \href{https://github.com/Halolegend94/uni_social_behavioral_networks/blob/master/chapters/ch03-submodular.tex}{this repo} by \href{https://github.com/Halolegend94}{Cristian Di Pietrantonio}.}
+\vspace{2ex}
+
+Some specific classes of problems arise from what are called the submodular functions; with some assumptions, a general algorithm has been designed to solve any problem of this kind. To illustrate, one of such problems is picked and described: the Max-Cover problem.
 
 \section{Max Cover Problem}\label{sec:max-cover}
 
-\begin{defn}[Max Cover]\label{max-cover}
-    Let $X=[n]$ be the ground set, $\mathscr{S}=2^X$, $k\geq1$ be a a parameter of the problem. The Max cover problem consists in finding
-    $\max_{\mathscr{C} \subseteq \mathscr{S},\ |\mathscr{C}|=k} f(\mathscr{C})$, where
+\begin{definition}[Max Cover]\label{max-cover}
+    Let $S$ be a collection of subsets of some set $U$, and $k \geq 1$ be a positive integer. The Max cover problem consists in finding a family of subsets $T \subseteq S$ such that $T$ does not conatin more than $k$ subsets, and the latter's union is maximized in terms of cardinality:
     \begin{equation}\label{eq:coverage}
-        f(\mathscr{C}) = \abs{\bigcup_{S \subset \mathscr{C}} S}
+        \max_{T \subseteq S} \left( \abs{\bigcup_{T_i \in T} T_i} \right) \qquad \abs{T} \leq k
     \end{equation}
-    is the \textit{coverage function}.
-\end{defn}
+\end{definition}
 
-In other words, the objective of the max cover problem is to maximize the number of nodes ``covered'' at least one time by a fixed size set of nodes.
-
-\begin{ex}\label{ex:mcp-ex1}
-    Let $G$ be the social graph in picture [\ref{fig:mcp-ex1}], and let $k=2$ the number of influencers we want to give our product as gifts, so that they will advertise it in such a way that as many people as possible will know about our product.
+\begin{example}\label{ex:mcp-ex1}
+    This problem can also be modeled by a bipartite graph, where the vertices on one side are the subsets in $S$, and on the other are the elements in $U$; the edges connect vertices according to membership. This model translates well in a real world case study for efficient advertising, where the ``subset'' vertices are \emph{influencers}, and the ``element'' vertices are the people reached by them. The goal then becomes to pick at most $k$ vertices among the $S_i$ such that they collectively ``cover'' the most $e_j$ vertices. An instance example is depicted in figure [\ref{fig:mcp-ex1}], with six elements $e_j$ and three subsets $S_i$. The chosen solution is the family $T = \{S_1, S_3\}$, but $S_2$ could have been chosen instead of $S_1$, because they have exactly the same neighbours.
     
-    \begin{figure}[h!]
+    \begin{figure}[ht]
         \centering
-        \includegraphics[scale=0.4]{mcp-ex1}
-        \caption{An example of max cover on graph $G$.}
+        \begin{tikzpicture}
+            \draw
+                (0.75, 0) node (s1) [draw, circle, minimum size = 2em] {$S_1$}
+                (3.75, 0) node (s2) [draw, circle, minimum size = 2em] {$S_2$}
+                (6.75, 0) node (s3) [draw, circle, minimum size = 2em] {$S_3$}
+                
+                (0,   -3) node (e1) [draw, circle, minimum size = 2em] {$e_1$}
+                (1.5, -3) node (e2) [draw, circle, minimum size = 2em] {$e_2$}
+                (3,   -3) node (e3) [draw, circle, minimum size = 2em] {$e_3$}
+                (4.5, -3) node (e4) [draw, circle, minimum size = 2em] {$e_4$}
+                (6,   -3) node (e5) [draw, circle, minimum size = 2em] {$e_5$}
+                (7.5, -3) node (e6) [draw, circle, minimum size = 2em] {$e_6$}
+
+                (s1) edge (e1)
+                (s1) edge (e2)
+                (s1) edge (e3)
+                (s1) edge (e4)
+                (s2) edge (e1)
+                (s2) edge (e2)
+                (s2) edge (e3)
+                (s2) edge (e4)
+                (s3) edge (e5)
+                (s3) edge (e6)
+            ;
+
+            \draw[densely dotted] (0.75, 0.75)
+                to[out = 180, in = 75]  (-0.6, -1.5) 
+                to[out = 255, in = 120] (-0.5, -3.25)
+                to[out = 300, in = 180] (2.25, -3.75)
+                to[out = 0  , in = 240] (5, -3.25)
+                to[out = 60 , in = 320] (2.25, -0.7)
+                to[out = 140 , in = 0]  cycle;
+            ;
+
+            \draw[densely dotted] (6.75, 0.75)
+                to[out = 180, in = 75]  (5.6, -1.5) 
+                to[out = 255, in = 120] (5.5, -3.25)
+                to[out = 300, in = 240] (8, -3.25)
+                to[out = 60 , in = 285] (7.8, -1.5)
+                to[out = 105 , in = 0]  cycle;
+            ;
+
+        \end{tikzpicture}
+        \caption{Graph representation of a Max Cover instance, $k \leq 2$}
         \label{fig:mcp-ex1}
     \end{figure}
+\end{example}
 
-    $\mathscr{S} = \{ \{1,3,4,5,6\}, \{2,3,4,5,6\}, \{1,3\}, \{2,3\}, \{1,4\}, \{2,4\}, \{1,5\}, \{2,5\}, \{1,6\}, \{2,6\}, \{7,8,9\}, \{7,8\}, \{7,9\} \}$ is the set of the neighbors of each node. To cover as many users as possible we choose as the best influencers the nodes 1 and 7.\\
-    Note that even if node 2 has more friends than node 7, it would cover the same nodes as 1, so it wouldn't be useful.
-\end{ex}
+The Max Cover problem is known to be \np-hard, however, an algorithm has been designed that makes a good approximation for the optimal solution:
 
-Now we present a greedy algorithm that gives an approximation for the max cover problem:
-\begin{lstlisting}[caption={The Greedy algorithm to solve the densest subgraph problem},label={lst:mcp-greedy}]
-Greedy($\mathscr{S}, k$):
-    $\mathscr{S}_0 \gets \emptyset$
+\noindent\begin{minipage}{\linewidth}
+    \begin{lstlisting}[caption = {The Greedy algorithm to solve the densest subgraph problem}, label = {lst:mcp-greedy}]
+algorithm $\mcgre(S, k)$:
+    $T \gets \emptyset$
     for $i = 1, \ldots, k$:
-        let $S_i \in \mathscr{S}$ be a set that maximizes $f \left( \mathscr{C}_{i-1} \cup \{S_i\} \right)$
-        $\mathscr{C}_i \gets \mathscr{C}_{i-1} \cup \{S_i\}$
-    return $\mathscr{C}_k$
-\end{lstlisting}
+        let $A \in S$ be a set that maximizes $\abs{\bigcup_{S_i \in T} S_i \cup A}$
+        $T \gets T \cup \{A\}$
+        $S \gets S \setminus \{A\}$
+    return $T$
+    \end{lstlisting}
+\end{minipage}
 
-Note that, at each step, we try all the possible sets $S_i$, and we pick the one that, united to the previous partial solution $\mathscr{C}_{i-1}$, gives the highest value for $f$, maximizing the next partial solution $\mathscr{C}_i$. Another way of seeing this operation is that, at each step, the algorithm removes the nodes already considered into $\mathscr{C}_{i-1}$, before choosing the possible $S_i$s.
+The essential idea is that on each iteration, of all the remianing subsets in $S$, the picked subset $A$ is the one that, along with the current state of $T$, increases the coverage more than the others, effectively maximizing the next iteration of $T$. Another way of seeing this operation is that, at each step, the algorithm removes the nodes already covered by $T$, before choosing the next $A$.
 
-\begin{ex}
-    Now we can look at example [\ref{ex:mcp-ex1}] with a different prospective:
-    
-    \begin{figure}[h!]
-        \centering
-        \includegraphics[scale=0.4]{mcp-ex2}
-        \caption{An example of application of [\ref{lst:mcp-greedy}].}
-        \label{fig:mcp-ex2}
-    \end{figure}
+Before delving into the related theorems, some specific notion are introduced which will help later. Also, for the sake of referring to specific states of objects during the execution of the algorithm, the state of object $T$ at iteration $i$ will be denoted as $T^{(i)}$. Let $f$ be the function counting the total elements covered by a family of subsets $T$:
 
-    Now the nodes in the upper part of the graph are the names of the sets we are considering, and the other are the nodes they contain, so $S_1 = S_2 = \{1,2,3,4\}$, $S_3 = \{5,6\}$ and $k=2$ as before.
-    
-    At the beginning we have $\mathscr{C}_0 \gets \emptyset$; then we choose at random between $S_1$ and $S_2$, since they give the same result, so we obtain $\mathscr{C}_1 \gets \{S_1\}$; finally, we consider the two possibilities $\{S_1, S_2\}$ and $\{S_1, S_3\}$, but the first one doesn't give any improvement, so we pick $S_3$ and we obtain $\mathscr{C}_2 \gets \{S_1, S_3\}$, that in this case is the optimal solution.
-\end{ex}
+\[
+    f(T) = \abs{\bigcup T}
+\]
 
-\begin{thm}\label{thm:mcp-greedy}
-    The algorithm Greedy, described in [\ref{lst:mcp-greedy}], returns a $\left(1-\frac{1}{e}\right)$-approximation for max cover.
-\end{thm}
-Before going into the proof, let's introduce the incremental return notation:
-\begin{defn}[Incremental gain]\label{def:incremental-gain}
+\begin{definition}[Incremental gain]\label{def:incremental-gain}
+    Given a subset $A$ and a family of subsets $T$, the \emph{incremental gain} of $A$ on $T$ is the number of new elements that are covered with $A$ that weren't covered before adding it to the family $T$:
+    \[
+        \incr(A, T) = \abs{A \setminus \bigcup T}
+    \]
+    In terms of the function $f$:
     \begin{equation}\label{eq:mcp-dsa}
-        \Delta(S|A) := f(A \cup \{S\}) - f(A) = \sum_{i \in X} [i \in S \wedge \nexists T \in A, i \in T],
+        \incr(A, T) = f(\{A\} \cup T) - f(T)
     \end{equation}
-    In other words, $\Delta(S|A)$ is the number of new elements that we can cover with $S$ and that weren't covered before adding $S$.\\ It can be extended to a general gain one obtain with $S$, starting at $A$.
-\end{defn}
+\end{definition}
+
+\begin{proposition}[Diminishing returns]\label{prop:mcp-dimret}
+    Given two subset families $S$ and $T$, for any subset $A$:
+    \[
+        S \supseteq T \implies \incr(A, S) \leq \incr(A, T)
+    \]
+\end{proposition}
+
+\begin{proposition}\label{prop:mcp-greediness}
+    The greediness of $\mcgre$ can be formalized as follows:
+    \[
+        \forall A \in S\; \forall 0 \leq i \leq k - 1 \qquad \incr(A, T^{(i)}) \leq \incr(A^{(i + 1)}, T^{(i)})
+    \]
+\end{proposition}
+
+\begin{theorem}\label{thm:mcp-greedy}
+    The algorithm $\mcgre$, described in [\ref{lst:mcp-greedy}], returns a $\left(1-\frac{1}{e}\right)$-approximation for max cover.
+\end{theorem}
+
 \begin{proof}
-    Let's fix an optimal solution $\mathscr{C}^* = \{S_1^*, S_2^*, \ldots, S_k^*\}$. Now we'll prove some lemmas that will help us in proving the theorem.
-    \begin{lem}\label{l:mcp-1}
-        \begin{equation}
-            \forall\ i \in {0, 1, \ldots, k-1} \quad
-            OPT = f(\mathscr{C}^*) \leq f(\mathscr{C}_i) + k \cdot \left( f(\mathscr{C}_{i+1}) - f(\mathscr{C}_i) \right)
-        \end{equation}
-    \end{lem}
+    Fix an optimal solution $T^* = \{S_1^*, S_2^*, \ldots, S_k^*\}$; for ease of writing, the first $i$ subsets of $T^*$ will be denoted as $T^*[i]$, for any $i$. Recall to not confuse this with $T^{(i)}$, which denotes the state of $T$ during algorithm execution at iteration $i$.
+
+    \begin{lemma}\label{l:mcp-1}
+        \[
+            \forall\ 0 \leq i \leq k - 1 \quad OPT = f(T^*) \leq f(T^{(i)}) + k \cdot \left( f(T^{(i + 1)}) - f(T^{(i)}) \right)
+        \]
+    \end{lemma}
+
     \begin{proof}
-        \begin{flalign*}
-            f(\mathscr{C}^*) &\leq f(\mathscr{C}^* \cup \mathscr{C}_i)
-            \tag{by monotonicity of $f$}&\\
-            &= f(\mathscr{C}_i) + \left( f(\{S_1^*\} \cup \mathscr{C}_i) - f(\mathscr{C}_i) \right)&\\
-            &\phantom{\ = f(\mathscr{C}_i)} + \left( f(\{S_1^*, S_2^*\} \cup \mathscr{C}_i ) - f(\{S_1^*\} \cup \mathscr{C}_i) \right)&\\
-            &\phantom{\ = f(\mathscr{C}_i)} + \ldots&\\
-            &\phantom{\ = f(\mathscr{C}_i)} + \left( f(\{S_1^*, \ldots, S_{k-1}^*\} \cup \mathscr{C}_i ) - f(\{S_1^*, \ldots, S_{k-2}^*\} \cup \mathscr{C}_i) \right)&\\
-            &\phantom{\ = f(\mathscr{C}_i)} + \left( f(\mathscr{C}^* \cup \mathscr{C}_i \right) - f(\{S_1^*, \ldots, S_{k-1}^*\} \cup \mathscr{C}_i)&\tag{telescoping series -- see $(*^1)$}\\
-            &= f(\mathscr{C}_i) + \sum_{j=1}^{k} \left( f(\{S_1^*, \ldots, S_j^*\} \cup \mathscr{C}_i) - f(\{S_1^*, \ldots, S_{j-1}^*\} \cup \mathscr{C}_i) \right)&\tag{just a more compact way to write the same thing}\\
-            &= f(\mathscr{C}_i) + \sum_{j=1}^{k} \Delta (S_j^* \st \{S_1^*, \ldots, S_{j-1}^*\} \cup \mathscr{C}_i)&\tag{by definition of $\Delta$ [\ref{eq:mcp-dsa}]}\\
-            &\leq f(\mathscr{C}_i) + \sum_{j=1}^{k} \Delta (S_j^* \st \mathscr{C}_i)&\tag{by diminishing returns -- see $(*^2)$}\\
-            &\leq f(\mathscr{C}_i) + \sum_{j=1}^{k} \Delta (S_{i+1} \st \mathscr{C}_i)&\tag{by $(*^3)$}\\
-            &\leq f(\mathscr{C}_i) + k \cdot \Delta (S_{i+1} \st \mathscr{C}_i)&\\
-            &\leq f(\mathscr{C}_i) + k \cdot \left( f(\mathscr{C}_{i+1}) - f(\mathscr{C}_i) \right)&
-        \end{flalign*}
-        In the step marked by $(*^1)$, we ``unpack'' the function $f$ as a \textbf{telescoping series}, where each term, except the first and the last, cancels itself with the next one, so that the result doesn't change, but we can rewrite the expression in a more convenient way for our proof (more about telescoping series \href{https://en.wikipedia.org/wiki/Telescoping_series}{on Wikipedia}).\\
-        In the step marked by $(*^2)$, we exploit the \textbf{diminishing returns} property of the function $f$ to give an upper bound, that is, if we already have a big number of sets (i.e., $\{S_1^*, \ldots, S_{j-1}^*\} \cup \mathscr{C}_i$), the gain $\Delta$ a new set $S_j^*$ can give us, is less significant then the gain we obtain if we have less sets (i.e., just $\mathscr{C}_i$) (more about diminishing returns \href{https://en.wikipedia.org/wiki/Diminishing_returns}{on Wikipedia}).\\
-        The step marked by $(*^3)$ is due to the fact that Greedy maximizes the value of $S$, so, if $S^*$ had been better then $S_{i+1}$, Greedy would have kept $S^*$, instead of picking a new set $S_{i+1}$.
-        Furthermore, let's note that in the steps $(*^2)$ and $(*^3)$ we are removing the dependencies on the optimal solution, first on the left and then on the right in the argument of $\Delta$.
+        \begin{align*}
+                  f(T^*)
+            &\leq f(T^* \cup T^{(i)}) & \text{(by optimality of of $T^*$)}&\\
+            &=    f(T^* \cup T^{(i)}) + \sum_{j = 0}^{k - 1} \left( f(T^*[j] \cup T^{(i)}) - f(T^*[j] \cup T^{(i)}) \right)         & \text{(zero sum)} \\
+            &=    f(T^*[0] \cup T^{(i)}) + \sum_{j = 0}^{k - 1} \left( f(T^*[j + 1] \cup T^{(i)}) - f(T^*[j] \cup T^{(i)}) \right)  & (T^*[k] = T^*) \\
+            &=    f(T^{(i)}) + \sum_{j = 0}^{k - 1} \left( f(T^*[j + 1] \cup T^{(i)}) - f(T^*[j] \cup T^{(i)}) \right)              & (T^*[0] = \emptyset) \\
+            &=    f(T^{(i)}) + \sum_{j = 0}^{k - 1} \incr \left( S^*_{j + 1}, T^*[j] \cup T^{(i)} \right)                           & \left( \begin{aligned} \text{by $\incr$ definition [\ref{eq:mcp-dsa}]} \\ T^*[j + 1] \setminus T^*[j] = S^*_{j + 1} \end{aligned} \right) \\
+            &\leq f(T^{(i)}) + \sum_{j = 0}^{k - 1} \incr \left( S^*_{j + 1}, T^{(i)} \right)                                       & \text{(by proposition [\ref{prop:mcp-dimret}])} \\
+            &=    f(T^{(i)}) + \sum_{j = 1}^k \incr \left( S^*_j, T^{(i)} \right)                                                   & \text{(index shift)} \\
+            &\leq f(T^{(i)}) + \sum_{j = 1}^k \incr \left( A^{(i + 1)}, T^{(i)} \right)                                             & \text{(by proposition \ref{prop:mcp-greediness})} \\
+            &=    f(T^{(i)}) + k \cdot \incr \left( A^{(i + 1)}, T^{(i)} \right)                                                    & \\
+            &=    f(T^{(i)}) + k \cdot \left( f(T^{(i + 1)}) - f(T^{(i)}) \right)                                                   & \left( T^{(i + 1)} = T^{(i)} \cup A^{(i + 1)} \right)
+        \end{align*}
     \end{proof}
 
-    With Lemma [\ref{l:mcp-1}] we shown that, at each step of Greedy, the partial solution $\mathscr{C}_i$ gives an upper bound to the optimal solution.\\
-    Now we want to prove that the difference between the partial and the optimal solution, bounded by $k \cdot \left( f(\mathscr{C}_{i+1}) - f(\mathscr{C}_i) \right)$, shrinks as the algorithm proceeds with its iterations.
+    What lemma [\ref{l:mcp-1}] essentially proves is that, at each iteration, the partial solution $T^{(i)}$ held by the algorithm enforces an upper bound for the partial optimal solutions.
     
-    Let's define the difference between the optimal solution and the partial solution at time $i$ as\\
-    $\delta_i := f(\mathscr{C}^*) - f(\mathscr{C}_i)$.
+    Now it is desirable to prove that such excess, $k \cdot \left( f(T^{(i + 1)}) - f(T^{(i)}) \right)$, shrinks as the algorithm proceeds with its iterations. Define the difference between the optimal solution and the partial solution at time $i$ as $\delta_i := f(T^*) - f(T^{(i)})$.
     
-    \begin{obs}\label{obs:mcp-1}
-        $\delta_i - \delta_{i+1} = f(\mathscr{C}^*) - f(\mathscr{C}_i) - \left( f(\mathscr{C}^*) - f(\mathscr{C}_{i+1}) \right) = f(\mathscr{C}_{i+1}) - f(\mathscr{C}_i)$.
-    \end{obs}
+    \begin{observation}\label{obs:mcp-1}
+        $\delta_i - \delta_{i+1} = f(T^*) - f(T^{(i)}) - \left( f(T^*) - f(T^{(i + 1)}) \right) = f(T^{(i + 1)}) - f(T^{(i)})$.
+    \end{observation}
     
-    \begin{lem}\label{l:mcp-2}
+    \begin{lemma}\label{l:mcp-2}
         The difference between the optimal solution and the partial solution at time $i$ decreases as $i$ increases:
-        \begin{equation}
-            \delta_{i+1} \leq \left(1 - \frac{1}{k}\right) \delta_i.
-        \end{equation}
-    \end{lem}
+        \[
+            \delta_{i + 1} \leq \left( 1 - \frac{1}{k} \right) \delta_i
+        \]
+    \end{lemma}
     \begin{proof}
-        \begin{flalign*}
-            &f(\mathscr{C}^*) - f(\mathscr{C}_i) \leq k \cdot \left( f(\mathscr{C}_{i+1}) - f(\mathscr{C}_i) \right)&\tag{by lemma [\ref{l:mcp-1}]}\\
-            &\implies \delta_i \leq k \cdot \left( f(\mathscr{C}_{i+1}) - f(\mathscr{C}_i) \right)&\\
-            &\implies \delta_i \leq k \cdot \left( \delta_i - \delta_{i+1} \right)&\tag{by observation [\ref{obs:mcp-1}]}\\
-            &\implies k \cdot \delta_{i+1} \leq k \cdot \delta_i - \delta_i&\\
-            &\implies k \cdot \delta_{i+1} \leq (k-1) \cdot \delta_i&\\
-            &\implies \delta_{i+1} \leq \left(1 - \frac{1}{k}\right) \delta_i&
-        \end{flalign*}
+        \begin{align*}
+            f(T^*) - f(T^{(i)})     \leq&\ k \cdot \left( f(T^{(i + 1)}) - f(T^{(i)}) \right)   & \text{(by lemma [\ref{l:mcp-1}])} \\
+            \delta_i                \leq&\ k \cdot \left( f(T^{(i + 1)}) - f(T^{(i)}) \right)   & \\
+            \delta_i                \leq&\ k \cdot \left( \delta_i - \delta_{i + 1} \right)     & \text{(by observation [\ref{obs:mcp-1}])} \\
+            k \cdot \delta_{i + 1}  \leq&\ k \cdot \delta_i - \delta_i                          & \\
+            k \cdot \delta_{i + 1}  \leq&\ (k - 1) \cdot \delta_i                               & \\
+            \delta_{i + 1}          \leq&\ \left( 1 - \frac{1}{k} \right) \delta_i              & 
+        \end{align*}
     \end{proof}
 
-    By applying Lemma [\ref{l:mcp-2}], we can finally prove Theorem [\ref{thm:mcp-greedy}]:
-    \begin{flalign*}
-        &\delta_0 = f(\mathscr{C}^*) - f(\mathscr{C}_0) = f(\mathscr{C}^*)&\\
-        &\delta_1 \leq \left( 1 - \frac{1}{k} \right) \cdot \delta_0 = \left( 1 - \frac{1}{k} \right) \cdot f(\mathscr{C}^*)&\\
-        &\cdots&\\
-        &\delta_i \leq \left( 1 - \frac{1}{k} \right) \cdot \delta_{i-1} = \left( 1 - \frac{1}{k} \right)^i \cdot f(\mathscr{C}^*)&\\
-        &\delta_k \leq \left( 1 - \frac{1}{k} \right)^k \cdot f(\mathscr{C}^*)&\\
-        &\text{Thus } f(\mathscr{C}^*) - f(\mathscr{C}_k) \leq \left( 1 - \frac{1}{k} \right)^k \cdot f(\mathscr{C}^*)&\\
-        &\implies f(\mathscr{C}_k) \geq \left( 1 - \left( 1 - \frac{1}{k} \right)^k \right) \cdot f(\mathscr{C}^*) \geq \left( 1 - \frac{1}{e} \right) \cdot f(\mathscr{C}^*)&\tag{by limit [\ref{eq:limit-1/e}]}
-    \end{flalign*}
-    Let's note that $f(\mathscr{C}_k)$ is the value returned by Greedy, so the theorem is proved.
+    \begin{corollary}
+        \[
+            \delta_k \leq \left( 1 - \frac{1}{k} \right)^k \delta_0 = \left( 1 - \frac{1}{k} \right)^k f(T^*)
+        \]
+    \end{corollary}
+
+    Therefore:
+    \begin{align*}
+        f(T^*) - f(T^{(k)}) \leq&\ \left( 1 - \frac{1}{k} \right)^k f(T^*)              & \\
+        \left( 1 - \left( 1 - \frac{1}{k} \right)^k \right) f(T^*) \leq&\ f(T^{(k)})    & \\
+        \left( 1 - \frac{1}{e} \right) f(T^*) \leq&\ f(T^{(k)})                         & \text{(by limit [\ref{eq:limit-1/e}])} \\
+    \end{align*}
+    Since $f(T^{(k)})$ is the subset returned by the algorithm $\mcgre$, the proof is complete.
 \end{proof}
 
-\begin{cor}
-    The greedy algorithm [\ref{lst:mcp-greedy}] is optimal, that is, it gives the best possible approximation to the max cover problem.
-\end{cor}
+\begin{corollary}
+    $\mcgre$ is optimal: it gives the best possible approximation to the max cover problem.\footnote{The best approximation efficiently obtainable for any submodular-related problem is proven to be up to a factor of $\left( 1 - \frac{1}{e} \right)$}
+\end{corollary}
 
-\begin{obs}
-    The greedy algorithm [\ref{lst:mcp-greedy}] returns a pretty good approximation of the optimal solution even after only half of the $k$ iterations:
-    \begin{flalign*}
-        &f(\mathscr{C}^*) - f(\mathscr{C}_i) \leq \left( 1 - \frac{1}{k} \right)^i \cdot f(\mathscr{C}^*)&\\
-        &\implies f(\mathscr{C}_i) \geq \left( 1 - \left( 1 - \frac{1}{k} \right)^i \right) \cdot f(\mathscr{C}^*)&\\
-        &\implies \text{if } i=\frac{k}{2},\ f(\mathscr{C}_i) \geq \left( 1 - e^{-1/2} \right) \cdot f(\mathscr{C}^*)&
-    \end{flalign*}
-    This means that taking $k/2$ sets instead of $k$ gives us a worse approximation, but not so worse: note that the approximation we obtain using $k$ is $1-\frac{1}{e} = 0.632$, while the approximation obtained using $k/2$ is $1 - e^{-1/2} = 0.393$.
-    
-    This result can be extraordinarily useful if we don't actually know the value of $k$.
-\end{obs}
+Note that this algorithm returns a pretty good approximation of the optimal solution even after only half of the $k$ iterations: the approximation factor incurred by performing all $k$ steps is $1 - \frac{1}{e} \simeq 0.632$, whereas performing only half of the total steps shrinks it to $1 - \frac{1}{e}^{\frac{1}{2}} \simeq 0.393$. This result is extraordinarily useful especially when a maximum iteration count $k$ is not given. Perhaps surprisingly, $\mcgre$ gives a useful approximation even at the first iteration:
+\[
+    f(T^*) - f(T^{(1)}) = \delta_1 \leq \left( 1 - \frac{1}{k} \right) f(T^*) \quad \implies \quad f(T^{(1)}) \geq \frac{1}{k} f(T^*)
+\]
 
-An other and even more surprising property is the following one:
-\begin{obs}
-    Already at the first iteration, Greedy gives us a useful approximation of the optimal solution:
-    \begin{flalign*}
-        &f(\mathscr{C}^*) - f(\mathscr{C}_1) \leq \left( 1 - \frac{1}{k} \right) \cdot f(\mathscr{C}^*)&\\
-        &\implies f(\mathscr{C}_1) \geq \frac{1}{k} \cdot f(\mathscr{C}^*)&
-    \end{flalign*}
-    This strong and rare property is due to the fact that the first set we pick is the most significant one, since it has the biggest cardinality.
-\end{obs}
+This is because the first set picked by the algorithm is essentially the one with largest cardinality; also, if $k = 1$ then such solution would trivially be optimal.
 
+\section{Submodular functions}
 
-\section{Submodular functions}\label{sec:submodular}
+Let $f: \powerset(U) \to \real$ be a function on sets:
 
-Let's take a function $f: 2^{[n]} \to \mathbb{R}$, we can define three classes of functions:
-\begin{defn}[Modular function]\label{def:submodular}
+\begin{definition}[Modular function]\label{def:modular}
     $f$ is modular if, $\forall\ S, T \subseteq [n]$,
     \begin{equation}\label{eq:modular}
         f(S) + f(T) = f(S \cup T) + f(S \cap T).
     \end{equation}
-\end{defn}
-\begin{defn}[Submodular function]\label{def:modular}
+\end{definition}
+
+\begin{definition}[Submodular function]\label{def:submodular}
     $f$ is submodular if, $\forall\ S, T \subseteq [n]$,
     \begin{equation}\label{eq:submodular}
         f(S) + f(T) \geq f(S \cup T) + f(S \cap T).
     \end{equation}
-\end{defn}
-\begin{defn}[Supermodular function]\label{def:supermodular}
+\end{definition}
+
+\begin{definition}[Supermodular function]\label{def:supermodular}
     $f$ is supermodular if, $\forall\ S, T \subseteq [n]$,
     \begin{equation}\label{eq:supermodular}
         f(S) + f(T) \leq f(S \cup T) + f(S \cap T).
     \end{equation}
-\end{defn}
+\end{definition}
 
-\begin{ex}[Modular function]
-    The cardinality function is modular:
+\begin{example}[Modular function]
+    Set cardinality as a function is modular:
     \begin{itemize}
-        \item $f(S)=|S|$ and $f(T)=|T|$,
+        \item $f(S) = |S|$ and $f(T) = |T|$,
         \item $f(S \cap T) = |S \cap T|$,
-        \item $f(S \cup T) = |S \cap T| + |S \Delta T$,
-        \item $f(S) + f(T) = 2 |S \cap T| + |S \Delta T$,
-        \item $2 |S \cap T| + |S \Delta T = |S \cap T| + |S \cap T| + |S \Delta T|$.
+        \item $f(S \cup T) = |S \cap T| + |S \symdiff T|$,
+        \item $f(S) + f(T) = 2 |S \cap T| + |S \symdiff T|$,
+        \item $2 |S \cap T| + |S \symdiff T| = |S \cap T| + |S \cap T| + |S \symdiff T|$.
     \end{itemize}    
-\end{ex}
+\end{example}
 
-\begin{ex}[Subodular function]
+\begin{example}[Submodular function]
     The coverage function [\ref{eq:coverage}] is submodular:
     \begin{itemize}
         \item let $S=\{\{1,2\}\}$ and $T = \{\{1\}\}$
@@ -207,227 +240,222 @@ Let's take a function $f: 2^{[n]} \to \mathbb{R}$, we can define three classes o
         \item $f(S) + f(T) = 3$,
         \item $3 > 2$.
     \end{itemize}    
-\end{ex}
+\end{example}
 
-\begin{thm}\label{thm:modular}
+\begin{theorem}\label{thm:modular}
     $f(S)$ is modular iff $\exists\ z, w_1, \ldots, w_{|S|}$ such that
     \begin{equation}
         f(S) = z + \sum_{i \in S} w_i.
     \end{equation}
-\end{thm}
+\end{theorem}
+
+\todo{Unproven}
 
 
 \subsection{Submodular functions properties} \label{sec:submodular-properties}
 
-\begin{lem}[Diminishing return property] \label{lem:dim-return}
-    If $f$ is submodular and $S \subseteq T$, $i \notin T$, then
-    \begin{equation}
-        \Delta(i|S) \geq \Delta(i | T).
-    \end{equation}
-\end{lem}
-Before going into the proof, let's recall that $\Delta(i|S)$ is the incremental gain at $S$ of $i$, as defined in [\ref{def:incremental-gain}].
-\begin{proof}
-    Let's take $A = S \cup {i}, B = T$;
-    \begin{flalign*}
-        f(A) + f(B) &\geq f(A \cup B) + f(A \cap B)& \tag{by submodularity}\\
-        f(S \cup \{ i\} ) + f(T) &\geq f(T \cup \{ i\}) + f(S)& \tag{by definition of A,B} \\
-        f(S \cup \{ i \}) - f(S) &\geq f(T \cup \{i\}) - f(T)& \\
-        \Delta(i|S) &\geq \Delta(i | T)& \tag{by definition of $\Delta$ }
-    \end{flalign*}
-\end{proof}
+Here, the definition of incremental gain given back in \ref{def:incremental-gain} is carried over
 
-\begin{obs}
-    The lemma is actually an ``if and only if''; proof of the inverse implication is left as an exercise.
-\end{obs}
-
-\begin{obs}
-    If $f$ was modular in \cref{lem:dim-return} the equality would hold instead.
-\end{obs}
-
-\begin{lem}\label{lem:submodular-power-function}
-    If $f_1, f_2, \dots, f_k: 2^x \mapsto \mathbb{R}$ are submodular, and $\alpha_1, \alpha_2 , \dots, \alpha_k \geq 0$, then
-    \begin{equation}
-        g(S) := \sum_{i=1}^{k} \alpha_i f_i(S)
-    \end{equation}
-    is submodular as well.
-\end{lem}
+\begin{lemma}[Submodular diminishing returns] \label{lem:dim-return}
+    Proposition [\ref{prop:mcp-dimret}] is actually applicable to any submodular function $f$, with the added constraint that the objects $A$ must not be in $T$:
+    \[
+        S \subseteq T \quad \implies \quad \forall A \not\in T \; \incr (A, S) \geq \incr(A, T)
+    \]
+\end{lemma}
 
 \begin{proof}
-    \begin{flalign*}
-        g(S) + g(T) &= \sum_{i=1}^{k} \left(\alpha_i f_i(S)\right) + \sum_{i=1}^{k} \left(\alpha_i f_i(T)\right)&\\
-        &= \sum_{i=1}^{k} \left(\alpha_i f_i(S) + \alpha_i f_i(T)\right)& \\
-        &= \sum_{i=1}^{k} \left(\alpha_i \left( f_i(S) + f_i(T) \right)\right)&\\
-        &\geq \sum_{i=1}^{k} \left(\alpha_i \left(f_i (S \cap T) + f_i (S \cup T) \right)\right)&\tag{by submodularity} \\
-        &= \sum_{i=1}^{k} \left(\alpha_i f_i(S \cap T)\right) + \sum_{i=1}^{k} \left(\alpha_i f_i (S \cup T)\right)& \\
-        &= g(S \cap T) + g(S \cup T)&
-    \end{flalign*}
+    Starting from the submodular inequality, the two families that give the result of interest are $T$ and $S \cup \{A\}$:
+    \begin{align*}
+        f(S \cup \{A\}) + f(T)  &\geq f((S \cup \{A\}) \cup T) + f((S \cup \{A\}) \cap T)   & \text{(by definiton of submodular function)} \\
+        f(S \cup \{A\}) + f(T)  &\geq f(T \cup \{A\}) + f(S)                                & \\
+        f(S \cup \{A\}) - f(S)  &\geq f(T \cup \{A\}) - f(T)                                & \\
+        \incr (A, S)            &\geq \incr(A, T)                                           & \text{(by definition of incremental gain)} \\
+    \end{align*}
 \end{proof}
 
-\begin{obs}
-    If one of the $\alpha$s is negative the \cref{lem:submodular-power-function} doesn't hold.
-\end{obs}
+The lemma is actually proven to work both ways; the reverse implication is left to prove as an exercise. Also, if $f$ is modular, the equality holds instead.
+
+\begin{lemma}\label{lem:submodular-power-function}
+    Let $f_i$ be a collection of $k$ submodular functions, and $\alpha_i$ a corresponding collection of nonegative reals. Then their linear combination $g$ is also submodular:
+    \[
+        g(S) = \sum_{i = 1}^k \alpha_i f_i(S)
+    \]
+\end{lemma}
+
+\begin{proof}
+    \begin{align*}
+               g(S) + g(T) 
+           =&\ \sum_{i = 1}^k \left( \alpha_i f_i(S) \right) + \sum_{i = 1}^k \left( \alpha_i f_i(T) \right)                & \\
+           =&\ \sum_{i = 1}^k \alpha_i \left( f_i(S) + f_i(T) \right)                                                       & \\
+        \geq&\ \sum_{i = 1}^k \alpha_i \left( f_i (S \cap T) + f_i (S \cup T) \right)                                       & \text{(by submodularity)} \\
+           =&\ \sum_{i = 1}^k \left( \alpha_i f_i(S \cap T)\right) + \sum_{i = 1}^k \left( \alpha_i f_i (S \cup T) \right)  & \\
+           =&\ g(S \cap T) + g(S \cup T)                                                                                    &
+    \end{align*}
+    
+    Note that if negative coefficients $\alpha_i$ are introduced, the lemma fails.
+\end{proof}
+
 
 \subsection{One particular submodular function}
 
-\begin{defn}\label{def:fca}
-    Let $\mathscr{C} \subseteq 2^{[n]}, \ w: \mathscr{C} \mapsto \mathbb{R}_{\geq 0 }, \ A \subseteq [n]$,
-    \begin{equation}
-        f_\mathscr{C}(A) = \sum_{S \in \mathscr{C}}\left( w(S) \cdot \left[ A \cap S \neq \emptyset \right] \right).
-    \end{equation}
-\end{defn}
-%
-This function looks for all the sets of a class and sums the weights of the ones that intersect the parameter set.
+\begin{definition}\label{def:fca}
+    Let $w$ be a function that assigns a nonnegative weight on all subsets of a subset family $T$. Define the function:
+    \[
+        f_w(A) = \sum_{\substack{S \in T \\ S \cap A \neq \emptyset}} w(S)
+    \]
+\end{definition}
 
-\begin{ex}
-    Let $\mathscr{C} = \{\{1,2\}, \{2,3\}\},\ w(\{1,2\})=1,\ w(\{2,3\})=3$, then $f_{\mathscr{C}}(\{1\})=1$ and $f_{\mathscr{C}}(\{2\})=4$.
-\end{ex}
+This function sums the weights of the subsets intersecting the given set $A$.
 
-\begin{obs}
-    Note that the coverage function [\ref{eq:coverage}] can be written in this form too.
-\end{obs}
+\begin{example}
+    Let $T = \{\{1, 2\}, \{2, 3\}\}$, $w(\{1, 2\}) = 1$, $w(\{2, 3\}) = 3$. Then $f_w(\{1\}) = 1$ and $f_w(\{2\}) = 4$.
+\end{example}
 
-\begin{lem} \label{lem:fC-submodular}
-    $f_\mathscr{C}(A)$ is submodular.
-\end{lem}
-%
+Note how this function is similar to the coverage function [\ref{eq:coverage}].
+
+\begin{lemma} \label{lem:fC-submodular}
+    $f_w$ is submodular.
+\end{lemma}
+
 \begin{proof} 
-    Fix $A,B \subseteq [n]$; let 
-    \begin{flalign*}
-        \mathscr{C}_A &= \left\{ S | S \in \mathscr{C} \ \land \ S \cap A \neq \emptyset \ \land \ S \cap B = \emptyset \right\}& \\
-        \mathscr{C}_B &= \left\{ S | S \in \mathscr{C} \ \land  \ S \cap B \neq \emptyset \ \land \ S \cap A = \emptyset \right\}& \\
-        \mathscr{C}_{\cap} &= \left\{ S | S \in \mathscr{C} \ \land \ S \cap A \neq \emptyset \ \land \ S \cap B \neq \emptyset \right\}&
-    \end{flalign*}
-    \textit{i.e.}, $\mathscr{C}_A$ are the sets that intersect $A$ but not $B$, $\mathscr{C}_B$ are the sets that intersect $B$ but not $A$ and $\mathscr{C}_{\cap}$ are the sets that intersect both $A$ and $B$.
-    %
-    \begin{obs}
-        The conditions are mutually exclusive.
-    \end{obs}
+    Given $A$ and $B$ two subset families, partition $T$ in blocks based on whether the subsets contained in $T$ are disjoint from $A$ and/or $B$; in particular: 
+    \begin{align*}
+        T_A     &= \{S \in T : S \cap A \neq \emptyset \wedge S \cap B = \emptyset\} & \\
+        T_B     &= \{S \in T : S \cap A = \emptyset \wedge S \cap B \neq \emptyset\} & \\
+        T_{AB}  &= \{S \in T : S \cap A \neq \emptyset \wedge S \cap B \neq \emptyset\} &
+    \end{align*}
     
-    Then,
-    \begin{flalign*}
-        f_\mathscr{C}(A) &= \sum_{S \in \mathscr{C}_A}w(S) + \sum_{S \in \mathscr{C}_{\cap}}w(S)& \\
-        f_\mathscr{C}(B) &= \sum_{S \in \mathscr{C}_B}w(S) + \sum_{S \in \mathscr{C}_{\cap}}w(S)& \\
-        f_\mathscr{C}(A \cup B) &= \sum_{S \in \mathscr{C}_A}w(S) + \sum_{S \in \mathscr{C}_B}w(S) + \sum_{S \in \mathscr{C}_{\cap}}w(S)& \\
-        f_\mathscr{C}(A \cap B) &\leq \sum_{S \in \mathscr{C}_{\cap}}w(S)& \label{eq:AcapB-leq-sum}\tag{$*$}
-    \end{flalign*}
-    Note that \cref{eq:AcapB-leq-sum} is true because of cases like the one in \cref{fig:sets-intersect-empty}; in general in $\mathscr{C}_{\cap}$ there may be more sets than in $A \cap B$.
+    Since the conditions governing the partition are mutually exclusive, the function images can be reinterpreted in terms of such blocks:
+    \begin{align*}
+        f_w(A)             =&\ \sum_{S \in T_A} w(S) + \sum_{S \in T_{AB}} w(S)                         & \\
+        f_w(B)             =&\ \sum_{S \in T_B} w(S) + \sum_{S \in T_{AB}} w(S)                         & \\
+        f_w(A \cup B)      =&\ \sum_{S \in T_A} w(S) + \sum_{S \in T_B} w(S) + \sum_{S \in T_{AB}} w(S) & \\
+        f_w(A \cap B)   \leq&\ \sum_{S \in T_{AB}} w(S)                                                 &
+    \end{align*}
+    Note that the last image is not an equality because, in general, while a set $C$ in $T_{AB}$ does intersect both $A$ and $B$, it may also be simultaneously disjoint from $A \cap B$ as shown in figure \ref{fig:sets-intersect-empty}, and thus would not add its weight in $f_w(A \cap B)$.
 
     \begin{figure}[ht]
         \centering
-        \includegraphics[width=.5\textwidth]{sets-intersect-empty.png}
-        \caption{Set C has non-empty intersection with both B and A but does not intersect their intersection.}\label{fig:sets-intersect-empty}
+        \begin{tikzpicture}
+            \path[radius = 2.2]
+                (0, -2.2) node (c) {$C$}
+                arc[start angle = 270, end angle = 150] node (a) {$A$}
+                arc[start angle = 150, end angle = 30] node (b) {$B$}
+            ;
+            \draw
+                (a) circle (2)
+                (b) circle (2)
+                (c) circle (2)
+            ;
+        \end{tikzpicture}
+        \caption{An instance where $C$ intersects $A$ and $B$ and is disjoint from $A \cap B$}
+        \label{fig:sets-intersect-empty}
     \end{figure}
     
-    So we have that 
-    \begin{flalign*}
-        f_\mathscr{C}(A) + f_\mathscr{C}(B) &= \sum_{S \in \mathscr{C}_A}w(S) + \sum_{S \in \mathscr{C}_B}w(S) + 2 \sum_{S \in \mathscr{C}_{\cap}} w(S)& \\
-                        &= f_\mathscr{C}(A \cup B) + \sum_{S \in \mathscr{C}_{cap}} w(S)& \\
-                        &\geq f_\mathscr{C}(A \cup B) + f_\mathscr{C}(A \cap B)& \tag{by inequality \cref{eq:AcapB-leq-sum}}
-    \end{flalign*}
-    And this finally prove the lemma [\ref{lem:fC-submodular}].
+    Adding $f_w(A)$ and $f_w(B)$ together in terms of the above sums:
+    \begin{align*}
+               f_w(A) + f_w(B) 
+           =&\ \sum_{S \in T_A} w(S) + \sum_{S \in T_B} w(S) + 2 \sum_{S \in T_{AB}} w(S)   & \\
+           =&\ f_w(A \cup B) + \sum_{S \in T_{AB}} w(S)                                     & \\
+        \geq&\ f_w(A \cup B) + f_w(A \cap B)                                                & 
+    \end{align*}
+    which is indeed the submodular inequality for $f_w$.
 \end{proof}
 
-\begin{obs}
-    Note that $f_\mathscr{C}(A)$ could not be directly computable, since if there is an exponential number of subset $S \in \mathscr{C}$, we must compute a sum for each of them, and this requires exponential time.
-\end{obs}
+Note that for very large subsets families $T$, computing $f_w$ becomes impractical, because it requires computing a sum on each single subset in $T$.
 
 
-\section{KKT model}\label{sec:ktt}
+\section{\textsc{Kkt} model}
 
-KKT stands for Kempe, Kleinsberg and Tardos.
-Let's assume we have $k$ gift products to give to $k$ persons for free for marketing reasons; let's assume as well that whenever a person buys the product he keeps it forever.
+%This model has been designed by Kempe, Kleinsberg and Tardos, and has the purpose of .
 
-Moreover, let's assume that time is discrete and that the product spreads over time:
+This case study is about product giveaway for advertising purposes: assume there is a stock of $k$ products, and $k$ persons receive one each; the goal of such is to spread information about the product starting from the former $k$ persons. The model is constructed from the following rules:
+
 \begin{itemize}
-    \item at time $t_0$ the only persons having the product will be the ones that got it for free;
-    \item at time $t_i$ for each of the edges incident on the nodes having the product we will be flipping a coin:
+    \item the social network is modeled by an undirected graph;
+    \item \emph{influential} nodes are those with high degree;
+    \item each person receiving a product keeps it forever;
+    \item the information spread takes place in discrete time steps:
     \begin{itemize}
-        \item with prob $p$ the product will spread on that edge;
-        \item else the edge is lost forever.
+        \item at time $t_0$, the only persons having knowledge the product are those that received it during the giveaway;
+        \item at time $t_i$, for each of the edges incident on the nodes knowing the product, a coin is flipped: with prob $p$ the information will spread on such edge, otherwise the edge is removed from the graph.
     \end{itemize}  
 \end{itemize} 
 
-While this point of view is dynamic, there is a static point of view which states the following:
-Regardless of which nodes are activated at time 0 what actually happens is that a coin is flipped indipendently for each edge in the graph:
-%
+Despite the model having an apparent temporal nature, note that each edge in the network gets to flip exactly one coin regardless of when it is actually flipped, and all coin throws are independent. This makes it equivalent to flip all coins at once, and by looking at the components of the resulting graph:
 \begin{itemize}
-    \item if the coin is $H$ (head), the edge will stay there;
-    \item else, the edge will be removed (won't be used for spreading the product).
-\end{itemize}
-%
-Nature will then make its choices, removing some edges. 
-By looking at the connected components after nature removes the edges we see that:
-%
-\begin{itemize}
-    \item each connected component containing at least one seed node will be fully conquered;
-    \item the others will be forever lost.
+    \item each component containing at least one starting node will be completely informed;
+    \item the others will be oblivious.
 \end{itemize}
 
-If we knew the final components, it would be clear which seed set to choose (we would sort the components by decreasing size and pick one node for each of the first $k$ components); sadly, this is not the case because the set of seed nodes must be chosen a priori.
+Knowing the final components makes picking the right starting nodes simple: sort the components by decreasing size and pick one node for each of the first $k$ components. However, this is not the case because the starting nodes must be chosen beforehand.
 
-Suppose that, after nature's random choices, $A$ is the set of ``\textit{used}'' or ``\textit{survived}'' edges, and $\mathscr{C}_A$ is the partition of the node set $V$ into connected components with $A$ as the edge set.\\
-Let $R(S)$ be the set of nodes ``\textit{conquered}'' with seed set $S$; this is clearly a random variable depending on which edges survive.
+Nevertheless, this conundrum can be solved in a probabilistic way. Consider an instance of this problem, throw all the coins, and let $A \subseteq E(G)$ be the set of edges that are not removed from the graph, and $T_A$ the partition of the nodes grouping them into the resulting connected components. Let $R(S)$ be the set of nodes informed by the starting nodes in $S$; this is clearly a random variable depending on which edges survive. Now it is possible to comput the expected cardinality of the reached set $R(S)$ conditioned on the edge set $A$, which is what the original problem wants to maximize:
 
-We can now ask what's the expected cardinality of the reached set $R(S)$ conditioned on the used edges set $A$; we, in fact, would like to maximize this quantity:
-\begin{equation}
-    E\left[\abs{R(S)} \big\rvert A\right] = \sum_{T \in \mathscr{C}_A}{\left( \abs{T} \cdot \left[ T \cap S \neq \emptyset \right] \right)} =: f_A(S)
-\end{equation}
+\[
+    \expect(\abs{R(S)} \knowing A) = \sum_{\substack{S_i \in T_A \\ S_i \cap S \neq \emptyset}} \abs{S_i}
+\]
 
 \begin{claim}
-    $f_A$ is submodular. 
+    Let $f_A(S)$ be the expected reach $\expect(\abs{R(S)} \knowing A)$ of a \textsc{kkt} instance parameterized by $S$. Then $f_A$ is submodular. 
 \end{claim}
+
 \begin{proof}
-    Follows from \cref{lem:fC-submodular}.
+    Note how the definition of $f_A$ is much similar to the function $f_w$ defined in \ref{lem:fC-submodular}; the only difference is in the weight function $w$ of $f_w$ being the set cardinality in $f_A$
 \end{proof}
 
-Moreover, we can define the expected value as a function of $S$ without conditioning it on a particular $A$ by using the law of total expectation.
+Moreover, the conditioning by $A$ in $f_A$ can be removed by total expectation:
 \begin{equation}\label{eq:sub-fs}
-    f(S) = \sum_{A \subseteq E}\left( f_A(S) \cdot Pr\left\{ A \text{ is the set of survived edges} \right\} \right) = E\left[ \abs{R(S)} \right]
+    \expect(\abs{R(S)}) = \sum_{A \subseteq E} \left( \expect(\abs{R(S)} \knowing A) \cdot \Pr[A] \right) = \sum_{A \subseteq E} \left( f_A(S) \cdot \Pr[A] \right) = f(S)
 \end{equation}
 
 \begin{claim}
-    $f(S)$ is submodular.
+    $f$ is submodular.
 \end{claim}
 \begin{proof}
-    Follows from \cref{lem:submodular-power-function}.
+    $f$ is by definition a nonnegative linear combination of submodular functions; by lemma \ref{lem:submodular-power-function}, $f$ is submodular too.
 \end{proof}
 
-The problem in optimazing this function is that computing it on a single set takes exponential time, but it can be approximated very well; as an exercise you can try to give the best sampling algorithm to do it (hint: an approximation can be obtained by using [\ref{eq:chebyshev}]). Note that it is possible to compute the average among the various results because the value of $f(S)$ is bounded between $k$ and $n$.
+\todo{Elaborate better
 
-The good news is that, since $f(S)$ is submodular, we already have an algorithm to optimize it, that is a slight variation of the one we discussed in section \nameref{sec:max-cover}, as we will see in the next section.
-
+The problem in optimizing this function is that computing it on a single set takes exponential time, but it can be approximated very well; as an exercise you can try to give the best sampling algorithm to do it (hint: an approximation can be obtained by using [\ref{eq:chebyshev}]). Note that it is possible to compute the average among the various results because the value of $f(S)$ is bounded between $k$ and $n$.
+}
 
 \section{A greedy algorithm for submodular functions.} \label{sec:submodular-greedy}
 
-Now we present a greedy algorithm that gives an approximation for $f(S)$ [\ref{eq:sub-fs}], and -- as we will see -- for any monotone, non-negative and submodular function:
-\begin{lstlisting}[caption={Greedy algorithm},label={lst:fS-greedysm}]
-$Greedy_{f,\varepsilon}$($k$):
-    $S_0 \gets \emptyset$
-    for $i = 1, \ldots, k$:
-        let $x_i \ be \ s.t. \ \Delta(x_i|S_{i-1}) \geq (1- \varepsilon) \cdot \max_x \Delta(x | S_{i-1})$
-        $S_i \gets S_{i-1} \cup \{x_i\}$
-    return $S_k$
-\end{lstlisting}
-Note that this is almost the same algorithm as [\ref{lst:mcp-greedy}], with the exception that we don't pick the element that maximize $f$, but a $(1-\varepsilon)$-approximation ot the optimal element.
+The algorithm used to solve the Max cover problem can be refined and generalized to work for any monotone, nonnegative submodular function function $f$, with some tweaks:
 
-\begin{thm}\label{thm:sub-greedy}
-    If $f$ is monotone, non-negative and submodular, then Greedy returns a $(1-e^{-1+\epsilon})$-approximation.
-\end{thm}
-\obs Note that $1-e^{-1+\epsilon} = 1 - \frac{1}{e} - O(\varepsilon)$.
-\begin{proof}[Proof of \cref{thm:sub-greedy}]
-    Let's pick an optimal solution $S^{*} = \{x_1^*, x_2^*, \ldots, x_k^*\}$, $\forall\ i \in \{0, \ldots, k-1\}$ we have that:
-    \begin{flalign*}
-            f(S^*) &\leq f(S^* \cup S_i)    \tag{by monotonicity of $f$}&\\
-            &= f(S_i) + \left( f(\{x_1^*\} \cup S_i) - f(S_i) \right)&\\
-            &\phantom{\ = f(S_i)} + \left( f(\{x_1^*, x_2^*\} \cup S_i ) - f(\{x_1^*\} \cup S_i) \right)&\\
-            &\phantom{\ = f(S_i)} + \ldots&\\
-            &\phantom{\ = f(S_i)} + \left( f(\{x_1^*, \ldots, x_{k}^*\} \cup S_i ) - f(\{x_1^*, \ldots, x_{k-1}^*\} \cup S_i) \right)&\\
-            &\phantom{\ = f(S_i)} + \left( f(S^* \cup S_i \right) - f(\{x_1^*, \ldots, x_{k-1}^*\} \cup S_i)&\tag{telescoping series -- see $(*^1)$}\\
-            &= f(S_i) + \Delta(x_1^* | S_i) + \Delta(x_2^* | S_i \cup \{x_1^*\}) + \ldots + \Delta(x_k^* | S_i \cup \{x_1^*, \ldots, x_{k-1}^*\})\tag{by definition of $\Delta$ [\ref{eq:mcp-dsa}]}\\
-            &= f(S_i) + \sum_{j=1}^{k} \left( \Delta(x_j^* | S_i \cup \{x_1^*, \ldots, x_{j-1}^*\})\right)\\
-            &\leq f(S_i) + \sum_{j=1}^{k} \left( \Delta(x_j^* | S_i )\right)&\tag{by diminishing returns -- see $(*^2)$}\\
-            &\leq f(S_i) + \sum_{j=1}^{k} \left( \frac{1}{1-\varepsilon}\Delta(x_{i+1} | S_i )\right)&\tag{by greedy choice}\\
-            &= f(S_i) +\frac{k}{1-\varepsilon} \Delta(x_{i+1} | S_i )&
-    \end{flalign*}
-    where $(*^1)$ and $(*^2)$ are explained in detail in the proof of \cref{l:mcp-1}.
+\begin{lstlisting}[caption = {Greedy algorithm for submodular functions}, label = {lst:fS-greedysm}]
+algorithm $\subgre(f, \varepsilon, S, k)$:
+    $T \gets \emptyset$
+    for $i = 1, \ldots, k$:
+        let $A \in S$ be such that $\incr_f(A, T) \geq (1 - \varepsilon) \cdot \max_{S_i \in S} \left( \incr_f(S_i, T) \right)$
+        $T \gets T \cup \{A\}$
+        $S \gets S \setminus \{A\}$
+    return $T$
+\end{lstlisting}
+
+Apart from the new parameters that convey the generalization of the algorithm, the relevant tweak consists in picking the subset $A$ that is a $(1 - \varepsilon)$-approximation ot the optimal, instead of just maximizing $f(A)$.
+
+\begin{proposition}\label{prop:subgreediness}
+    The greediness of $\subgre$ can be formalized as follows:
+    \[
+        \forall A \in S\; \forall 0 \leq i \leq k - 1 \qquad \incr \left( A, T^{(i)} \right) \leq \oneover{1 - \varepsilon} \cdot \incr \left( A^{(i + 1)}, T^{(i)} \right)
+    \]
+\end{proposition}
+
+\begin{theorem}\label{thm:sub-greedy}
+    If $f$ is monotone, non-negative and submodular, then Greedy returns a $(1 - e^{\varepsilon - 1})$-approximation. Note that $1 - e^{\varepsilon - 1} = 1 - \oneover{e} - O(\varepsilon)$.
+\end{theorem}
+
+\begin{proof}
+    Let $T^* = \{S_1^*, S_2^*, \ldots, S_k^*\}$ be an optimal solution. By reusing some findings in the proof of lemma \ref{l:mcp-1}, for any iteration $i$:
+    \begin{align*}
+                   f(T^*) 
+            \leq&\ f(T^{(i)}) + \sum_{j = 1}^k \incr \left( S^*_j, T^{(i)} \right)                                          & \text{(by proof of lemma [\ref{l:mcp-1}])} \\
+            \leq&\ f(T^{(i)}) + \sum_{j = 1}^k \oneover{1 - \varepsilon} \cdot \incr \left( A^{(i + 1)}, T^{(i)} \right)    & \text{(by proposition [\ref{prop:subgreediness}])} \\
+               =&\ f(T^{(i)}) + \frac{k}{1 - \varepsilon} \cdot \incr \left( A^{(i + 1)}, T^{(i)} \right)                   &
+    \end{align*}
+
+    \todo{Unfinished, may need to translate some more of the proof of theorem \ref{thm:mcp-greedy}}
 \end{proof}

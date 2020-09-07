@@ -4,16 +4,28 @@
 \newcommand{\st}{\;\ifnum\currentgrouptype=16 \middle\fi|\;}
 
 \newcommand{\lsh}{\textsc{lsh}}
-\newcommand{\pgf}{\textsc{pgf}}
 \newcommand{\dna}{\textsc{dna}}
+% linear programming
 \newcommand{\lp}{\textsc{lp}}
-% erdos-renyi
+% nondet poly problem class
+\newcommand{\np}{\textsc{np}}
+% erdos-renyi algorithm
 \newcommand{\ergen}{\mathcal{G}en_{\textsc{er}}}
-% preferential attachment
+% preferential attachment algorithm
 \newcommand{\pagen}{\mathcal{G}en_{\textsc{pa}}}
-% first-edge
+% first-edge algorithm
 \newcommand{\ferec}{\mathcal{R}ec_{\textsc{fe}}}
+% Max Cover greedy algorithm
+\newcommand{\mcgre}{\mathcal{G}reedy_{\textsc{mc}}}
+% Submodular greedy algorithm
+\newcommand{\subgre}{\mathcal{G}reedy_{\textsc{sub}}}
 \newcommand{\randdist}{\mathcal{R}and}
+% incremental gain for submodular functions
+\newcommand{\incr}{\mathcal{I}ncr}
+
+% pgf acronym for text
+\newcommand{\pgf}{\textsc{pgf}}
+% pgf math symbol
 \newcommand{\pgfunc}{\mathcal{P}\!\textit{gf}}
 
 % Theorems
@@ -31,6 +43,8 @@
 % adds commands \abs and \norm (from https://tex.stackexchange.com/questions/43008/absolute-value-symbols)
 \DeclarePairedDelimiter\abs{\lvert}{\rvert}%
 \DeclarePairedDelimiter\norm{\lVert}{\rVert}%
+
+% code for inverting default behaviour with star variants
 \makeatletter
 \let\oldabs\abs
 \def\abs{\@ifstar{\oldabs}{\oldabs*}}
@@ -42,6 +56,8 @@
 \DeclareMathOperator*{\argmax}{arg\,max}
 \DeclareMathOperator*{\avg}{avg}
 \DeclareMathOperator*{\xor}{\oplus}
+
+\newcommand{\symdiff}{\mathrel{\vartriangle}}
 
 % other symbols
 \newcommand{\correct}{\ding{51}}

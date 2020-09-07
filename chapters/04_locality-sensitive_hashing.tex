@@ -156,16 +156,16 @@ then randomly pick an index value $i$, such as $8$. Then the hash function param
 
 \begin{lemma} Alternate formulation of the Hamming similarity:
     \[
-        \hammsim(A, B) = 1 - \frac{\abs{A \vartriangle B}}{\abs{U}}
+        \hammsim(A, B) = 1 - \frac{\abs{A \symdiff B}}{\abs{U}}
     \]
 \end{lemma}
 
 \begin{proof}
     \begin{align*}
         \hammsim(A, B) =&\ \frac{\abs{A \cap B} + \abs{\overline{A \cup B}}}{\abs{U}} & \\
-        =&\ \frac{\abs{A \cap B} + \abs{\overline{A \cup B}} + \abs{A \vartriangle B} - \abs{A \vartriangle B}}{\abs{U}} & \\
-        =&\ \frac{\abs{U} - \abs{A \vartriangle B}}{\abs{U}} & \\
-        =&\ 1 - \frac{\abs{A \vartriangle B}}{\abs{U}} &
+        =&\ \frac{\abs{A \cap B} + \abs{\overline{A \cup B}} + \abs{A \symdiff B} - \abs{A \symdiff B}}{\abs{U}} & \\
+        =&\ \frac{\abs{U} - \abs{A \symdiff B}}{\abs{U}} & \\
+        =&\ 1 - \frac{\abs{A \symdiff B}}{\abs{U}} &
     \end{align*}
 \end{proof}
 
@@ -278,15 +278,15 @@ In spirit of such practical perspective, the following mathematical definitions 
 
 Other similarities akin to $\jaccsim$ have been designed:
 \begin{align*}
-    D(A, B)  =&\ \frac{\abs{A \cap B}}{\abs{A \cap B} + \frac{1}{2} \abs{A \vartriangle B}} & \tag{S\o{}rensen-Dice similarity} \\
-    An(A, B) =&\ \frac{\abs{A \cap B}}{\abs{A \cap B} + 2 \abs{A \vartriangle B}}           & \tag{Anderberg similarity}
+    D(A, B)  =&\ \frac{\abs{A \cap B}}{\abs{A \cap B} + \frac{1}{2} \abs{A \symdiff B}} & \tag{S\o{}rensen-Dice similarity} \\
+    An(A, B) =&\ \frac{\abs{A \cap B}}{\abs{A \cap B} + 2 \abs{A \symdiff B}}           & \tag{Anderberg similarity}
 \end{align*}
 
 and they can be collectively expressed with a single similarity function parameterized on $\gamma$:
 
 \begin{definition}[$\gamma$-similarity]
     \begin{equation}
-    \displaystyle S_\gamma(A, B) = \frac{\abs{A \cap B}}{\abs{A \cap B} + \gamma \abs{A \vartriangle B}}
+    \displaystyle S_\gamma(A, B) = \frac{\abs{A \cap B}}{\abs{A \cap B} + \gamma \abs{A \symdiff B}}
     \end{equation}
 \end{definition}
 
@@ -521,7 +521,7 @@ Therefore $f_\gamma$ is a \pgf. Applying it to the Jaccard similarity:
         f_\gamma (\jaccsim(A, B))
     =&\ f_\gamma \left( \frac{\abs{A \cap B}}{\abs{A \cup B}} \right) \\
     =&\ \frac{\frac{\abs{A \cap B}}{\abs{A \cup B}}} {\frac{\abs{A \cap B}}{\abs{A \cup B}} + \gamma \frac{\abs{A \cup B} - \abs{A \cap B}}{\abs{A \cup B}}} \\
-    =&\ \frac{\abs{A \cap B}} {\abs{A \cap B} + \gamma \abs{A \vartriangle B}} \\
+    =&\ \frac{\abs{A \cap B}} {\abs{A \cap B} + \gamma \abs{A \symdiff B}} \\
     =&\ S_\gamma(A, B)
 \end{align*}
 
@@ -537,7 +537,7 @@ Sketches are an alternative method to \lsh-schemes for the concept of  represent
 \end{example}
 
 \begin{example}
-    It's possible to approximate $\frac{\abs{A \cap B}}{\abs{A \cap B} + \frac{1}{2}\abs{A \vartriangle B}}$ with $\frac{1}{2} \cdot \abs{A \cup B} + \frac{1}{2} \cdot \abs{A \cap B}$.
+    It's possible to approximate $\frac{\abs{A \cap B}}{\abs{A \cap B} + \frac{1}{2}\abs{A \symdiff B}}$ with $\frac{1}{2} \cdot \abs{A \cup B} + \frac{1}{2} \cdot \abs{A \cap B}$.
 \end{example}
 
 % TODO check
