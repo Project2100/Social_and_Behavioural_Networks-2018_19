@@ -1,75 +1,146 @@
 \chapter{Clustering}\label{sec:clustering}
 
-In clustering problems, we have a dataset of points in a multi-dimensional space, and we want to partition this dataset into a certain number of clusters, such that a certain distance or cost functions is minimized within the clusters and maximized among them.
+\newcommand{\cost}{\mathcal{C}\textit{ost}}
 
-In traditional approaches to this problem, the number of clusters $k$ is fixed in advance, and the algorithm partitions the dataset in the given number of clusters.\\
-The best known algorithms of this type are:\label{clust-k-algs}
-\begin{itemize}
+Clustering is a name that refers to a broad class of problems that involve sets of objects, usually modeled as points in a multidimensional space, with a notion of distance between each other; the goal is to group all the points in \emph{clusters} such that the given definition of distance is minimized among the points in each cluster, and maximized between points of different clusters.
+
+While the number of clusters need not be fixed, in some traditional approaches it is indeed fixed at a given value $k$; there are three widely known variants of clustering that are grouped together in what is called \emph{centroid-based clustering}:
+\begin{itemize}\label{clust-k-algs}
     \item \textit{k-medians}: find the location of the $k$ centers as to minimize the average distance between a point and a center;
     \item \textit{k-centers}: find the location of the $k$ centers as to minimize the maximum distance between a point and a center;
-    \item \textit{k-means}: find the location of the $k$ centers as to minimize the square of the distance between a point and a center;
+    \item \textit{k-means}: find the location of the $k$ centers as to minimize the square of the distance between a point and a center. This is the most used in practice because its objective functions resemble probability variance, thus it can be interpreted as the search of Gaussian distributions that randomly generate the points of the original dataset.
 \end{itemize}
 
-\obs The most used is k-means, because its objective functions resembles variance, and so it can be interpreted as the search of Gaussians that randomly generated the points of the dataset.
+\begin{example}
+    Consider a product delivery company having a dataset of users, each one with their geographic position in a map. The company has a large enough budget to deploy $k$ warehouses, and its goal is to find the best places to build them. A reasonable strategy would be to apply the \emph{k-medians} model, with the intent of minimizing the average distance between a user and its closest warehouse, therefore minimizing average delivery times.
+\end{example}
 
-\begin{thm}\label{thm:clustering-np}
-    k-medians, k-centers and k-means are NP-complete problems.
-\end{thm}
+\begin{example}
+    Consider a social network memorized as a dataset, where each user is modeled as a vector. Social networks of some significance are expected to contain billions of users, and each user's vector could have up to millions of dimensions.\footnote{this phenomenon is aptly named the \emph{curse of dimensionality}, of which an introduction can be found \href{https://en.wikipedia.org/wiki/Curse_of_dimensionality}{here}}
+    The distance between any two users might reveal how much they are similar, based on the assumption that friends share common interests; an efficient way to advertise specific products would be to group users in friendship clusters, and simply target specific ads to a whole cluster.
+\end{example}
 
-\begin{ex}
-    We have a dataset of vectors representing users of a social network. Each vector could have up to millions dimensions (this is called \href{https://en.wikipedia.org/wiki/Curse_of_dimensionality}{\textit{curse of dimensionality}}), and we could have billions of such vectors.\\
-    The distance between any pair of nodes tells us how much they are similar, so we want to cluster similar users to recommend them similar products or movies, or to send them similar ads.
-\end{ex}
-
-\begin{ex}
-    We are Amazon and we have a dataset of users, each one with his/her geographic position in a map, so the distance between two points is the actual distance between two users. We have a fixed budget to position $k$ warehouses, and we want to find the best places where to put them.\\
-    A good strategy could be to apply k-medians, so that each client, on average, is at the minimum possible distance from the warehouse.
-\end{ex}
-
-In real cases, often the number of clusters $k$ is not known \textit{a priori}, so one can use \textit{hierarchical clustering}, but this technique only produces some levels of grouping, so the user of the model still have to decide how many groups to use, and this is not always trivial.
-
-\begin{ex}
-    In the example in figure [\ref{fig:hierarchical-clustering-ex}] we can see that, after the algorithm groups the elements in levels of clusters, the user must decide which level to use, of if an intermediate number of clusters is preferable.
+Generally, centroid-based clustering problems are known to be \np-complete. In some real case studies, the number of clusters is not explicitly set, and other formulations like \textit{hierarchical clustering} are used. However, this technique produces only some levels of grouping; at some point, a decision about how many clusters are needed has to be made, and such a decision might not always have a trivial answer. An example of such conundrum is shown in figure \ref{fig:hierarchical-clustering-ex}, where either one of the three clustering levels is deemed acceptable, or a different, intermediate number of clusters is preferred, and thus another run of the hierarchical clustering algorithm is needed.
     
-    \begin{figure}
-        \centering
-        \includegraphics[width=0.7\textwidth]{hierarchical-clustering}
-        \caption{An example of hierarchical clustering.}
-        \label{fig:hierarchical-clustering-ex}
-    \end{figure}
-\end{ex}
+\begin{figure}[ht]
+    \centering
+    \begin{tikzpicture}[font = \small]
+        \draw [fill]
+            (0, 0) circle [radius = 0.8mm, fill, outer sep = 0.5mm] node [above] {$A$}
+            (0.5, 0) circle [radius = 0.8mm, fill, outer sep = 0.5mm] node [above] {$B$}
+            (2, 0) circle [radius = 0.8mm, fill, outer sep = 0.5mm] node [above] {$C$}
+            (2.5, 0) circle [radius = 0.8mm, fill, outer sep = 0.5mm] node [above] {$D$}
+            (0, -2) circle [radius = 0.8mm, fill, outer sep = 0.5mm] node [above] {$E$}
+            (0.5, -2) circle [radius = 0.8mm, fill, outer sep = 0.5mm] node [above] {$F$}
+            (2, -2) circle [radius = 0.8mm, fill, outer sep = 0.5mm] node [above] {$G$}
+            (2.5, -2) circle [radius = 0.8mm, fill, outer sep = 0.5mm] node [above] {$H$}
+        ;
 
-As we will see, in \textit{correlation clustering} model it is the algorithm itself that produces the optimal number of clusters.\\ Generally speaking, if the user wants to minimize the distance within clusters, an optimal but useless solution would be to pick a singleton for each data point, whereas if the aim is to maximize the distance among clusters, one could end up with a single cluster that contains all the points, another optimal but useless solution, but these scenarios can't happen with correlation clustering.
+        \draw
+            (0.25, 0) ellipse [x radius = 0.65, y radius = 0.5] {}
+            (2.25, 0) ellipse [x radius = 0.65, y radius = 0.5] {}
+            (0.25, -2) ellipse [x radius = 0.65, y radius = 0.5] {}
+            (2.25, -2) ellipse [x radius = 0.65, y radius = 0.5] {}
+        ;
+        
+        \draw [rounded corners = 5mm]
+            (-0.6, 0.7) rectangle (1.1, -2.7)
+            (1.4, 0.7) rectangle (3.1, -2.7)
+
+            (-1, 1.1) rectangle (3.5, -3.1)
+        ;
+
+        \draw[->, > = stealth] 
+            (4, -1) -- (5.5, -1)
+        ;
+        
+        \path [level distance = 1.2cm,
+                level 1/.style = {sibling distance = 2.4cm},
+                level 2/.style = {sibling distance = 1.2cm},
+                level 3/.style = {sibling distance = 0.6cm}]
+            (8, 0.9) node {} 
+                child{ node {}
+                    child{ node {}
+                        child { node {$A$} }
+                        child { node {$B$} }
+                    }
+                    child{ node {}
+                        child { node {$C$} }
+                        child { node {$D$} }
+                    }
+                }
+                child{ node {}
+                    child{ node {}
+                        child { node {$E$} }
+                        child { node {$F$} }
+                    }
+                    child{ node {}
+                        child { node {$G$} }
+                        child { node {$H$} }
+                    }
+                }
+        ;
+    \end{tikzpicture}
+    \caption{An example of hierarchical clustering.}
+    \label{fig:hierarchical-clustering-ex}
+\end{figure}
+
+On a theoretical standpoint, if $k$ is left unspecified, there are solutions that are trivially optimal, but have no practical use: if the goal is to minimize the distance within clusters, then the optimal solution is the singleton partition, whereas if the goal is to maximize the distance among clusters, then the optimal partition is indeed the trivial one. A technique called \textit{correlation clustering} has been designe that overcomes this limitation.
 
 
 \section{Correlation clustering}\label{sec:corr-clust}
 
-We have a certain distance metric $d$ and a graph $G(V, E^+, E^-)$, where $E^+$ is the set of positive edges, that is, the ones that link nodes that are similar according to $d$, $E^-$ is the set of negative edges, that is, the ones that link dissimilar nodes according to $d$.\\
-Note that $E^+ \cup E^- = \binom{V}{2}$ (i.e., the union of the edges in $E^+$ and $E^-$ is the set of all the edges connecting every pair of distinct vertices) and $E^+ \cap E^- = \emptyset$ (i.e., an edge can't be both positive and negative).\\
-The goal is to put similar nodes together and different nodes separated, that is, we want to minimize the number of errors, given by the number of similar nodes put in different cluster and dissimilar nodes put in the same cluster, as formalized by the $cost$ function:
+In the correlation clustering model, the graph of interest is modeled as a complete undirected graph $\mathcal{K}_n$, where all edges are partitioned into two classes $E^+$ and $E^-$. Each edge lies in either one of the two classes according to a metric $d$ operating on the vertices of $G$: if the endpoints of an edge are similar by the metric, then the edge lies in $E^+$, otherwise it is in $E^-$. An alternative, equivalent perspective is to consider a generic undirected graph as the starting model, and viewing $E^+$ as its set of edges, and $E^-$ as all the other edges that are missing.
+The goal of putting similar nodes together and different nodes separated becomes for all clusters in a clustering $T$, to maximize edges from $E^+$ and minimize those from $E^-$ inside them. This notion is formalized by the function $\cost$:
 
-\begin{defn}[Cost]\label{def:clust-cost}
-    Given a partition $\mathscr{C} = \{C_1, \ldots, C_i, \ldots\}$ of $V$ (that is, $C_i \cup C_j = \emptyset\ \forall\ i \neq j$, $\bigcup_{C_i \in \mathscr{C}} = V,\ C_i \neq \emptyset\ \forall\ C_i$), the $cost$ function is defined as follows:
-    \begin{align}\label{eq:clust-cost}
-        Cost(\mathscr{C}) = \sum_{\{i,j\} \in \binom{V}{2}} \bigl( &\left[ i,j \in E^+ \wedge\ i \text{ and } j \text{ are in different clusters of } \mathscr{C} \right] +\\
-        &\left[ i,j \in E^- \wedge\ i \text{ and } j \text{ are in the same cluster of } \mathscr{C} \right] \bigr)\nonumber
-    \end{align}
-\end{defn}
+\begin{equation}\label{eq:clust-cost}
+    \cost(T) = \sum_{\{i, j\} \in E^+} \left[ \nexists S \in T : i, j \in S \right] + \sum_{\{i, j\} \in E^-} \left[ \exists S \in T : i, j \in S \right]
+\end{equation}
 
-\textbf{N.B.}: \textit{Even if there exist an edge connecting any pair of distinct vertices, in the following pictures sometimes we don't draw all the negative edges; so, if there isn't an edge between two nodes, we assume that there exists an implicit negative edge between those nodes.}
+Note that a clustering result $T$ is indeed a partition of the vertices $V$, with the added quirk that it will never contain an empty set.
 
-\begin{ex}
-    Let's look at an example of correlation clustering in picture [\ref{fig:corr-clustering-ex}], where negative edges are dashed.
+\begin{example}
+    Consider the example of correlation clustering in picture [\ref{fig:corr-clustering-ex}], where negative edges are dashed. In all the figures throughout this chapter, if an edge is either dashed or missing, then it is assumed to be in $E^-$. In this case, the nodes $A$, $B$, $C$ and $D$ are grouped together in cluster $C_1$ and the node $E$ is left alone in cluster $C_2$, since the first nodes are all similar to each other, while the other is dissimilar from all the others.
     
     \begin{figure}
         \centering
-        \includegraphics[width=0.3\textwidth]{corr-clustering}
+        \begin{tikzpicture}
+            \draw
+                (0, 0) node (a) [draw, circle] {} node [above, outer sep = 2mm, font = \scriptsize] {$A$}
+                (1, -1) node (b) [draw, circle] {} node [right, outer sep = 2mm, font = \scriptsize] {$B$}
+                (-1, -1) node (c) [draw, circle] {} node [left, outer sep = 2mm, font = \scriptsize] {$C$}
+                (0, -2) node (d) [draw, circle] {} node [below, outer sep = 2mm, font = \scriptsize] {$D$}
+
+                (4, -2) node (e) [draw, circle] {} node [right, outer sep = 2mm, font = \scriptsize] {$E$}
+
+                (a) edge (b)
+                (a) edge (c)
+                (a) edge (d)
+                (b) edge (c)
+                (b) edge (d)
+                (c) edge (d)
+                
+                (a) edge [dashed] (e)
+                (b) edge [dashed] (e)
+                (c) edge [dashed] (e)
+                (d) edge [dashed] (e)
+            ;
+
+            \draw[densely dotted]
+                (0, -1) circle [radius = 1.8] (-2.1, -1) node {$C_1$}
+                (4.2, -2) circle [x radius = 6mm, y radius = 4mm] (4.6, -2) node [right, outer sep = 2mm] {$C_2$}
+            ;
+        \end{tikzpicture}
+
         \caption{An example of correlation clustering.}
         \label{fig:corr-clustering-ex}
     \end{figure}
 
-    In this case, we put the nodes $A, B, D, E$ together in cluster $C_1$ and we let node $C$ alone in cluster $C_2$, since the first nodes are all similar to each other, while the other is dissimilar from all the others.
-\end{ex}
+\end{example}
+
+Optimal solutions are thus easy to find if the graph consists of disjoint cliques: the cliques themselves make a perfect clustering, with zero cost. The practical implication is that, on instances that do have a zero cost solution, a multiplicative approximation is possible only if an algorithm always finds it; otherwise the approximation will be infinite, even if the cost is small.
+
+Of course, this is not the general case; indeed most instances do have a minimum cost for clustering, the simplest one being a graph of three vertices with two edges. Figure \ref{fig:clust-special} shows all possible clustering options of such a graph, and it should be clear that none of them have zero cost; for this reason, this particular graph is called a \emph{bad triangle}. Further considerations are made on graphs that are made by composing two triangles: if they share the middle vertex, each still has a minimum cost of 1, while if they have a common positive edge, the singular cost drops to $\half$; figure \ref{fig:clust-bad-triangles} shows this, highlighting the bad triangles involved.
 
 \begin{figure}
     \centering
@@ -78,97 +149,71 @@ The goal is to put similar nodes together and different nodes separated, that is
     \label{fig:clust-special}
 \end{figure}
 
-Now we're interested in some \textbf{special cases}, shown in figure [\ref{fig:clust-special}]:
-{ \renewcommand{\theenumi}{\alph{enumi}}
-\begin{enumerate}
-    \item If the nodes are all similar to each other, a single cluster will be created, and the \textit{cost} is 0;
-    \item If nodes are all dissimilar to each other, a singleton for each node will be created, and the \textit{cost} is 0;
-    \item If there are ``triangles'' like the ones in figures c1-c5, whatever clustering we produce the \textit{cost} is at least 1.
-\end{enumerate} }
+\begin{figure}
+    \centering
+    \includegraphics[width=\textwidth]{clust-bad-triangles}
+    \caption{Cost of bad triangles.}
+    \label{fig:clust-bad-triangles}
+\end{figure}
 
-These examples allow us to make some observations:
-\begin{obs}\label{obs:clust-1}
-    Since the solution can have $cost=0$, we can produce a multiplicative approximation only if we manage to always find the optimal solution if it has $cost=0$, otherwise the approximation will be infinite, even if the cost is small.
-\end{obs}
-\begin{obs}\label{obs:clust-2}
-    We know that if the graph is composed of disjoint positive cliques, there exists a solution with $cost=0$, and we can find it by removing negative edges and looking for connected components. Thus, we can produce a multiplicative approximation.
-\end{obs}
-\begin{obs}\label{obs:clust-3}
-    In whatever way we find triangles made of two positive edges and a negative edge, the $cost$ will be at least 1 for each such triangle, and for that reason those triangles are called ``\textit{bad triangles}'' (we will give a formal definition later).\\
-    Furthermore, the $cost$ for each bad triangle is at least 1 even if there is a shared node between the bad triangles (see figure [\ref{fig:clust-bad-triangles}]a.), but it is 1/2 if there is a shared edge (see figure [\ref{fig:clust-bad-triangles}]b.).
+Rather surprisingly, it can be shown that the minimum cost for clustering a graph can be related with good accuracy to how many bad triangles the graph contains as subgraphs. Ths motivates a formalization:
 
-    \begin{figure}
-        \centering
-        \includegraphics[width=\textwidth]{clust-bad-triangles}
-        \caption{Cost of bad triangles.}
-        \label{fig:clust-bad-triangles}
-    \end{figure}
-
-    Note that in figure [\ref{fig:clust-bad-triangles}] the gray circles represent bad triangles instead of clusters.
-\end{obs}
-
-\begin{defn}[Bad triangle]
-    If $\{i,j\} \in E^+ \wedge \{j,k\} \in E^+ \wedge \{i,k\} \in E^-$, then $\{i,j,k\}$ is a bad triangle.
-    
-    The set of all the bad triangles of a graph is $\mathscr{T} = \left\{ \{i,j,k\} \st \{i,j,k\} \in \binom{V}{3} \text{ is a bad triangle} \right\}$.
-\end{defn}
+\begin{definition}[Bad triangle]
+    Let $\mathcal{K}_n$ be a complete graph with its edges partitioned into two disjoint subsets $E^+$ and $E^-$. The family $G_\triangle$ collects all the bad triangles of $G$:
+    \[
+        G_\triangle = \{ \{x, y, z\} \subseteq V(G) : \{x, y\}, \{y, z\} \in E^+ \wedge \{x, z\} \in E^-\}
+    \]
+\end{definition}
 
 
 \subsection{Randomized pivot}\label{sec:random-pivot}
 
-Now we present a greedy algorithm by Ailon, Charikar, Newman to approximate the correlation clustering problem:
-\begin{lstlisting}[caption={Randomized Pivot}, label={lst:clust-random-pivot}]
-randomized_pivot($V, E^+, E^-$):
-    $V_1 \gets \emptyset$
-    $i \gets 1$
-    while $V_i \neq \emptyset$:
-        pick $v_i \ \uar$ from $V_i$   // we choose the the pivot $v_i$
-        $C_i \gets \left\{ w \st w \in V_i \wedge \{v_i, w\} \in E^+ \right\} \cup \{v_i\}$   // we create a new cluster $V_{i+1}$
-        $V_{i+1} \gets V_i - C_i$   // we remove all the nodes of $V_{i+1}$
-        $i \gets i+1$
-    return $\mathscr{C}_G = \{C_1, C_2, \ldots, C_{i-1}\}$
+This is an approximation algorithm for solving the correlation clustering problem desgned by Ailon, Charikar, Newman:
+\begin{lstlisting}[caption = {Randomized Pivot algorithm}, label = {lst:clust-random-pivot}]
+algorithm $\rpgre(V, E^+, E^-)$:
+    $T \gets \emptyset$
+    while $V \neq \emptyset$:
+        $v \pickUAR V$                                      // pick a pivot 
+        $C \gets \left\{ w \in V : \{v, w\} \in E^+ \right\} \cup \{v\}$   // create a new cluster $C$
+        $T \gets T \cup \{C\}$
+        $V \gets V \setminus C$                              // remove all the nodes of $C$
+    return $T$
 \end{lstlisting}
 
-\begin{ex}
-    Let's look at some example of execution of Randomized Pivot.
+\begin{example}
+    Here is a collection of correlation clustering instances, along with solutions provided by the Randomized Pivot algorithm. In figure \ref{fig:clust-rp-1}, on the left, the algorithm provides a good approximation of an optimal solution: an improvement would be to split $C_1$ into two more components, one of them holding a bad triangle; this would reduce the cost by $1$. The right diagram shows that, if a zero cost solution exists, the algorithm reliably succeeds in finding it.\footnote{This can be proven by observing that in cliques, all vertices are adjacent to each other, a property exploited by $\rpgre$}
     
-    In figure [\ref{fig:clust-rp-1}] we can see all the steps performed by Randomized Pivot to obtain a good approximation of the correlation clustering problem: it produces three clusters, but with one error: there is a positive edge between clusters $C_2$ and $C_2$.
-    \begin{figure}
+    \begin{figure}[ht]
         \centering
-        \includegraphics[width=0.5\textwidth]{clust-rp-1}
-        \caption{Approximated solution of Randomized Pivot.}
+        \includegraphics[width=0.45\textwidth]{clust-rp-1}
+        \hspace{1pt}
+        \includegraphics[width=0.45\textwidth]{clust-rp-2}
+        \caption{Two runs of Randomized Pivot on different graphs: the left one does not have a zero cost solution}
         \label{fig:clust-rp-1}
     \end{figure}
 
-    In figure [\ref{fig:clust-rp-2}] we can see that, if it exists, Randomized Pivot successes to obtain the optimal solution with $cost=0$: it creates a cluster for each clique, as previously said in observation [\ref{obs:clust-2}].
-    \begin{figure}
-        \centering
-        \includegraphics[width=0.5\textwidth]{clust-rp-2}
-        \caption{Optimal solution of Randomized Pivot.}
-        \label{fig:clust-rp-2}
-    \end{figure}
-
-    In figure [\ref{fig:clust-rp-3}] we see a case in which Randomized Pivot could find a very bad approximation: if there is a positive star, there are two possibilities:
-    { \renewcommand{\theenumi}{\alph{enumi}}
-    \begin{enumerate}
-        \item the algorithm chooses a leave of the star as pivot, so the $cost$ is only $n-1$;
-        \item the algorithm chooses the root of the star as pivot, so the $cost$ is  even $\binom{n-1}{2} \approx n^2$.
-    \end{enumerate} }
-    Note that the second (and worst) possibility happen with probability $1/n$, so it's not so unlikely.
+    In figure [\ref{fig:clust-rp-3}] is a case in which the algorithm potentially provides a very bad approximation: if the graph is a star, there are two possible outcomes:
+    \begin{itemize}
+        \item the algorithm picks a leaf as a pivot, and the cost of the resulting solution will be $n - 1$;
+        \item the algorithm picks the root as a pivot, and the cost will grow up to $\binom{n-1}{2} \approx n^2$. Note that picking the root \uar{} happens with probability $\oneover{n}$, which might not be as negligible as desired.
+    \end{itemize}
+    
     \begin{figure}
         \centering
         \includegraphics[width=0.5\textwidth]{clust-rp-3}
         \caption{Worst case of approximated solution of Randomized Pivot.}
         \label{fig:clust-rp-3}
     \end{figure}    
-\end{ex}
+\end{example}
 
-\begin{thm}\label{thm:clust-rp-approx}
-    Randomized Pivot [\ref{lst:clust-random-pivot}] returns an expected 3-approximation:
-    \begin{equation}
-        E\left[cost\left( \mathscr{C}_G \right)\right] \leq 3 \cdot \min_{\mathscr{C}} \{cost(\mathscr{C})\} = 3 \cdot OPT.
-    \end{equation}
-\end{thm}
+Despite some pathological cases such as a star graph, this algorithm does yield good approximations on average:
+
+\begin{theorem}\label{thm:clust-rp-approx}
+    Randomized Pivot [\ref{lst:clust-random-pivot}] returns on average a 3-approximation of an optimal solution:
+    \[
+        \expect(\cost(\rpgre(G))) \leq 3 \cdot OPT_\textsc{cc}.
+    \]
+\end{theorem}
 
 \begin{obs}\label{obs:clust-4}
     By using Markov Inequality [\ref{eq:markov}], it can be proved that the bad event have small probability, if we execute the algorithm many times:
@@ -183,176 +228,201 @@ randomized_pivot($V, E^+, E^-$):
 \end{obs}
 
 \begin{proof}[Proof of Theorem \ref{thm:clust-rp-approx}]
-    As usual, we will prove the theorem by steps, introducing some lemmas and claims.
+    Recall the definition \ref{eq:clust-cost} of the cost function; there are two sums added together:
     
-    \begin{lem}\label{l:clust-1}
-        Let $cost^+_j := \abs{\big\{ \{v,w\} \st v \in C_j \wedge w \in V_{j+1} \wedge \{v,w\} \in E^+ \big\}}$ and\\ $cost^-_j := \abs{\big\{ \{v,w\} \st v,w \in C_j \wedge \{v,w\} \in E^- \big\}}$, then
-        \begin{equation}
-            cost(\mathscr{C}_G) = \sum_j \left( cost_j^+ + cost_j^- \right).
-        \end{equation}
-    \end{lem}
-    \begin{proof}
-        The proof directly follows from the definition of $cost_j^+$ and $cost_j^-$: as we can see in figure [\ref{fig:clust-costs}], $cost_j^+$ covers the first part of the definition of $cost$ [\ref{eq:clust-cost}], that is, the cases in which the algorithm puts two similar nodes in different clusters (edges marked with $*$ in the picture), and $cost_j^-$ covers the second part of the definition, i.e., the cases in which two dissimilar nodes are put in the same cluster (edges marked with $**$ in the picture). Thus, all the errors (red edges) are covered either by $cost_j^+$ or by $cost_j^-$.
-    \end{proof}
+    \begin{itemize}
+        \item one sum involves edges in $E^+$, where the cost for one edge is $1$ whenever its endpoints lie in different clusters. In terms of the algorithm, this can be expressed in an equivalent manner as saying that, given the first cluster $C^{(i)}$ that captures one of the two endpoints $x$, the other endpoint $y$ will not be pulled into $C^{(i)}$, and thus appear in the next iteration inside $V^{(i + 1)}$:\footnote{Another implication is that $x$ cannot be a pivot}
+        \[
+            \left[ \nexists i : x, y \in C^{(i)} \right] \iff \left[ \exists i : x \in C^{(i)} \wedge y \in V^{(i + 1)} \right]
+        \]
+        \item the other sum involves edges in $E^-$, each contributing to the cost when its own endpoints belong to the same cluster. Algorithmically, this translates as saying that for each edge with cost $1$, at some iteration $i$, the relative cluster $C^{(i)}$ will capture both endpoints at the same time:\footnote{Also, neither endpoint can be a pivot}
+        \[
+            \left[ \exists i : x, y \in C^{(i)} \right]
+        \]
+    \end{itemize}
 
-    \begin{figure}
-        \centering
-        \includegraphics[width=0.35\textwidth]{clust-costs}
-        \caption{Example of application of the definition of $cost_j^+$ and $cost_j^-$.}
-        \label{fig:clust-costs}
-    \end{figure}
+    Let $\cost_+^{(i)}$ and $\cost_+^{(i)}$ be the costs that incur respectively for cutting positive edges and from preserving negative edges on an arbitrary iteration $i$, with the singluar edge cost expressed algorithmically as above. Given a solution $T$ returned by the algorithm $\rpgre$, its total cost can be rewritten as follows:
+    \[
+        \cost(T) = \sum_{i \in \textsc{iter}} \cost_+^{(i)} + \sum_{i \in \textsc{iter}} \cost_-^{(i)}
+    \]
 
-    The following two claims, that follow from Lemma [\ref{l:clust-1}], connect the different types of bad triangles we see in figure [\ref{fig:clust-costs}] with the different types of errors, or costs.
+    These costs are directly linked to specific bad triangles:
     
     \begin{claim}\label{cl:clust-1}
-        $cost_j^+$ is the number of bad triangles $T$ that
+        $\cost_+^{(i)}$ is the number of bad triangles $T$ for which there exists an iteration $i$ such that:
         \begin{enumerate}
-            \item are fully contained in $V_j$,
-            \item contain $v_j$, and
-            \item for which $\abs{C_j \cup T} = 2$.
+            \item $T$ contains $v^{(i)}$,
+            \item $C^{(i)}$ contains exactly two vertices of $T$,
+            \item $V^{(i)}$ includes $T$.
         \end{enumerate}
     \end{claim}
 
     \begin{claim}\label{cl:clust-2}
-        $cost_j^-$ is the number of bad triangles $T$ that
+        $\cost_-^{(i)}$ is the number of bad triangles $T$ for which there exists an iteration $i$ such that:
         \begin{enumerate}
-            \item are fully contained in $C_j \subseteq V_j$,
-            \item contain $v_j$.
+            \item $T$ contains $v^{(i)}$,
+            \item $C^{(i)}$ includes $T$.
         \end{enumerate}
     \end{claim}
 
-    Now we introduce the concept of ``hitting'' a bad triangle, that will be useful to prove the next lemma.
-    \begin{defn}[Hit]\label{def:clust-hit}
-        We say that Random-Pivot [\ref{lst:clust-random-pivot}] \emph{hits} a bad triangle $T$ if $\exists\ j \st T \subseteq V_j$ and $v_j \in T$.
-    \end{defn}
+    \begin{definition}[Hit]\label{def:clust-hit}
+        It is said that an instance of Randomized Pivot \emph{hits} a bad triangle $T$ if there is an iteration $i$ such that $V^{(i)}$ includes $T$, and the pivot $v^{(i)}$ is among the vertices of $T$.
+    \end{definition}
 
-    \begin{cor}\label{cor:clust-1}
-        $cost(\mathscr{C}_G)$ is the number of bad triangles hit by Random-Pivot.
-    \end{cor}
+    \begin{corollary}\label{cor:clust-1}
+        For any solution $H$ given by the algorithm, $\cost(H)$ is the number of bad triangles hit by the algorithm during execution.
+    \end{corollary}
+
     \begin{proof}
-        Corollary [\ref{cor:clust-1}] follows by the claims [\ref{cl:clust-1}] and [\ref{cl:clust-2}] and by the definition of ``hit'' [\ref{def:clust-hit}].
+        Follows by the claims [\ref{cl:clust-1}] and [\ref{cl:clust-2}] and by definition [\ref{def:clust-hit}].
     \end{proof}
     
     We introduced the concept of \textit{hitting} because we want to relate the probability of hitting a bad triangle with the cost paid by the algorithm. We can't directly compute this probability, but we obtain a useful linear relationship.
-    \begin{lem}\label{l:clust-2}
-        Given a bad triangle $T \in \mathscr{T}$, let $p_T$ be the (a priori) probability that Random-Pivot will hit $T$. Then
-        \begin{equation}
-            E[cost(\mathscr{C}_G)] = \sum_{T \in \mathscr{T}} p_T.
-        \end{equation}
-    \end{lem}
+    \begin{lemma}\label{l:clust-2}
+        Given an instance of correlation clustering, for each bad triangle $T \in G_\triangle$ let $p_S$ be the probability of the Randomized Pivot algorithm hitting it.\footnote{Care should be taken while thinking about such probabilities, as which triangle gets hit or not, and how probable are such events on any specific itertion generally depends on the previous random choices the algorithm makes} Then:
+        \[
+            \expect(\cost(\rpgre(G))) = \sum_{T \in G_\triangle} p_T
+        \]
+    \end{lemma}
+
     \begin{proof}
-        Lemma [\ref{l:clust-2}] follows by Corollary [\ref{cor:clust-1}] and the definition of expected value [\ref{def:expected-value}]: we know that $cost(\mathscr{C}_G)$ is a random variable (it depends on $\mathscr{C}_G$, that is the result returned by Randomized Pivot, that in turn is a random algorithm, as the name suggests), and, since its value is the number of bad triangles hit by the algorithm, we can decompose it in a sum of Bernoulli random variables $X_T$, one for each $T \in \mathscr{T}$, that assume value 1 if the algorithm hits $T$, with probability $p_T$, and 0 otherwise.
+        Lemma [\ref{l:clust-2}] follows by Corollary [\ref{cor:clust-1}] and the definition of expected value [\ref{def:expected-value}]: we know that $cost(\mathscr{C}_G)$ is a random variable (it depends on $\mathscr{C}_G$, that is the result returned by Randomized Pivot, that in turn is a random algorithm, as the name suggests), and, since its value is the number of bad triangles hit by the algorithm, we can decompose it in a sum of Bernoulli random variables $X_T$, one for each $T \in G_\triangle$, that assume value 1 if the algorithm hits $T$, with probability $p_T$, and 0 otherwise.
     \end{proof}
 
-    So, finally we have all the tools we need to prove that $E\left[cost\left( \mathscr{C}_G \right)\right] \leq 3 \cdot OPT$ (the claim of Theorem [\ref{thm:clust-rp-approx}]), that is, $\frac{\sum_{T \in \mathscr{T}} p_T}{3} \leq OPT$, and we'll do it with a primal-dual proof, exploiting the linear program underlying Randomized-Pivot.
+    So, finally we have all the tools we need to prove that $E\left[cost\left( \mathscr{C}_G \right)\right] \leq 3 \cdot OPT$ (the claim of Theorem [\ref{thm:clust-rp-approx}]), that is, $\frac{\sum_{T \in G_\triangle} p_T}{3} \leq OPT$, and we'll do it with a primal-dual proof, exploiting the linear program underlying Randomized-Pivot.
     
-    We begin with the dual LP:
-    \begin{equation}\label{lp:clust-dual}
-        \begin{aligned}
-            &\min \sum_{\{i,j\} \in \binom{V}{2}} X_{\{i,j\}}&\\
-            &\begin{cases}
-                X_{\{i,j\}} + X_{\{j,k\}} + X_{\{i,k\}} \geq 1 & \forall\ \{i,j,k\} \in \mathscr{T}
-            \end{cases}&\\
-            &X_{\{i,j\}} \geq 0 \ \forall\ \{i,j\} \in \binom{V}{2}&
-        \end{aligned}
-    \end{equation}
+    This is a dual \lp{} formulation of the correlation clustering problem:
     
-    \obs The objective function is the number of errors the algorithm makes (that is, the cost function), while the meaning of the constraint is that the sum of the costs paid for a bad triangle is at least 1, since we know we will make at least one error for each bad triangle.
+        \begin{align*} \label{lp:clust-dual}
+            & \min \left( \sum_{\{i, j\} \in E(G)} X_{\{i, j\}} \right) & \\
+            & X_{\{i, j\}} + X_{\{j, k\}} + X_{\{i, k\}} \geq 1         & \forall \{i, j, k\} \in G_\triangle \\
+            & X_{\{i, j\}} \geq 0                                       & \forall \{i, j\} \in E(G)
+        \end{align*}
     
-    \begin{lem}\label{l:clust-3}
-        For each solution $\mathscr{C}$, $cost(\mathscr{C}) \geq \text{DUAL}^*$, where $\text{DUAL}^*$ is the optimal solution of the dual LP.
-    \end{lem}
+    The objective function counts the number of errors the algorithm makes (that is, the cost function), while the second constraint models the cost of each bad triangle being at least $1$, which is proven to be part of the minimum cost of an optimal solution.
+    
+    \begin{lemma}\label{l:clust-3}
+        For each solution $T$, its cost is greater than the cost of the dual \lp's optimal solution:
+        \[
+            \forall T \qquad \cost(T) \geq \textsc{Opt}_\textsc{dual}
+        \]
+    \end{lemma}
+
     \begin{proof}
-        It is hard to find the optimal solution of the dual, but for our purpose it is sufficient to show a feasible solution and it will be greater or equal than the optimal one.
+        For the purposes of the lemma, it is sufficient to provide a solution and show that it is feasible; the lemma's statement will then be a consequence of the \lp{} solution's properties.
         
-        Let $X_{\{i,j\}} := \begin{cases}
-        1 & \text{if } \big( \{i,j\} \in E^+ \wedge i \text{ and } j \text{ are split by } \mathscr{C} \big) \text{ or }\\
-        &\phantom{\text{if }} \big( \{i,j\} \in E^- \wedge i \text{ and } j \text{ are together in } \mathscr{C} \big)\\
-        0 & \text{otherwise}
-        \end{cases}$.\\
-        Informally, $X_{\{i,j\}}=1$ iff there is an error in $\mathscr{C}$.
-        
-        This is a feasible solution because we are counting each bad triangle, and so the value of the dual, with this solution, is equal to $cost(\mathscr{C})$.
+        Construct a solution $T$ by performing the assignments to the variables $X_{\{a, b\}}$ as follows:
+        \[
+            X_{\{a, b\}} = \begin{cases}
+                1 & \textsc{if } \{a, b\} \in E^+ \iff \nexists C \in T : a, b \in C \\
+                0 & \textsc{else}
+            \end{cases}
+        \]
+
+        Note that the condition on the first assignent does represent both the events that positive edges get cut and negative edges are preserved in a concise fashion. In short, $X_{\{a, b\}} = 1$ iff there is an error in $T$, and since it is proven that each bad triangle entails one error, the constraint is satisfied. Therefore, the objective function effectively counts each bad triangle that is hit, so the solution's value, is equal to $\cost(T)$.
     \end{proof}
     
-    \begin{cor}\label{cor:clust-2}
-        \begin{equation}
-            OPT \geq \text{DUAL}^*
-        \end{equation}
-    \end{cor}
+    A primal formulation of the problem would be:
+    \begin{align*}\label{lp:clust-primal}
+        &\max \left( \sum_{T \in G_\triangle} y_T \right)   & \\
+        &\sum_{T \in S_{ij}} y_T \leq 1                     & \forall \{i, j\} \in E(G) \\
+        &y_T \geq 0                                         & \forall T \in G_\triangle 
+    \end{align*}
+
+    where $S_{ij}$ denotes the set of all the triangles that share the edge $\{i, j\}$. The first constraint, which is an example of \textit{fractional packing}, requires some explanation: each edge will have at most a weight of 1, summing up the weights of the bad triangles that contain such edge. Next up is to find a feasible solution for the program.
+    
+    \begin{lemma}\label{l:clust-4}
+        $y_T = \frac{p_T}{3}$ is a feasible solution for the primal \lp.
+    \end{lemma}
+
+    \todo{This proof is much convoluted, and the required definitions are so deep it is almost impossible to not lose track at least a few times. Needs more development, and maybe more separate propositions in order to make it more digestible}
+
+    % Some ideas:
+
+    %the cost funciton is cost(T) = sum of broken positive edges + sum of preserved negative edges. Let v^(i) be a pivot, then if a clustering breaks a positive edge (implying it asn't been cut beforehand, therefore both endpoints are in V^(i)), this means that one of its endpoints is included in C^(i), and is thus adjacent to v^(i), and the other endpoint is outside C^(i), which makes it nonadjacent to v(i). It entails that the pivot and the endpoints of the broken edge make a bad triangle. In the case of negative edges arises when both the endpoints are in the same cluster, which means two things: neither can be the pivot, otherwise they woud be in different clusters, and both are adjacent to the pivot.
+    % Better: for each endpoint to be in the cluster, either it is a pivot, or it is adjacent to it.
+
+    % The (T is hit) evemnt is better expressed with the conditions on the pivot and on the V^(i); it would also be best to encode all the conditions listed in the coost functions into it.
+
+    % given the set of vertices of the triangles sharing edge ij W_ij, multiple pivots can be picked inside of it. Let v^(n) be the first such pivot:
+    % v^{(n)} is either i or j, fix i wlog: then all edges of the triangles in S_ij incident on i including ij will be preserved if positive, or cut if negative, and the edges incident on j excluding ij will decide the cost incurred in such operation for each triangle. This means that no other next pivot can hit a traingle in S_ij
+    % v^{(n)} is neither i nor j: sicne v^{(n)} must be adjacent to at least one endpoint ij fix i wlog, then i will be placed in the same cluster as the pivot, having i in the cluster uses up all the bad triangles; again, no other next pivot can hit a traingle in S_ij.
+    % therefore, of all the pivots in W_ij, only the first one hits triangles
+
     \begin{proof}
-        Since $OPT = \min_{\mathscr{C}} \{cost(\mathscr{C})\}$, the corollary follows directly from Lemma [\ref{l:clust-3}].
+        It is sufficient to prove that, for each edge $\{i, j\}$, its corresponding sum constraint is satisfied. Fix an arbitrary edge $\{i, j\}$, then let $W_{ij}$ be the set that collects all of the triangles' vertices in $S_{ij}$:
+        \[
+            W_{ij} = \bigcup_{T \in S_{ij}} V(T)
+        \]
+        Also, let $\phi_{ij}$ be the event that, among the triangles that include the edge $\{i, j\}$, one of them is picked as a pivot:
+        \[
+            \phi = \exists k : v^{(k)} \in W_{ij}
+        \]
+        Then:
+        \begin{align*}
+                &\ \sum_{T \in S_{ij}} y_T                                                           & \\
+               =&\ \sum_{T \in S_{ij}} \frac{p_T}{3}                                                 & \text{(by hypothesis)}\\
+               =&\ \oneover{3} \sum_{T \in S_{ij}} \Pr[\exists k : v^{(k)} \in T]                    & \text{(by definition [\ref{def:clust-hit}])} \\
+               =&\ \oneover{3} \sum_{T \in S_{ij}} \left( \Pr[\exists k : v^{(k)} \in T \knowing \phi_{ij}] \cdot \Pr[\phi_{ij}] +  \Pr[\exists k : v^{(k)} \in T \knowing \neg \phi_{ij}] \cdot \Pr[\neg \phi_{ij}] \right)                            & \text{(by total probability)} \\
+               =&\ \oneover{3} \sum_{T \in S_{ij}} \left( \Pr[\exists k : v^{(k)} \in T \knowing \phi_{ij}] \cdot \Pr[\phi_{ij}] + 0 \cdot \Pr[\neg \phi_{ij}] \right)                                                                               & \mathllap{\text{(no pivot in $W_{ij}$ implies no pivot in $T$)}} \\
+               =&\ \oneover{3} \sum_{T \in S_{ij}} \Pr[\exists k : v^{(k)} \in T \knowing \phi_{ij}] \cdot \Pr[\phi_{ij}] & \\
+            \leq&\ \oneover{3} \sum_{T \in S_{ij}} \Pr[\exists k : v^{(k)} \in T \knowing \phi_{ij}] & \mathllap{\text{(any probability is at most $1$)}}
+        \end{align*}
+
+        % The original proof kaind of implied that n = k; is it true? YES, it can be proven, see comments proof beginnning
+        Under the condition $\phi_{ij}$, there will be one node that ends up being the first pivot chosen in $W_{ij}$; suppose it is $v^{(n)}$, that is, let $n$ be the iteration such that $v^{(n)} \in W_{ij}$ and for all $m < n$, no pivots are picked in $W_{ij}$. Moreover, let $B^{(n)}_{ij} = V^{(n)} \cap W_{ij}$ be the nodes of $W_{ij}$ that are part of the residual graph when $v^{(n)}$ is chosen as a pivot. Then:
+        \begin{align*}
+                &\ \sum_{T \in S_{ij}} \Pr[\exists k : v^{(k)} \in T \knowing \phi_{ij}] & \\
+               =&\ \sum_{S \subseteq W_{ij}} \Pr[B^{(n)}_{ij} = S] \cdot \sum_{T \in S_{ij}} \Pr[\exists k : v^{(k)} \in T \knowing \phi_{ij} \wedge B^{(n)}_{ij} = S] & \text{(by total probability on $W_{ij}$)} \\
+               =&\ \begin{aligned}
+                \sum_{S \subseteq W_{ij}} \Pr[B^{(n)}_{ij} = S] \cdot \Biggl( & \sum_{T \in S_{ij}} \Pr[\exists k : v^{(k)} \in T \wedge T \subseteq S \knowing \phi_{ij} \wedge B^{(n)}_{ij} = S] \\ + & \sum_{T \in S_{ij}} \Pr[\exists k : v^{(k)} \in T \wedge T \not\subseteq S \knowing \phi_{ij} \wedge B^{(n)}_{ij} = S] \Biggr)
+               \end{aligned} & \text{(by total probability on $S$)} \\
+               =&\ \begin{aligned}
+                \sum_{S \subseteq W_{ij}} \Pr[B^{(n)}_{ij} = S] \cdot \Biggl( & \sum_{T \in S_{ij}} \Pr[\exists k : v^{(k)} \in T \wedge T \subseteq B^{(n)}_{ij} \knowing \phi_{ij}] \\ + & \sum_{T \in S_{ij}} \Pr[\exists k : v^{(k)} \in T \wedge T \not\subseteq B^{(n)}_{ij} \knowing \phi_{ij}] \Biggr)
+               \end{aligned} & \text{(by condition collapse)} \\
+               =&\ \sum_{S \subseteq W_{ij}} \Pr[B^{(n)}_{ij} = S] \cdot \left(\sum_{T \in S_{ij}} \Pr[\exists k : v^{(k)} \in T \wedge T \subseteq B^{(n)}_{ij} \knowing \phi_{ij}] + 0 \right) & \text{(by definition [\ref{def:clust-hit}])} \\ % This step badly needs an explanation
+               =&\ \sum_{S \subseteq W_{ij}} \Pr[B^{(n)}_{ij} = S] \cdot \sum_{T \in S_{ij}} \Pr[\exists k : v^{(k)} \in T \wedge T \subseteq B^{(n)}_{ij} \knowing \phi_{ij}] & \\
+               =&\ \sum_{S \subseteq W_{ij}} \Pr[B^{(n)}_{ij} = S] \cdot \sum_{T \in S_{ij}} \frac{3}{|B^{(n)}_{ij}|} \tag{$*^4$} & \\
+               =&\ \sum_{S \subseteq W_{ij}} \Pr[B^{(n)}_{ij} = S] \cdot (|W_{ij}| - 2) \cdot \frac{3}{|B^{(n)}_{ij}|} & (\abs{S_{ij}} = \abs{W_{ij}} - 2)\\
+            \leq&\ \sum_{S \subseteq W_{ij}} \Pr[B^{(n)}_{ij} = S] \cdot 3 & \tag{we upper bound $\frac{|S|-2}{|S|}$ with 1} \\
+        \end{align*}
+
+        
+        Note that in $(*^4)$, the triangles completely included in $S$ have probability $3/|S|$ of being hit, since each of their vertices have the same, uniform probability of being picked as the pivot.
+
+        Therefore:
+        \begin{align*}
+                &\ \sum_{T \in S_{ij}} y_T                                                           & \\
+            \leq&\ \oneover{3} \sum_{T \in S_{ij}} \Pr[\exists k : v^{(k)} \in T \knowing \phi_{ij}] & \\
+            \leq&\ \oneover{3} \sum_{S \subseteq W_{ij}} \Pr[B^{(n)}_{ij} = S] \cdot 3 & \\
+               =&\ \sum_{S \subseteq W_{ij}} \Pr[B^{(n)}_{ij} = S] & \\
+               =&\ \Pr[B^{(n)}_{ij} \subseteq W_{ij}] & \\
+               =&\ 1 & (B^{(n)}_{ij} = V^{(n)} \cap W_{ij} \subseteq W_{ij}) \\
+        \end{align*}
+        
+        The generic constraint of the primal is satisfied, therefore the proposed primal solution is feasible.
     \end{proof}
 
-    Now we are going to present the primal LP and to show that $\frac{p_T}{3}$ is a feasible solution. This will allow us to conclude that the following inequality holds:
+
+
+
+    Now we are going to conclude that the following inequality holds:
     \begin{claim}\label{cl:clust-ineq}
         \begin{equation}\label{eq:clust-ineq}
-            \frac13 \cdot \text{E}[\text{cost}(\mathscr{C}_P)] =  \sum_{T \in \mathscr{T}} \frac{p_T}{3} \leq \text{PRIMAL}^* \leq \text{DUAL}^* \leq OPT
+            \frac13 \cdot \text{E}[\text{cost}(\mathscr{C}_P)] =  \sum_{T \in G_\triangle} \frac{p_T}{3} \leq \text{PRIMAL}^* \leq \text{DUAL}^* \leq OPT
         \end{equation}
     \end{claim}
 
     \obs\label{obs:clust-ineq} If we prove the first inequality, we will have proved that the expected cost of the solution returned by the algorithm is no more than 3 times the cost of the optimal solution. Note that this concludes the proof of Theorem [\ref{thm:clust-rp-approx}].
     
     \begin{proof}
-        The first equation follows from Lemma~\ref{l:clust-2}, the second inequality is due to the weak duality theorem [\ref{thm:weak-duality}], the third one to Corollary [\ref{cor:clust-2}], and we'll prove the first one shortly with Lemma [\ref{l:clust-4}].
+        The first equation follows from Lemma~\ref{l:clust-2}, the second inequality is due to the weak duality theorem [\ref{thm:weak-duality}], the third one is a consequence of lemma \ref{l:clust-3}, and we'll prove the first one shortly with Lemma [\ref{l:clust-4}].
     
-        Primal LP:
-        \begin{equation}\label{lp:clust-primal}
-            \begin{aligned}
-                &\max \sum_{T \in \mathscr{T}} y_T&\\
-                &\begin{cases}
-                    \sum_{T \in \mathscr{T},\ \{i,j\} \subset T} y_T \leq 1 & \forall\ \{i,j\} \in \binom{V}{2}
-                \end{cases}&\\
-                &y_T \geq 0 \ \forall\ T \in \mathscr{T}&
-            \end{aligned}
-        \end{equation}
         
-        \obs This kind of constraint is called \textit{fractional packing of triangles}: for each edge, we want to take at most a weight of 1, summing up the weights of the bad triangles that contain that edge.
+        Set $y_T = \frac{p_T}{3}$ for each $T \in G_\triangle$. This solution has a value of $\frac13 \cdot \sum_{T \in G_\triangle} p_T$, so if we prove it is feasible for the primal, we have shown that $\frac13 \cdot \sum_{T \in G_\triangle} p_T \le \pi^{*}$, where $\pi^{*}$ is the solution of the primal.
     
-        Consider the primal program, and set $y_T = p_T / 3$ for each $T \in \mathscr{T}$. This solution has a value of $\frac13 \cdot \sum_{T \in \mathscr{T}} p_T$ in the primal so, if we prove it is feasible for the primal, we have shown that $\frac13 \cdot \sum_{T \in \mathscr{T}} p_T \le \pi^{*}$, where $\pi^{*}$ is the solution of the primal.
-    
-        \begin{lem}\label{l:clust-4}
-            $y_T = \frac{p_T}{3}$ is a feasible solution for the primal.
-        \end{lem}
-    
-        \begin{proof}
-            To conclude that the solution is feasible for the primal, we only have to prove that, for each $\{i,j\} \in \binom V2$, it holds
-            $\sum_{\substack{T \in \mathscr{T}\\T \supset \{i,j\}}} y_T \le 1$.
         
-            Fix an edge $\{i,j\} \in \binom V2$, and let $A = \bigcup_{\substack{T \in \mathscr{T}\\T \supset \{i,j\}}} T$ be the set of each node of each bad triangle that includes the edge $\{i,j\}$. Let $\xi$ be the event that, during a run of the algorithm, at least one node of $A$ becomes a pivot.\\
-            Note that we need $\xi$ because we know that, if it happens, the algorithm will find at least a triangle in $A$, otherwise none, and this allows us to divide the probabilities in two parts, by lat of total probability.
-        
-            Then,
-            \begin{align*}
-                \sum_{\substack{T \in \mathscr{T}\\T \supset \{i,j\}}} y_T &= \sum_{\substack{T \in \mathscr{T}\\T \supset \{i,j\}}} \frac{p_T}3&\\
-                &=\frac13 \cdot \sum_{\substack{T \in \mathscr{T}\\T \supset \{i,j\}}} \Pr{T \text{ is hit}}&\\
-                &=\frac13 \cdot \sum_{\substack{T \in \mathscr{T}\\T \supset \{i,j\}}} \Big( \Pr{T \text{ is hit} \mid \xi} \cdot \Pr{\xi} +  \Pr{T \text{ is hit} \mid \overline{\xi}\,} \cdot \Pr{\,\overline{\xi}\,} \Big)&\tag{by total probability}\\
-                &=\frac13 \cdot \sum_{\substack{T \in \mathscr{T}\\T \supset \{i,j\}}} \Big( \Pr{T \text{ is hit} \mid \xi} \cdot \Pr{\xi} + 0 \cdot \Pr{\,\overline{\xi}\,}\Big)&\\
-                &=\frac13 \cdot \sum_{\substack{T \in \mathscr{T}\\T \supset \{i,j\}}} \Big( \Pr{T \text{ is hit} \mid \xi} \cdot \Pr{\xi}\Big)&\\
-                &\le \frac13 \cdot \sum_{\substack{T \in \mathscr{T}\\T \supset \{i,j\}}} \Pr{T \text{ is hit} \mid \xi}.&
-            \end{align*}
-            Under the conditioning $\xi$, there will be one node that ends up being the first  pivot chosen in $A$; suppose it is $v_k$ (that is, let $k$ be such that $v_k \in A$ and $v_{k'} \not\in A$ fo each $1 \le k' < k$ --- observe that such a $k$ must exists if $\xi$ happens).
-            Moreover, let $B = V_k \cap A$ be the subset of nodes of $A$ that are part of the residual graph when $v_k$ is chosen as a pivot.
-        
-            Then,
-            \begin{align*}
-                \sum_{\substack{T \in \mathscr{T}\\T \supset \{i,j\}}} y_T &\le \frac13 \cdot \sum_{\substack{T \in \mathscr{T}\\T \supset \{i,j\}}} \Pr{T \text{ is hit} \mid \xi}&\\
-                &=\frac13 \cdot \sum_{S \subseteq A} \left(\Pr{B = S \mid \xi} \cdot \sum_{\substack{T \in \mathscr{T}\\T \supset \{i,j\}}} \Pr{T \text{ is hit} \mid B = S \wedge \xi}\right)&\tag{$*^1$}\\
-                &=\frac13 \cdot \sum_{S \subseteq A} \left(\Pr{B = S \mid \xi} \cdot \left(\sum_{\substack{T \in \mathscr{T}\\ \{i,j\} \subset T  \subseteq S}} \Pr{T \text{ is hit} \mid B = S \wedge \xi} + \sum_{\substack{T \in \mathscr{T}\\ \{i,j\} \subset T  \not\subseteq S}} \Pr{T \text{ is hit} \mid B = S \wedge \xi}\right)\right)&\tag{$*^2$}\\
-                &=\frac13 \cdot \sum_{S \subseteq A} \left(\Pr{B = S \mid \xi} \cdot \left(\sum_{\substack{T \in \mathscr{T}\\ \{i,j\} \subset T  \subseteq S}} \Pr{T \text{ is hit} \mid B = S \wedge \xi} + \sum_{\substack{T \in \mathscr{T}\\ \{i,j\} \subset T  \not\subseteq S}} 0\right)\right)\tag{$*^3$}&\\
-                &=\frac13 \cdot \sum_{S \subseteq A} \left(\Pr{B = S \mid \xi} \cdot \sum_{\substack{T \in \mathscr{T}\\ \{i,j\} \subset T  \subseteq S}} \Pr{T \text{ is hit} \mid B = S \wedge \xi} \right)&\\
-                &=\frac13 \cdot \sum_{S \subseteq A} \left(\Pr{B = S \mid \xi} \cdot \sum_{\substack{T \in \mathscr{T}\\ \{i,j\} \subset T  \subseteq S}}  \frac3{|S|} \right)\tag{$*^4$}&\\
-                &=\frac13 \cdot \sum_{S \subseteq A} \left(\Pr{B = S \mid \xi} \cdot (|S| -2) \cdot  \frac3{|S|} \right)&\\
-                &\le\frac13 \cdot \sum_{S \subseteq A} \Big(\Pr{B = S \mid \xi} \cdot 3 \Big)&\tag{we upper bound $\frac{|S|-2}{|S|}$ with 1}\\
-                &=\sum_{S \subseteq A} \left(\Pr{B = S \mid \xi} \right) = \Pr{B \subseteq A\mid \xi}= 1.&
-            \end{align*}
-            
-            In $(*^1)$ we apply the law of total probability again, to split the probabilities according to the value of $B$; in $(*^2)$ we break the sum in two parts, with triangles completely in $S$ and \textit{not} completely in $S$, the latter will never be hit by the algorithm, by definition of hit [\ref{def:clust-hit}], (so their probabilities are 0 in $(*^3)$), the former have probability $3/|S|$ of being hit, since each of their vertexes has the same probability of being chosen as the pivot (since it's picked $\uar$), and we use it in $(*^4)$.
-            
-            Thus, the generic constraint of the primal is satisfied: the proposed primal solution is then feasible, which concludes the proof of Lemma [\ref{l:clust-4}].
-        \end{proof}
-        
-        Then, $\frac13 \cdot \sum_{T \in \mathscr{T}} p_T$ cannot be larger than the optimal primal value $\pi^*$. The proof of Claim [\ref{cl:clust-ineq}] is concluded.
+        Then, $\frac13 \cdot \sum_{T \in G_\triangle} p_T$ cannot be larger than the optimal primal value $\pi^*$. The proof of Claim [\ref{cl:clust-ineq}] is concluded.
     \end{proof}
     
     By Claim [\ref{cl:clust-ineq}], we have
@@ -362,17 +432,14 @@ randomized_pivot($V, E^+, E^-$):
 
 \subsection{Parallel Random Pivot}
 
-\obs The random-pivot algorithm [\ref{lst:clust-random-pivot}] can be very slow if there are many isolated nodes (i.e., many negative edges).
-
-The good news is we can obtain a $(3+\varepsilon)-approximation$ in logarithmic time, if we run a parallel version of the algorithm in a framework such as Pregel or Map-Reduce.\\
-The algorithm is deeply discussed and analyzed in the paper \href{https://dl.acm.org/citation.cfm?id=2623743}{Correlation clustering in MapReduce}, by Chierichetti et al., here we just purpose a brief description.
+\obs The random-pivot algorithm [\ref{lst:clust-random-pivot}] can be very slow if there are many negative edges. However, a parallel version of the algorithm designed in a framework such as Pregel or Map-Reduce is able to reduce running time logarithmically. The algorithm is deeply discussed and analyzed in the paper \href{https://dl.acm.org/citation.cfm?id=2623743}{Correlation clustering in MapReduce}, by Chierichetti et al., here we just purpose a brief description.
 
 \begin{lstlisting}[caption={Parallel Randomized Pivot}, label={lst:parallel-random-pivot}]
 parallel randomized pivot:
-    while istance is not empty:
+    while instance is not empty:
         - $\Delta^+ \gets$ max positive degree;
         - activate each element with probability $\varepsilon/\Delta^+$;
-        - deactivate active nodes liked to other active nodes;
+        - deactivate active nodes linked to other active nodes;
         - create a cluster for each remaining active node   // there are many pivots
           (break ties randomly);
 \end{lstlisting}
@@ -397,7 +464,7 @@ As we briefly saw at the beginning of this chapter, the goal of k-centers proble
     Using the value of $d(x,C)$, we can rewrite the goal as: Minimize $\max_{x \in X} \min_{y \in C} d(x, y)$.
 \end{defn}
 
-As we stated in the introduction [\ref{thm:clustering-np}], minimum k-centers is np-hard, so we look for an approximation. It has been proved that the best possible approximation one can obtain in polynomial time is a 2-approximation: $$OPT \leq A(X,k) \leq 2 OPT \ \ \ \forall\ X,k.$$
+As we stated in the introduction, minimum k-centers is np-hard, so we look for an approximation. It has been proved that the best possible approximation one can obtain in polynomial time is a 2-approximation: $$OPT \leq A(X,k) \leq 2 OPT \ \ \ \forall\ X,k.$$
 
 Now we present the algorithm to solve the minimum k-centers problem, then we'll prove it gives a 2-approximation.
 
@@ -431,7 +498,7 @@ min-k-centers:
             $\forall\ A \subset C,\ d(z,A) \geq d(z,C)$, since we have more possibilities to find a point closer to $z$ in $C$ than in $A$ (since it's bigger).
         \end{obs}
         We can use this observation and our assumption [\ref{eq:centers-assumption}] to show that $d(z, \{c_1\}) \geq d(z,C) > 2 \cdot OPT$.\\
-        Since the algorithm [\ref{lst:min-k-centers}] pick as center the furthest point from those already considered, we also know that $d(c_2, \{c_1\}) \geq d(z, \{c_1\})$.
+        Since the algorithm [\ref{lst:min-k-centers}] pick as centre the furthest point from those already considered, we also know that $d(c_2, \{c_1\}) \geq d(z, \{c_1\})$.
         
         Similarly, we can say that $d(c_3, \{c_1, c_2\}) \geq d(z, \{c_1, c_2\}) \geq d(z,C) > 2 \cdot OPT$.
         The same holds for $c_4$: $d(c_4, \{c_1, c_2, c_3\}) \geq d(z, \{c_1, c_2, c_3\}) > 2 \cdot OPT$.
@@ -440,7 +507,7 @@ min-k-centers:
 
     Now we can go back to the proof of Theorem [\ref{thm:k-centers-approx}], and show that the claim [\ref{cl:centers}], true under assumption [\ref{eq:centers-assumption}], produces a contradiction.
     
-    Let $O = \{o_1, o_2, \ldots, o_k\}$. Any point in the dataset must be at distance at most $OPT$ from a center in $O$, by definition of the problem; the same holds for the points in $C$, so let's pick $c_1$ from $C$ and let's say that the closest point to $c_1$ in $O$ is $o_1$ (it's just a name). Then $c_2$ can't be at distance $\leq OPT$ from $o_1$, otherwise we have $d(c_1, c_2) \leq 2 \cdot OPT$, but it's impossible for [\ref{cl:centers}].
+    Let $O = \{o_1, o_2, \ldots, o_k\}$. Any point in the dataset must be at distance at most $OPT$ from a centre in $O$, by definition of the problem; the same holds for the points in $C$, so let's pick $c_1$ from $C$ and let's say that the closest point to $c_1$ in $O$ is $o_1$ (it's just a name). Then $c_2$ can't be at distance $\leq OPT$ from $o_1$, otherwise we have $d(c_1, c_2) \leq 2 \cdot OPT$, but it's impossible for [\ref{cl:centers}].
     
     The same holds for any $c_i \in C$, thus each $c_i$ is ``covered'' by a different $o_i$.
     
@@ -458,7 +525,7 @@ min-k-centers:
 
 \obs Differently from k-centers problem [\ref{def:k-centers}], k-means doesn't require that the centers are a subset of the points of the dataset.
 
-\obs As we stated in the introduction [\ref{thm:clustering-np}], minimum k-means is np-hard, so we can't actually find a solution for this problem. The following algorithm is frequently used for the \textit{K-means} problem, even though it does not solve it.
+\obs As we stated in the introduction, minimum k-means is np-hard, so we can't actually find a solution for this problem. The following algorithm is frequently used for the \textit{K-means} problem, even though it does not solve it.
 
 \begin{enumerate}
     \item Phase 1:
@@ -468,7 +535,7 @@ min-k-centers:
     \end{enumerate}
     \item Phase 2:
     \begin{enumerate}
-        \item Compute the center of mass (barycenter) of each cluster,
+        \item Compute the centre of mass (barycenter) of each cluster,
         \item Assign each point to a barycenter to build new clusters,
         \item Repeat 2.1 and 2.2 until clusters stay the same.
     \end{enumerate}
