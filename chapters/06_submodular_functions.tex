@@ -8,7 +8,7 @@ Some specific classes of problems arise from what are called the submodular func
 \section{Max Cover Problem}\label{sec:max-cover}
 
 \begin{definition}[Max Cover]\label{max-cover}
-    Let $S$ be a collection of subsets of some set $U$, and $k \geq 1$ be a positive integer. The Max cover problem consists in finding a family of subsets $T \subseteq S$ such that $T$ does not conatin more than $k$ subsets, and the latter's union is maximized in terms of cardinality:
+    Let $S$ be a collection of subsets of some set $U$, and $k \geq 1$ be a positive integer. The Max cover problem consists in finding a family of subsets $T \subseteq S$ such that $T$ does not contain more than $k$ subsets, and the latter's union is maximized in terms of cardinality:
     \begin{equation}\label{eq:coverage}
         \max_{T \subseteq S} \left( \abs{\bigcup_{T_i \in T} T_i} \right) \qquad \abs{T} \leq k
     \end{equation}
@@ -81,7 +81,7 @@ algorithm $\mcgre(S, k)$:
     \end{lstlisting}
 \end{minipage}
 
-The essential idea is that on each iteration, of all the remianing subsets in $S$, the picked subset $A$ is the one that, along with the current state of $T$, increases the coverage more than the others, effectively maximizing the next iteration of $T$. Another way of seeing this operation is that, at each step, the algorithm removes the nodes already covered by $T$, before choosing the next $A$.
+The essential idea is that on each iteration, of all the remaining subsets in $S$, the picked subset $A$ is the one that, along with the current state of $T$, increases the coverage more than the others, effectively maximizing the next iteration of $T$. Another way of seeing this operation is that, at each step, the algorithm removes the nodes already covered by $T$, before choosing the next $A$.
 
 Before delving into the related theorems, some specific notion are introduced which will help later. Also, for the sake of referring to specific states of objects during the execution of the algorithm, the state of object $T$ at iteration $i$ will be denoted as $T^{(i)}$. Let $f$ be the function counting the total elements covered by a family of subsets $T$:
 
@@ -390,7 +390,7 @@ Despite the model having an apparent temporal nature, note that each edge in the
 
 Knowing the final components makes picking the right starting nodes simple: sort the components by decreasing size and pick one node for each of the first $k$ components. However, this is not the case because the starting nodes must be chosen beforehand.
 
-Nevertheless, this conundrum can be solved in a probabilistic way. Consider an instance of this problem, throw all the coins, and let $A \subseteq E(G)$ be the set of edges that are not removed from the graph, and $T_A$ the partition of the nodes grouping them into the resulting connected components. Let $R(S)$ be the set of nodes informed by the starting nodes in $S$; this is clearly a random variable depending on which edges survive. Now it is possible to comput the expected cardinality of the reached set $R(S)$ conditioned on the edge set $A$, which is what the original problem wants to maximize:
+Nevertheless, this conundrum can be solved in a probabilistic way. Consider an instance of this problem, throw all the coins, and let $A \subseteq E(G)$ be the set of edges that are not removed from the graph, and $T_A$ the partition of the nodes grouping them into the resulting connected components. Let $R(S)$ be the set of nodes informed by the starting nodes in $S$; this is clearly a random variable depending on which edges survive. Now it is possible to compute the expected cardinality of the reached set $R(S)$ conditioned on the edge set $A$, which is what the original problem wants to maximize:
 
 \[
     \expect(\abs{R(S)} \knowing A) = \sum_{\substack{S_i \in T_A \\ S_i \cap S \neq \emptyset}} \abs{S_i}

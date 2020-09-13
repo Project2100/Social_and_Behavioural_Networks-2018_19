@@ -1,6 +1,6 @@
 \chapter{Locality Sensitive Hashing}
 
-The topic of this chapter is about techniques based on hashing that aim to construct a notion of ``distance'' from proprties of a given family of objects; practical applications include efficient grouping by using the constructed distance function, or assessing how much two objects are different from each other. The general idea of \emph{locality} is that objects that are much similar yield hashes that are almost the same, if not exactly.
+The topic of this chapter is about techniques based on hashing that aim to construct a notion of ``distance'' from properties of a given family of objects; practical applications include efficient grouping by using the constructed distance function, or assessing how much two objects are different from each other. The general idea of \emph{locality} is that objects that are much similar yield hashes that are almost the same, if not exactly.
 
 Hashing typically means that an input object of great size is reduced to a much smaller ``fingerprint'', its \emph{hash}. The usual approach of constructing a distance function implementation (a \lsh-scheme), is to formulate a mathematical equation that expresses the desired notion of similarity (the distance function), and then attempt to construct an implementation using known efficient functions (the scheme). The process of creating a scheme usually involves a preprocessing step, and a function family which, by choosing one or another function according a probability distribution, statistically classifies the objects in the same way as the similarity function does.
 
@@ -19,7 +19,7 @@ Often, instead of looking for distance functions, the central formula models the
 
 This is a real-world case study that involved the search engine company Altavista in 1997; it applied an innovative technique designed by its then vice-president Andrei Broder for web-page indexing, and achieved a reduction of used storage space around a factor of 10.
 
-The principal idea is that some kinds of documents, which are very similar to each other, are stored sparsely throughout the Internet; to save storage space, only one among the similars is picked, and its info stored in the index, while all the others are linked to the first one.
+The principal idea is that some kinds of documents, which are very similar to each other, are stored sparsely throughout the Internet; to save storage space, only one among them is picked, and its info stored in the index, while all the others are linked to the first one.
 
 This idea is broadly captured by what is known as the \emph{Bag-of-Words} model\footnotemark, which treats bodies of text as collections of all distinct words that are contained in it. For example, given two phrases as separate bodies:
 
@@ -57,7 +57,7 @@ If the Jaccard similarity is computed on these sets, the result will be $\frac{3
 
 \subsubsection{Constructing a \lsh-scheme for indexing}
 
-The similarity of choice will then be the Jaccard similarity. The pre-processing step will be to randomly pick a permutation of all the words that appear at least once in the two bodies $\pi \in \order(A \cup B)$.
+The similarity of choice will then be the Jaccard similarity. The preprocessing step will be to randomly pick a permutation of all the words that appear at least once in the two bodies $\pi \in \order(A \cup B)$.
 
 Constructing a random sequence from a given set of generic objects can be done efficiently, an example is shown in the first steps of algorithm \ref{lst:min_hash}, where words are encoded as numbers. Then the permutation $\pi$ is used to compute the hash of $A$, which consists in returning the foremost element in $A$ according to the ordering $\pi$.
 
@@ -101,8 +101,8 @@ It is said that $A$ is similar to $B$ if and only if $h_\pi(p_1) = h_\pi(p_2)$. 
 \begin{itemize}
     \item $A \cap B = \emptyset \implies \Pr[h_\pi(A) = h_\pi(B)] = 0$; they have no words in common, so their hashes must be different, independently of the chosen order;
     \item $A = B \implies \Pr[h_\pi(A) = h_\pi(B)] = 1$; this time, all words are in common, so their hashes must coincide, again, independently of the chosen order;
-    \item Otherwise, since $\pi$ is chosen \uar, the probability that the hashes are equal has the same meaning of the probability of finding the lowest element of A and B in the intersection with respect of the union (and not in $U$ as a whole, as our previous observation suggests). This is exactly the Jaccard similarity's definition:
-    \todo{Formally, this doesn't add up; need to rewrite
+    \item Otherwise, since $\pi$ is chosen \uar{}, the probability that the hashes are equal has the same meaning of the probability of finding the lowest element of A and B in the intersection with respect of the union (and not in $U$ as a whole, as our previous observation suggests). This is exactly the Jaccard similarity's definition:
+    \todo{Formally, this does not add up; need to rewrite
     \[
         \Pr[h_\pi(A) = h_\pi(B)] = \frac{\Pr[\min(A) \in A \cap B \wedge \min(B) \in A \cap B]}{\Pr[\min(A) \in A \cup B \wedge \min(B) \in A \cup B]} = \frac{\abs{A \cap B}}{\abs{A \cup B}} = \jaccsim(A, B).
     \]
@@ -140,7 +140,7 @@ We can now observe that the min hash algorithm [\ref{lst:min_hash}] is efficient
 \textsc{Author's note}: This case is best presented with the easier notion of Hamming distance, as the similarity needs to be generalized from its presented form in order to use it here correctly; best to switch to binary strings gradually if this format is kept.
 }
 
-In the previous case study, we considered small subsets of the universe set: each web page has only few words with respect to the whole English language. However, there are cases in which the overlays between two subsets are often relevant, and this case study is one of them. Here, the Hamming similarity is significanlty preferred over the Jaccard similarity.
+In the previous case study, we considered small subsets of the universe set: each web page has only few words with respect to the whole English language. However, there are cases in which the overlays between two subsets are often relevant, and this case study is one of them. Here, the Hamming similarity is significantly preferred over the Jaccard similarity.
 
 Let $A$ and $B$ be two sequences of \dna{} nucleotides $\{Ad, Th, Gu, Cy\}$ modeling two separate \dna{} strands of length $n$. A simple hash function would take one index value $i \in [n]$ as parameter, and return the corresponding nucleotide found in a given sequence; comparing the hashes becomes checking if the two nucleotides of their respective \dna{} sequences at the same specific positions match.
 
@@ -176,19 +176,19 @@ then randomly pick an index value $i$, such as $8$. Then the hash function param
 \end{align*}
 }
 
-Arguably, this natural arising of the Hamming similarity is most influenced by how many different ``seeds'' can be used for the hash function: in the web-page indexing case, the set of permutations of all distinct words contained in the two bodies of text grows exponentially, which justifies avoiding to use an English vocabulary from the start. Here, the index grows linearly, thus a more exaustive similarity check can be performed.
+Arguably, this natural arising of the Hamming similarity is most influenced by how many different ``seeds'' can be used for the hash function: in the web-page indexing case, the set of permutations of all distinct words contained in the two bodies of text grows exponentially, which justifies avoiding to use an English vocabulary from the start. Here, the index grows linearly, thus a more exhaustive similarity check can be performed.
 
 Again, the trick here is to randomly pick a subset of index values that is large enough for giving a good similarity estimate, and the Chernoff bound can provide the set size for a requested confidence level.
 
 \subsection{Binary strings}
 
-A closely related case study takes into consideration binary strings instead of \dna{} strands, essentially reducing the number of symmbols from 4 to 2. For example, let:
+A closely related case study takes into consideration binary strings instead of \dna{} strands, essentially reducing the number of symbols from 4 to 2. For example, let:
 \begin{align*}
     A =&\ 010100011001 \\
     B =&\ 101111000010
 \end{align*}
 
-and pick $i = 5$ as the index value. The consequence is that the hashes are not the same, therefore the strings are considered different. With a twist of prespective, each string can be associated with a set containing the indices where the sequence has a ``1''. The probability of two hashes being equal for a given index is:
+and pick $i = 5$ as the index value. The consequence is that the hashes are not the same, therefore the strings are considered different. With a twist of perspective, each string can be associated with a set containing the indices where the sequence has a ``1''. The probability of two hashes being equal for a given index is:
 
 \todo{May have similar problem of formality like the previous case study
 
@@ -530,7 +530,7 @@ which in turn, by theorem \ref{thm:pgfcompsim}, is \lsh-able.
 
 \section{Sketches}
 
-Sketches are an alternative method to \lsh-schemes for the concept of  represent bigger and more comlpex objects using just a few selected properties. Note that this is not akin to a compression method, which seeks to exactly map an original object with a unique, smaller image
+Sketches are an alternative method to \lsh-schemes for the concept of  represent bigger and more complex objects using just a few selected properties. Note that this is not akin to a compression method, which seeks to exactly map an original object with a unique, smaller image
 
 \begin{example}
     It's possible to go back to $\abs{A \cap B}$ from data such as $\abs{A}$, $\abs{B}$, $h_s(A)$, $h_s(B)$ and $\jaccsim(A, B) \pm \varepsilon$. Note that the similarity value can be obtained from the objects' hashes by applying the Chernoff bound, and all other data need just a few additional bits to be stored.
@@ -562,7 +562,7 @@ Sketching proves to be invaluable in that it is able to make good enough approxi
         \end{cases}
     \]
 
-    where $S$ is a similarity grouping every element under a single class, and $T$ is another smiliarity where each element has its own distinct class.
+    where $S$ is a similarity grouping every element under a single class, and $T$ is another similarity where each element has its own distinct class.
 
     When $\alpha = 1$, $f_\alpha$ induces a banal partition over its domain, whereas with $\alpha = 0$ the induced partition is punctual. The hash functions that can implement such a function would be a constant one for $S$, and an identity function for $T$ (remember that in $T$'s case, $T(x, x) = 1$). However this is not a good scheme, because we're not shrinking data.
 
@@ -597,7 +597,7 @@ For example, where we used $\jaccsim$ to approximate $S_\gamma$, we had $\delta 
 
     \todo{Here the idea of modeling the seed as a RV finally pops out of nowhere... need to review all of the chapter on all probabilities
     
-    A concern about picking seeds with positive probabilities is raised too, which isn't much valuable, hash function families really need a section of their own in this chapter}
+    A concern about picking seeds with positive probabilities is raised too, which is not much valuable, hash function families really need a section of their own in this chapter}
     Fix an object $A \in U$, and let $h_X$ be a \lsh-scheme for $S$ with the seed $X$ as a random variable. Then:
     \begin{align*}
             &\ \sum_{B \in V} S(A, B)                                                                       & \\

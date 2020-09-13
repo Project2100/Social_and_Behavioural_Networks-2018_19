@@ -85,7 +85,7 @@ Generally, centroid-based clustering problems are known to be \np-complete. In s
     \label{fig:hierarchical-clustering-ex}
 \end{figure}
 
-On a theoretical standpoint, if $k$ is left unspecified, there are solutions that are trivially optimal, but have no practical use: if the goal is to minimize the distance within clusters, then the optimal solution is the singleton partition, whereas if the goal is to maximize the distance among clusters, then the optimal partition is indeed the trivial one. A technique called \textit{correlation clustering} has been designe that overcomes this limitation.
+On a theoretical standpoint, if $k$ is left unspecified, there are solutions that are trivially optimal, but have no practical use: if the goal is to minimize the distance within clusters, then the optimal solution is the singleton partition, whereas if the goal is to maximize the distance among clusters, then the optimal partition is indeed the trivial one. A technique called \textit{correlation clustering} has been designed that overcomes this limitation.
 
 
 \section{Correlation clustering}\label{sec:corr-clust}
@@ -156,7 +156,7 @@ Of course, this is not the general case; indeed most instances do have a minimum
     \label{fig:clust-bad-triangles}
 \end{figure}
 
-Rather surprisingly, it can be shown that the minimum cost for clustering a graph can be related with good accuracy to how many bad triangles the graph contains as subgraphs. Ths motivates a formalization:
+Rather surprisingly, it can be shown that the minimum cost for clustering a graph can be related with good accuracy to how many bad triangles the graph contains as subgraphs. This motivates a formalization:
 
 \begin{definition}[Bad triangle]
     Let $\mathcal{K}_n$ be a complete graph with its edges partitioned into two disjoint subsets $E^+$ and $E^-$. The family $G_\triangle$ collects all the bad triangles of $G$:
@@ -168,7 +168,7 @@ Rather surprisingly, it can be shown that the minimum cost for clustering a grap
 
 \subsection{Randomized pivot}\label{sec:random-pivot}
 
-This is an approximation algorithm for solving the correlation clustering problem desgned by Ailon, Charikar, Newman:
+This is an approximation algorithm for solving the correlation clustering problem designed by Ailon, Charikar, Newman:
 \begin{lstlisting}[caption = {Randomized Pivot algorithm}, label = {lst:clust-random-pivot}]
 algorithm $\rpgre(V, E^+, E^-)$:
     $T \gets \emptyset$
@@ -241,7 +241,7 @@ Despite some pathological cases such as a star graph, this algorithm does yield 
         \]
     \end{itemize}
 
-    Let $\cost_+^{(i)}$ and $\cost_+^{(i)}$ be the costs that incur respectively for cutting positive edges and from preserving negative edges on an arbitrary iteration $i$, with the singluar edge cost expressed algorithmically as above. Given a solution $T$ returned by the algorithm $\rpgre$, its total cost can be rewritten as follows:
+    Let $\cost_+^{(i)}$ and $\cost_+^{(i)}$ be the costs that incur respectively for cutting positive edges and from preserving negative edges on an arbitrary iteration $i$, with the single edge cost expressed algorithmically as above. Given a solution $T$ returned by the algorithm $\rpgre$, its total cost can be rewritten as follows:
     \[
         \cost(T) = \sum_{i \in \textsc{iter}} \cost_+^{(i)} + \sum_{i \in \textsc{iter}} \cost_-^{(i)}
     \]
@@ -319,7 +319,7 @@ Despite some pathological cases such as a star graph, this algorithm does yield 
             \end{cases}
         \]
 
-        Note that the condition on the first assignent does represent both the events that positive edges get cut and negative edges are preserved in a concise fashion. In short, $X_{\{a, b\}} = 1$ iff there is an error in $T$, and since it is proven that each bad triangle entails one error, the constraint is satisfied. Therefore, the objective function effectively counts each bad triangle that is hit, so the solution's value, is equal to $\cost(T)$.
+        Note that the condition on the first assignment does represent both the events that positive edges get cut and negative edges are preserved in a concise fashion. In short, $X_{\{a, b\}} = 1$ iff there is an error in $T$, and since it is proven that each bad triangle entails one error, the constraint is satisfied. Therefore, the objective function effectively counts each bad triangle that is hit, so the solution's value, is equal to $\cost(T)$.
     \end{proof}
     
     A primal formulation of the problem would be:
@@ -342,11 +342,11 @@ Despite some pathological cases such as a star graph, this algorithm does yield 
     %the cost funciton is cost(T) = sum of broken positive edges + sum of preserved negative edges. Let v^(i) be a pivot, then if a clustering breaks a positive edge (implying it asn't been cut beforehand, therefore both endpoints are in V^(i)), this means that one of its endpoints is included in C^(i), and is thus adjacent to v^(i), and the other endpoint is outside C^(i), which makes it nonadjacent to v(i). It entails that the pivot and the endpoints of the broken edge make a bad triangle. In the case of negative edges arises when both the endpoints are in the same cluster, which means two things: neither can be the pivot, otherwise they woud be in different clusters, and both are adjacent to the pivot.
     % Better: for each endpoint to be in the cluster, either it is a pivot, or it is adjacent to it.
 
-    % The (T is hit) evemnt is better expressed with the conditions on the pivot and on the V^(i); it would also be best to encode all the conditions listed in the coost functions into it.
+    % The (T is hit) event is better expressed with the conditions on the pivot and on the V^(i); it would also be best to encode all the conditions listed in the cost functions into it.
 
     % given the set of vertices of the triangles sharing edge ij W_ij, multiple pivots can be picked inside of it. Let v^(n) be the first such pivot:
-    % v^{(n)} is either i or j, fix i wlog: then all edges of the triangles in S_ij incident on i including ij will be preserved if positive, or cut if negative, and the edges incident on j excluding ij will decide the cost incurred in such operation for each triangle. This means that no other next pivot can hit a traingle in S_ij
-    % v^{(n)} is neither i nor j: sicne v^{(n)} must be adjacent to at least one endpoint ij fix i wlog, then i will be placed in the same cluster as the pivot, having i in the cluster uses up all the bad triangles; again, no other next pivot can hit a traingle in S_ij.
+    % v^{(n)} is either i or j, fix i wlog: then all edges of the triangles in S_ij incident on i including ij will be preserved if positive, or cut if negative, and the edges incident on j excluding ij will decide the cost incurred in such operation for each triangle. This means that no other next pivot can hit a triangle in S_ij
+    % v^{(n)} is neither i nor j: since v^{(n)} must be adjacent to at least one endpoint ij fix i wlog, then i will be placed in the same cluster as the pivot, having i in the cluster uses up all the bad triangles; again, no other next pivot can hit a triangle in S_ij.
     % therefore, of all the pivots in W_ij, only the first one hits triangles
 
     \begin{proof}
@@ -369,7 +369,7 @@ Despite some pathological cases such as a star graph, this algorithm does yield 
             \leq&\ \oneover{3} \sum_{T \in S_{ij}} \Pr[\exists k : v^{(k)} \in T \knowing \phi_{ij}] & \mathllap{\text{(any probability is at most $1$)}}
         \end{align*}
 
-        % The original proof kaind of implied that n = k; is it true? YES, it can be proven, see comments proof beginnning
+        % The original proof kaind of implied that n = k; is it true? YES, it can be proven, see comments proof beginning
         Under the condition $\phi_{ij}$, there will be one node that ends up being the first pivot chosen in $W_{ij}$; suppose it is $v^{(n)}$, that is, let $n$ be the iteration such that $v^{(n)} \in W_{ij}$ and for all $m < n$, no pivots are picked in $W_{ij}$. Moreover, let $B^{(n)}_{ij} = V^{(n)} \cap W_{ij}$ be the nodes of $W_{ij}$ that are part of the residual graph when $v^{(n)}$ is chosen as a pivot. Then:
         \begin{align*}
                 &\ \sum_{T \in S_{ij}} \Pr[\exists k : v^{(k)} \in T \knowing \phi_{ij}] & \\
@@ -520,12 +520,12 @@ min-k-centers:
 \begin{defn}[Minimum k-means]\label{def:k-means}
     The minimum k-means problem is defined as follows:\\
     Input: $X \in \mathbb{R}^d = \{x_1, x_2, ..., x_n\}$ points in a metric space.\\
-    Goal: Find $k$ centers $c_1, \dots, c_k$ in $\mathbb{R}^d$ (the euclidian space) s.t. $\sum_{x \in X} d(x,C)^2$ is minimized, where $d(x,C) := \min_{y \in C} d(x,y)$ is the distance between a point and a set of points.
+    Goal: Find $k$ centers $c_1, \dots, c_k$ in $\mathbb{R}^d$ (the euclidean space) s.t. $\sum_{x \in X} d(x,C)^2$ is minimized, where $d(x,C) := \min_{y \in C} d(x,y)$ is the distance between a point and a set of points.
 \end{defn}
 
-\obs Differently from k-centers problem [\ref{def:k-centers}], k-means doesn't require that the centers are a subset of the points of the dataset.
+\obs Differently from k-centers problem [\ref{def:k-centers}], k-means does not require that the centers are a subset of the points of the dataset.
 
-\obs As we stated in the introduction, minimum k-means is np-hard, so we can't actually find a solution for this problem. The following algorithm is frequently used for the \textit{K-means} problem, even though it does not solve it.
+\obs As we stated in the introduction, minimum k-means is \np-hard, so we can't actually find a solution for this problem. The following algorithm is frequently used for the \textit{K-means} problem, even though it does not solve it.
 
 \begin{enumerate}
     \item Phase 1:
@@ -606,7 +606,7 @@ Since the algorithm performs some kind of optimization on real numbers, we could
     \end{lem}
     \begin{proof}[Proof of lemma \ref{lem:k-means-2}]
         Let's look at the algorithm from a combinatorial point of view.\\
-        The clusterization can be seen as a coloring where we are using $k$ colors.
+        The clustering can be seen as a coloring where we are using $k$ colors.
         Having $k$ colors and $n$ points there may be $k^n$ colorings, so the number of possible clusterings is finite.
     \end{proof}
 
@@ -653,5 +653,5 @@ Open problems:
 \begin{itemize}
     \item Researches tried to apply the same procedure of k-means++ to other problems that have similar objective function: the distance $d$ with exponents $e \neq 2$. The result was that it works if the exponent is $e \geq 2$, but it is unknown if it could work if $1 \leq e < 2$;
     \item Since each solution depends on the previous one, the algorithms we saw can't be parallelized without getting a worse approximation, thus researchers are looking for a parallel algorithm that obtain the minimum loose in approximation;
-    \item There are some algorithms that returns a constant approximation of k-means problem, but they aren't used since they are too slow or too hard to implement or use, so maybe some better algorithm can still be found.
+    \item There are some algorithms that returns a constant approximation of k-means problem, but they are not used since they are too slow or too hard to implement or use, so maybe some better algorithm can still be found.
 \end{itemize}

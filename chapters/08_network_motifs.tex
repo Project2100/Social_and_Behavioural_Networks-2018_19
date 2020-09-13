@@ -1,6 +1,6 @@
 \chapter{Network motifs}
 
-It has been observed that, in most graphs that arise as models of real-world networks, like biological or social ones, some specific subgraph pattern may repeat consistently; these repeated patterns are called \emph{network motifs}, and  may be proper to a specifi network, or even shared among different ones. These subgraphs, defined by a particular pattern of interactions between the involved vertices, may reflect a behaviour for which particular functions are achieved efficiently. Indeed, motifs are of notable importance largely because they may reflect functional properties. Some purposes for exploiting network motifs are:
+It has been observed that, in most graphs that arise as models of real-world networks, like biological or social ones, some specific subgraph pattern may repeat consistently; these repeated patterns are called \emph{network motifs}, and  may be proper to a specific network, or even shared among different ones. These subgraphs, defined by a particular pattern of interactions between the involved vertices, may reflect a behaviour for which particular functions are achieved efficiently. Indeed, motifs are of notable importance largely because they may reflect functional properties. Some purposes for exploiting network motifs are:
    \begin{itemize}
        \item Efficiency: to build better and/or faster algorithms;
        \item Classification: to find structural differences among graphs induced by different relations and measured counting the frequency of various motifs;
@@ -19,7 +19,7 @@ The triangle graph $\mathcal{K}_3$ is the simplest, nontrivial motif that is usu
     \end{equation}
 \end{definition}
 
-The higher the coefficient, the more triangles the graph contains. An example of a graph along with its connected triples is swown in figure \ref{fig:graph-example-triangles}; note that when a triangle is present, there are three distinct connected triples, all sharing the same vertices but different edges. In total, there are $5$ connected triples and $1$ triangle, so the global clustering coefficient of the starting graph is $\frac{3}{5}$. If the specific case of a clique $\mathcal{K}_n$ is considered, then observe that all vertex triplets induce a triangle; in the end, $c(\mathcal{K}_n) = 1$.
+The higher the coefficient, the more triangles the graph contains. An example of a graph along with its connected triples is shown in figure \ref{fig:graph-example-triangles}; note that when a triangle is present, there are three distinct connected triples, all sharing the same vertices but different edges. In total, there are $5$ connected triples and $1$ triangle, so the global clustering coefficient of the starting graph is $\frac{3}{5}$. If the specific case of a clique $\mathcal{K}_n$ is considered, then observe that all vertex triplets induce a triangle; in the end, $c(\mathcal{K}_n) = 1$.
 \begin{figure}
     \centering
     
@@ -167,7 +167,7 @@ Going further with the cube, the formula for each element becomes:
 \]
 which means, intuitively, that $(A^3)_{uv}$ contains the number of paths of length $3$ that go from $u$ to $v$; this reasoning generalizes to any $A^k$ for paths of length $k$.
 
-Finding triangles in a graph then relies in computing the diagonal elements of $A^3$. For example, consider the graph $\mathcal{K}_3$ composed of a single triangle; starting from an arbitrary node $u$, there are indeed two paths of length $3$ that loop from $u$ to itself: $u \to v \to w$ and $u \to w \to v$. Therefore $(A^3)_{uu}$ would evaluate $2$, however the triangle is just one. That is true in general, so every triangle counts twice to the diagonal entry of every node that forms it; and since each node of the triangle detest it, said triangle does appear in $3$ differen diagonal entries, one for each vertex.
+Finding triangles in a graph then relies in computing the diagonal elements of $A^3$. For example, consider the graph $\mathcal{K}_3$ composed of a single triangle; starting from an arbitrary node $u$, there are indeed two paths of length $3$ that loop from $u$ to itself: $u \to v \to w$ and $u \to w \to v$. Therefore $(A^3)_{uu}$ would evaluate $2$, however the triangle is just one. That is true in general, so every triangle counts twice to the diagonal entry of every node that forms it; and since each node of the triangle detest it, said triangle does appear in $3$ different diagonal entries, one for each vertex.
 
 \begin{definition}
     Let $M$ be a matrix, its \emph{trace} is:
@@ -188,7 +188,7 @@ Algorithm_2(A):
     return $\frac{tr(AC)}{6}$
 \end{lstlisting}
 
-Its running time is mainly governed by matrix multiplication, for which the best known algorithm takes time $O(n^{2.37})$. It entails that the time complexity is independent from the number of edges: in fact, the algorithm doesn't take into account the structure of the graph. On one hand, this approach gives an improvement for dense graphs, lowering the bound from $O(n^3)$ to $O(n^{2.37})$; but on the other hand it suffers a performance hit on sparse graphs. Note that this is true because, even if a matrix $A$ is sparse, its square $A^2$ won't. A good example showcasing this consequence is a star graph, for which the adjacency matrix on $7$ vertices and its square are:
+Its running time is mainly governed by matrix multiplication, for which the best known algorithm takes time $O(n^{2.37})$. It entails that the time complexity is independent from the number of edges: in fact, the algorithm does not take into account the structure of the graph. On one hand, this approach gives an improvement for dense graphs, lowering the bound from $O(n^3)$ to $O(n^{2.37})$; but on the other hand it suffers a performance hit on sparse graphs. Note that this is true because, even if a matrix $A$ is sparse, its square $A^2$ won't. A good example showcasing this consequence is a star graph, for which the adjacency matrix on $7$ vertices and its square are:
 \[
 	A = \begin{pmatrix}
 		0 & 0 & 0 & 0 & 0 & 1 & 0 \\
@@ -362,7 +362,7 @@ Algorithm_1b(G, H):
     else:
         return $[F \simeq H]$
 \end{lstlisting}
-But this doesn't produce a substantial improvement, so how can we pick $k$ nodes in such a way that they are connected, and that they have a high chance of forming the motif we are looking for? A possibility is to pick a random node, then choose one of its neighbors, then choose a neighbor of the selected neighbor, and so on. This idea is put to good use for a special case: the 3-star.
+But this does not produce a substantial improvement, so how can we pick $k$ nodes in such a way that they are connected, and that they have a high chance of forming the motif we are looking for? A possibility is to pick a random node, then choose one of its neighbors, then choose a neighbor of the selected neighbor, and so on. This idea is put to good use for a special case: the 3-star.
 
 
 \subsection{4-motifs}

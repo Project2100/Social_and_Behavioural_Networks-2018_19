@@ -15,8 +15,8 @@ In this chapter we are going to define some mathematical models that describes t
 
 Given an undirected graph $G$, the general spreading model starts with a single node, the \emph{source} having a specific piece of information. On each time interval:
 \begin{itemize}
-    \item in the \emph{push} variant, the vertices possessing the information will replicate and transmit it to a randomly chosen neighbour, regardless of such neighbour having already recieved it;
-    \item in the \emph{pull} variant, each uninformed vertex randomly chooses a neighbour; if the latter has the information, then it gets replicated and transmittedto the former.
+    \item in the \emph{push} variant, the vertices possessing the information will replicate and transmit it to a randomly chosen neighbour, regardless of such neighbour having already received it;
+    \item in the \emph{pull} variant, each uninformed vertex randomly chooses a neighbour; if the latter has the information, then it gets replicated and transmitted to the former.
 \end{itemize}
 
 An upper bound on the spreading steps is given by the necessary rounds to completely spread the information in the whole graph, which in turn depends on the graph's structure; for example, a star will require much less time than a chain. This model can be useful to choose the best starting vertices as sources, for advertising purposes.
@@ -69,7 +69,7 @@ For example, consider an execution of the trace spreading model as depicted in f
 From here onwards, it is assumed that any node may act as a source: $S = V$. The question is: how many traces do we need to reconstruct the graph reliably enough?
 
 \section{The First-edge Algorithm}
-This algorithm, of which steps are provided in \ref{lst:first-edge}, hinges on the siimple idea that a trace reliably discovers one edge of the graph, which is the one connecting the source to the first informed vertex after it. Since the algorithm adds one edge for each trace, finding all the edges requires just as many traces.
+This algorithm, of which steps are provided in \ref{lst:first-edge}, hinges on the simple idea that a trace reliably discovers one edge of the graph, which is the one connecting the source to the first informed vertex after it. Since the algorithm adds one edge for each trace, finding all the edges requires just as many traces.
 
 \begin{lstlisting}[caption = {The First-edge algorithm}, label = {lst:first-edge}]
 algorithm $\ferec(C)$                       // The set of traces

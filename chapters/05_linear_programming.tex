@@ -81,7 +81,7 @@ where:
         \end{aligned}
     \end{equation}
     
-    Note that it uses the same (transposed) coefficient and constant matrices of a primal, but the variable vector has dimension $m$ instead of $n$. This means that changing $\max$ into $\min$ and letting any constraint become a variable and viceversa is required to pass from the primal to the dual.
+    Note that it uses the same (transposed) coefficient and constant matrices of a primal, but the variable vector has dimension $m$ instead of $n$. This means that changing $\max$ into $\min$ and letting any constraint become a variable and vice versa is required to pass from the primal to the dual.
 \end{definition}
 
 \begin{theorem}[Weak Duality]\label{thm:weak-duality}
@@ -98,7 +98,7 @@ where:
     where the first inequality holds by definition of dual, and the second by definition of primal.
 \end{proof}
 
-Given a primal \lp{}, the usual way to solve it is to guess a solution $\overline{x}$, check that it satisfies the constraints, and then evaluate how good it is by using the objective function. To know if the solution is sufficienlty close to optimal, the same process can be applied on the corresponding dual \lp{} with another solution $\overline{y}$. If the costs of both guesses are close, then the chosen solutions are indeed close to optimal.
+Given a primal \lp{}, the usual way to solve it is to guess a solution $\overline{x}$, check that it satisfies the constraints, and then evaluate how good it is by using the objective function. To know if the solution is sufficiently close to optimal, the same process can be applied on the corresponding dual \lp{} with another solution $\overline{y}$. If the costs of both guesses are close, then the chosen solutions are indeed close to optimal.
 
 \begin{theorem}[Strong Duality]\label{thm:strong-duality}
     If $\overline{x}$ is an optimal solution to the primal and $\overline{y}$ is an optimal solution to the dual, and if $\overline{c}^T \overline{x}$ and $\overline{y} \overline{b}$ are finite, then the solutions are the same:
@@ -268,7 +268,7 @@ In other words, the consequence of constructing the solution used to prove \ref{
         \]
     \end{claim}
     \begin{proof}
-        Assume that this was not the case: $\exists\ X_{\{i, j\}} < \min(Y_i, Y_j)$. Then the value of $X_{\{i, j\}}$ can be increased up to $\min(Y_i, Y_j)$, which in turn increases the objective function's value while keeping the solution feasible. It entails that $X_{\{i, j\}}$ wasn't the optimal value, which is a contradiction.
+        Assume that this was not the case: $\exists\ X_{\{i, j\}} < \min(Y_i, Y_j)$. Then the value of $X_{\{i, j\}}$ can be increased up to $\min(Y_i, Y_j)$, which in turn increases the objective function's value while keeping the solution feasible. It entails that $X_{\{i, j\}}$ was not the optimal value, which is a contradiction.
     \end{proof}
 
     Let $\{X_i, Y_i\}$ be an optimal solution, fix a parameter $r$ and let:
@@ -411,7 +411,7 @@ algorithm $Greedy(G(V,E))$:
     As it often happens in primal-dual proofs, even in this case it will be useful to refer to an underlying algebraic structure, for this proof it will be the \textit{orientation}.
     
     \begin{defn}[Orientation]
-        An orientation $\varphi$ of the simple undirected graph $G(V,E)$ is an assignmento f each edge in $E$ to one of its endpoints.
+        An orientation $\varphi$ of the simple undirected graph $G(V,E)$ is an assignment of each edge in $E$ to one of its endpoints.
     \end{defn}
     
     \obs There are $2^{\abs{E}}$ possible orientations $\varphi$.
@@ -466,7 +466,7 @@ algorithm $Greedy(G(V,E))$:
         \label{fig:dsp-phi}
     \end{figure}
 
-    Note that the algorithm doesn't care about orientations, but we will use this concept in the proof.
+    Note that the algorithm does not care about orientations, but we will use this concept in the proof.
     
     \begin{lem}\label{l:dsp-greedy-2}
         Let $M$ be the solution returned by Greedy, i.e., $M := \max_{i = 0, \ldots, n-1}\{f(S_i)\}$, then the following inequality holds:
@@ -497,7 +497,7 @@ algorithm $Greedy(G(V,E))$:
     This finally concludes the proof of Theorem [\ref{thm:dsp-greedy}].
 \end{proof}
 
-\obs To obtain the actual approximated densest subgraph from Greedy, it isn't necessary to store each one of the $S_i$s, it is sufficient to keep in memory the degree of the node $v_i$ we deleted. Furthermore, by returning the obtained community and $\deg(v_i)$, we have a proof of the goodness of that community, since the degree gives a bound for the optimal community.
+\obs To obtain the actual approximated densest subgraph from Greedy, it is not necessary to store each one of the $S_i$s, it is sufficient to keep in memory the degree of the node $v_i$ we deleted. Furthermore, by returning the obtained community and $\deg(v_i)$, we have a proof of the goodness of that community, since the degree gives a bound for the optimal community.
 
 Now we are going to show the \textit{implicit linear problem} underlying Greedy.\\
 The \textbf{primal} LP is the same we saw in the previous section, i.e. [\ref{lp-densest-subgraph}], we just rename some variables and give a name to the constraints (in square brackets):

@@ -2,7 +2,7 @@
 
 If we want to infer some information about a graph that is particularly big, such as the ones behind the web or social networks like Facebook, we usually can't perform most tasks directly on the actual graph: in the majority of cases, such tasks would take too much time. For this reason, graph models are devised in order to represent the actual ones closely enough, and then are used in their stead to perform efficient analysis.
 
-Some properties are recurringly of interest when dealing with a network:
+Some properties are of recurrent interest when dealing with a network:
 \begin{itemize}
     \item the overall number of nodes,
     \item the average degree,
@@ -13,7 +13,7 @@ Some properties are recurringly of interest when dealing with a network:
 
 \section{Erd\H{o}s–Rényi model}\label{sec:gnp}
     
-This is a model for generating random graphs, that has many applications due to its simplicity, but doesn't fit real world networks: the nodes in such a generated graph have more or less the same degree, based on a fixed probability; in real networks degrees usually follow a gaussian distribution.
+This is a model for generating random graphs, that has many applications due to its simplicity, but doesn't fit real world networks: the nodes in such a generated graph have more or less the same degree, based on a fixed probability; in real networks degrees usually follow a Gaussian distribution.
 
 Denote by $\ergen(n, p)$ a random process that produces a graph with $n$ nodes, in which each edge appears with probability $p$. This process can be described by the following algorithm:
 
@@ -240,7 +240,7 @@ Indeed, the fraction of nodes of degree $x$ approaches $x^{-3}$. This is what ma
 
 In the social network context it means that it is exponentially more likely to pick ``normal people'' with few friends or followers rather than popular profiles, called \emph{celebrities} or \emph{authorities}. Nodes with high degree in a social network are few, but they exist. So, as an example, an advertisement agency could pay those celebrities to publicize a product, enabling a spread of information due to the high number of connections those nodes have.
 
-The actual algorithm $\pagen(n)$ constructing a graph using preferential attachemnt is of the inductive type:
+The actual algorithm $\pagen(n)$ constructing a graph using preferential attachment is of the inductive type:
 
 \begin{lstlisting}[caption = {The $\pagen(n)$ algorithm}, label = {lst:algopa}]
 algorithm $\pagen(n)$:
@@ -287,12 +287,12 @@ As with the Erd\H{o}s-Rényi model, analysis starts from the distribution of its
 \end{observation}
     
 \begin{proof}
-    The proof will be structured as a nested double induction: the outer one variates the degree $d$, whereas the inner deals with the number of vertices $t$. It is worth to begin with a high level overview of what happens whenever a new vertex $v_t$ is added, and how the degree counts change after addition:
+    The proof will be structured as a nested double induction: the outer one goes over the degree $d$, whereas the inner deals with the number of vertices $t$. It is worth to begin with a high level overview of what happens whenever a new vertex $v_t$ is added, and how the degree counts change after addition:
 
     \begin{itemize}
         \item Counting nodes with degree 1:
             \begin{itemize}
-                \item $v_t$ creates a self loop: the number of nodes with degree 1 doesn't change;
+                \item $v_t$ creates a self loop: the number of nodes with degree 1 does not change;
                 \item $v_t$ connects to a node $w$ of degree 1: in this case $v_t$ is a new node with degree 1, but $w$ now has a degree greater than 1, thus the overall number of nodes with degree 1 does not change;
                 \item $v_t$ connects to a node of degree 2 or more: $v_t$ is a new node with degree 1, so the number of nodes with degree 1 increases by one;
             \end{itemize}
@@ -365,7 +365,6 @@ As with the Erd\H{o}s-Rényi model, analysis starts from the distribution of its
 
         \begin{itemize}
             \item Base: ($t = 0$): At time $t + 1 = 1$ the graph is composed by a single node with degree 2, thus no 1-degree vertex is present. The claim holds for $c \geq \frac{2}{3}$:
-
             \[
                 \frac{2}{3} - c \leq \expect(X_1^{(1)}) = 0 \leq \frac{2}{3} + c
             \]
