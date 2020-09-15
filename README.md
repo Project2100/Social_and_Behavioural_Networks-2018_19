@@ -12,7 +12,7 @@ Many thanks go to Giovanni Ficarra and Donato Crisostomi, who kept the document 
 
 * Andrea Proietto: [GitHub](https://github.com/Project2100)
 * Giovanni Ficarra: [GitHub](https://github.com/GioFic95)
-* Donato Crisostomi
+* Donato Crisostomi: [GitHub](https://github.com/crisostomi)
 
 ## Requirements
 
