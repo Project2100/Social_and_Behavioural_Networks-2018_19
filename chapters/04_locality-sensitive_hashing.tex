@@ -134,7 +134,7 @@ The size of $P$ required for a sufficiently good estimate can be obtained using 
 
 We can now observe that the min hash algorithm [\ref{lst:min_hash}] is efficient: instead of comparing two entire pages, it only compares $n$ integers.
 
-\section{A case study: Comparing DNAs}
+\section{A case study: Comparing \dna{} strands}
 
 \todo{
 \textsc{Author's note}: This case is best presented with the easier notion of Hamming distance, as the similarity needs to be generalized from its presented form in order to use it here correctly; best to switch to binary strings gradually if this format is kept.
@@ -250,11 +250,8 @@ In spirit of such practical perspective, the following mathematical definitions 
 \end{example}
 
 
-% INSIGHT
-\obs Preprocess and hash function (aka a scheme) determine the similarity function; in real world scenarios, attempts are made to construct such elements to implement such similarity
-
-% MAJOR INSIGHT:
-\obs In the previous webpage example [\ref{sec:web-page-indexing}], we're not dealing with a single hashing function, but with a family of functions each built with its own word permutation: the scheme distributes over the permutations of the union!
+% INSIGHT: Preprocess and hash function (aka a scheme) determine the similarity function; in real world scenarios, attempts are made to construct such elements to implement such similarity
+% MAJOR INSIGHT: In the previous webpage example [\ref{sec:web-page-indexing}], we're not dealing with a single hashing function, but with a family of functions each built with its own word permutation: the scheme distributes over the permutations of the union!
 % Now, do all permutations induce unique partitions? AP200828: Good question, might be true considering the domain being \powerset{\nonneg}
 
 
@@ -448,9 +445,9 @@ The proof is inductive and makes use of four lemmas presented here. The first on
     This forms the base step of the proof by induction, for $i = 0$. The inductive step consists in proving that $S^{i + 1} = S \cdot S^i$ admits a \lsh-scheme for any $i$, and since $S$ does admit one by definition, $S^i$ does admit one too by inductive hypothesis, and lemma \ref{lem:pgfcomp} proves that \lsh-ability is preserved upon concatenation, $S^{i + 1}$ does admit a \lsh-scheme, completing the proof.
 \end{proof}
 
-\begin{lem}[L4]\label{l:pgf_4}
+\begin{lemma}[L4]\label{l:pgf_4}
     Let $P = \{p_i\}$ be a countably infinite set of real numbers between 0 and 1 such that their total sum is 1, and $S = \{S_i\}$ be a set of \lsh-able similarities such that $\abs{S} = \abs{P}$. Then $\sum_{i = 0}^{\infty} p_i S_i$ is also a \lsh-able similarity.
-\end{lem}
+\end{lemma}
 
 \begin{proof}
 
@@ -478,7 +475,7 @@ This lemma is useful if a weighted average is needed:
 \]
 
 \begin{proof}[Proof of the theorem \ref{thm:pgfcompsim}]
-    We want to prove that $\sum_{i = 0}^{\infty} p_i S^i$ has a scheme. By lemma [\ref{l:powersim}] we know $S^i$ has a scheme, and by L4 [\ref{l:pgf_4}] we know the sum is lshable.
+    We want to prove that $\sum_{i = 0}^{\infty} p_i S^i$ has a scheme. By lemma [\ref{l:powersim}] we know $S^i$ has a scheme, and by L4 [\ref{l:pgf_4}] we know the sum is \lsh-able.
 \end{proof}
 
 

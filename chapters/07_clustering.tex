@@ -215,7 +215,7 @@ Despite some pathological cases such as a star graph, this algorithm does yield 
     \]
 \end{theorem}
 
-\begin{obs}\label{obs:clust-4}
+\begin{observation}\label{obs:clust-4}
     By using Markov Inequality [\ref{eq:markov}], it can be proved that the bad event have small probability, if we execute the algorithm many times:
     \begin{itemize}
         \item Let $X=cost(\mathscr{C})$, $X$ is a not concentrated random variable with expected value $E[X] \leq 3 \cdot OPT$;
@@ -225,7 +225,7 @@ Despite some pathological cases such as a star graph, this algorithm does yield 
         $\left( 1 - \Theta(\varepsilon) \right)^{\left( \frac{\ln 1/\delta}{\varepsilon} \right)} \to \Theta(\delta)$;
         \item At this point, it is sufficient to return the best solution among those computed by the algorithm in the various trials, and with high probability it will be a solution that respects the 3-approximation, that is, a solution for which the bad event doesn't happen.
     \end{itemize}
-\end{obs}
+\end{observation}
 
 \begin{proof}[Proof of Theorem \ref{thm:clust-rp-approx}]
     Recall the definition \ref{eq:clust-cost} of the cost function; there are two sums added together:
@@ -279,7 +279,7 @@ Despite some pathological cases such as a star graph, this algorithm does yield 
     
     We introduced the concept of \textit{hitting} because we want to relate the probability of hitting a bad triangle with the cost paid by the algorithm. We can't directly compute this probability, but we obtain a useful linear relationship.
     \begin{lemma}\label{l:clust-2}
-        Given an instance of correlation clustering, for each bad triangle $T \in G_\triangle$ let $p_S$ be the probability of the Randomized Pivot algorithm hitting it.\footnote{Care should be taken while thinking about such probabilities, as which triangle gets hit or not, and how probable are such events on any specific itertion generally depends on the previous random choices the algorithm makes} Then:
+        Given an instance of correlation clustering, for each bad triangle $T \in G_\triangle$ let $p_S$ be the probability of the Randomized Pivot algorithm hitting it.\footnote{Care should be taken while thinking about such probabilities, as which triangle gets hit or not, and how probable are such events on any specific iteration generally depends on the previous random choices the algorithm makes} Then:
         \[
             \expect(\cost(\rpgre(G))) = \sum_{T \in G_\triangle} p_T
         \]
@@ -309,7 +309,7 @@ Despite some pathological cases such as a star graph, this algorithm does yield 
     \end{lemma}
 
     \begin{proof}
-        For the purposes of the lemma, it is sufficient to provide a solution and show that it is feasible; the lemma's statement will then be a consequence of the \lp{} solution's properties.
+        For the purposes of the lemma, it is sufficient to provide a solution and show that it is feasible; the statement will then be a consequence of the \lp{} solution's properties.
         
         Construct a solution $T$ by performing the assignments to the variables $X_{\{a, b\}}$ as follows:
         \[
@@ -339,7 +339,7 @@ Despite some pathological cases such as a star graph, this algorithm does yield 
 
     % Some ideas:
 
-    %the cost funciton is cost(T) = sum of broken positive edges + sum of preserved negative edges. Let v^(i) be a pivot, then if a clustering breaks a positive edge (implying it asn't been cut beforehand, therefore both endpoints are in V^(i)), this means that one of its endpoints is included in C^(i), and is thus adjacent to v^(i), and the other endpoint is outside C^(i), which makes it nonadjacent to v(i). It entails that the pivot and the endpoints of the broken edge make a bad triangle. In the case of negative edges arises when both the endpoints are in the same cluster, which means two things: neither can be the pivot, otherwise they woud be in different clusters, and both are adjacent to the pivot.
+    %the cost function is cost(T) = sum of broken positive edges + sum of preserved negative edges. Let v^(i) be a pivot, then if a clustering breaks a positive edge (implying it hasn't been cut beforehand, therefore both endpoints are in V^(i)), this means that one of its endpoints is included in C^(i), and is thus adjacent to v^(i), and the other endpoint is outside C^(i), which makes it nonadjacent to v(i). It entails that the pivot and the endpoints of the broken edge make a bad triangle. In the case of negative edges arises when both the endpoints are in the same cluster, which means two things: neither can be the pivot, otherwise they would be in different clusters, and both are adjacent to the pivot.
     % Better: for each endpoint to be in the cluster, either it is a pivot, or it is adjacent to it.
 
     % The (T is hit) event is better expressed with the conditions on the pivot and on the V^(i); it would also be best to encode all the conditions listed in the cost functions into it.
@@ -369,7 +369,7 @@ Despite some pathological cases such as a star graph, this algorithm does yield 
             \leq&\ \oneover{3} \sum_{T \in S_{ij}} \Pr[\exists k : v^{(k)} \in T \knowing \phi_{ij}] & \mathllap{\text{(any probability is at most $1$)}}
         \end{align*}
 
-        % The original proof kaind of implied that n = k; is it true? YES, it can be proven, see comments proof beginning
+        % The original proof kind of implied that n = k; is it true? YES, it can be proven, see comments proof beginning
         Under the condition $\phi_{ij}$, there will be one node that ends up being the first pivot chosen in $W_{ij}$; suppose it is $v^{(n)}$, that is, let $n$ be the iteration such that $v^{(n)} \in W_{ij}$ and for all $m < n$, no pivots are picked in $W_{ij}$. Moreover, let $B^{(n)}_{ij} = V^{(n)} \cap W_{ij}$ be the nodes of $W_{ij}$ that are part of the residual graph when $v^{(n)}$ is chosen as a pivot. Then:
         \begin{align*}
                 &\ \sum_{T \in S_{ij}} \Pr[\exists k : v^{(k)} \in T \knowing \phi_{ij}] & \\
@@ -626,7 +626,7 @@ Let's thus see what a smoothed analysis is.
     In a smoothed analysis the running time is computed in the following way:
     \begin{enumerate}
         \item The input is adversary;
-        \item The datapoints are perturbed a little bit;
+        \item The data points are perturbed a little bit;
         \item The expected running time is computed (expected because of the perturbation of the points, which is stochastic).
     \end{enumerate}
 \end{defn}

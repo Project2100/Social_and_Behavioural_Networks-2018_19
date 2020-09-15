@@ -1,7 +1,6 @@
 \newcommand{\expect}{\textrm{\textup{E}}}
 \newcommand{\variance}{\textrm{\textup{Var}}}
 \newcommand{\powerset}{\mathcal{P}}
-\newcommand{\st}{\;\ifnum\currentgrouptype=16 \middle\fi|\;}
 
 \newcommand{\lsh}{\textsc{lsh}}
 \newcommand{\dna}{\textsc{dna}}
@@ -21,6 +20,8 @@
 \newcommand{\subgre}{\mathcal{G}reedy_{\textsc{sub}}}
 % Randomized pivot algorithm
 \newcommand{\rpgre}{\mathcal{G}reedy_{\textsc{rp}}}
+% Weighted majority algorithm
+\newcommand{\wmaj}{\mathcal{M}aj_w}
 \newcommand{\randdist}{\mathcal{R}and}
 % incremental gain for submodular functions
 \newcommand{\incr}{\mathcal{I}ncr}
@@ -42,20 +43,16 @@
 
 % Theorems
 \newtheorem{thm}{Theorem}[section]
-\newtheorem{cor}{Corollary}[thm]
 \newtheorem{lem}[thm]{Lemma}
 \newtheorem{defn}{Definition}[section]
 \theoremstyle{definition}
 \newtheorem{obs}{Observation}[section]
 \theoremstyle{remark}
 \newtheorem{ex}{Example}[section]
-\theoremstyle{remark}
-\newtheorem{qst}{Question}[section]
 
 % adds commands \abs and \norm (from https://tex.stackexchange.com/questions/43008/absolute-value-symbols)
 \DeclarePairedDelimiter\abs{\lvert}{\rvert}%
 \DeclarePairedDelimiter\norm{\lVert}{\rVert}%
-
 % code for inverting default behaviour with star variants
 \makeatletter
 \let\oldabs\abs
@@ -67,7 +64,6 @@
 % other math commands
 \DeclareMathOperator*{\argmax}{arg\,max}
 \DeclareMathOperator*{\avg}{avg}
-\DeclareMathOperator*{\xor}{\oplus}
 
 \newcommand{\symdiff}{\mathrel{\vartriangle}}
 

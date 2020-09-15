@@ -373,7 +373,7 @@ In other words, the consequence of constructing the solution used to prove \ref{
 \todo{Not sure on how to explain this}
 This \lp{} is proven to work as a good model for the Densest Subgraph problem. However, this begets a different question: is there an efficient method for finding the set $S$ using the program's optimal value $v$? Or to put it in another way, how many candidate sets $S$ can there be? In principle infinitely many, but the only ones that matter are given by $r \in \{Y_i : 1 \leq i \leq n\}$ (because of how $S(r)$ is defined). So we try all the $n$ possible values of $r$ and pick the best one.
 
-Note that solving this \lp{} requires polynomial time; however if the graph of interest is a very large one, such as a social graph woth more than 10\ 000 nodes, this method becomes quite intractable. In such scenarios, linear and sublinear approximations are sought for.
+Note that solving this \lp{} requires polynomial time; however if the graph of interest is a very large one, such as a social graph with more than 10\ 000 nodes, this method becomes quite intractable. In such scenarios, linear and sublinear approximations are sought for.
 
 
 \subsection{A greedy algorithm to solve the densest subgraph problem}\label{sec:dsp-greedy}

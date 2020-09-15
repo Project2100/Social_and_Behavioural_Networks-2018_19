@@ -36,7 +36,7 @@ Note that the probability $p$ is the same for all edges; the interest lies in st
 We begin our study of a given graph $G = (V, E)$ obtained by $\ergen(n, p)$ by looking at its degree distribution. Let $X = \deg(i) = \sum_{j \neq i} X_j$, where $i$ and $j$ are vertices, and the $X_j$ are mutually independent RVs defined as:
 \[
     X_j =
-    % TODO More ampersands are not accepted by 'cases', requires 'multicolumn' env
+    % TODO More ampersands are not accepted by 'cases', requires 'multi-column' env
     \begin{cases}
         1 & \text{if } \exists i : \{i, j\} \in E(G) \text{\qquad (with probability } p)                    \\
         0 & \text{otherwise}                         \text{\qquad \qquad \qquad (with probability } 1 - p)  \\
@@ -234,7 +234,7 @@ Indeed, the fraction of nodes of degree $x$ approaches $x^{-3}$. This is what ma
         \addlegendentry{$y=x^{-3}$}
         \end{axis}
     \end{tikzpicture}
-    \caption{Power law distribution on linear and logarithmic scalings}
+    \caption{Power law distribution on linear and logarithmic scales}
     \label{fig:power-law}
 \end{figure}
 

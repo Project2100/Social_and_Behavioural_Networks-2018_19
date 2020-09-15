@@ -10,9 +10,9 @@ $\overline{X}$: bits string of computer $A$
 $\overline{Y}$: bits string of computer $B$
 Algo(X,Y):
     let $S \subseteq [n]$ be the set of indexes sampled u.a.r.
-    let computer $A$ compute $a = \xor_{i \in S} x_{i}$
+    let computer $A$ compute $a = \bigoplus_{i \in S} x_{i}$
     $A$ sends $a$ to $B$
-    $B$ computes $b = \xor_{i \in S} y_{i}$
+    $B$ computes $b = \bigoplus_{i \in S} y_{i}$
     return $[a = b]$
 \end{lstlisting}
 
@@ -40,7 +40,7 @@ We can thus perform $k$ runs of the algorithm. If it never returns $DIFF$ we can
 
     Observe that the \textsc{xor} of the bits at the indices in $S \setminus D$ is the same for $A$ and for $B$. Let $z$ represent this quantity:
     \begin{align*}        
-        z = \bigoplus_{i \in S \setminus D} x_i &= \xor_{i \in S \setminus D} y_i
+        z = \bigoplus_{i \in S \setminus D} x_i &= \bigoplus_{i \in S \setminus D} y_i
     \end{align*}
 
     Since $z$ is common to $a$ and $b$, then they are different iff $\bigoplus_{i \in D} x_i$ is different from $\bigoplus_{i \in D} y_i$:
@@ -49,15 +49,15 @@ We can thus perform $k$ runs of the algorithm. If it never returns $DIFF$ we can
     \end{align}
     By definition of \textsc{xor}:
     \begin{align}
-        \bigoplus_{i \in D} x_i \neq \bigoplus_{i \in D} y_i \iff \left(\bigoplus_{i \in D} x_i\right) \xor \left(\bigoplus_{i \in D} y_i\right) = 1
+        \bigoplus_{i \in D} x_i \neq \bigoplus_{i \in D} y_i \iff \left(\bigoplus_{i \in D} x_i\right) \oplus \left(\bigoplus_{i \in D} y_i\right) = 1
     \end{align}
     Furthermore, by distributive property:
     \begin{align}
-        \left(\bigoplus_{i \in D} x_i\right) \xor \left(\bigoplus_{i \in D} y_i\right) = \bigoplus_{i \in D}\left( x_i \xor y_i \right)
+        \left(\bigoplus_{i \in D} x_i\right) \oplus \left(\bigoplus_{i \in D} y_i\right) = \bigoplus_{i \in D}\left( x_i \oplus y_i \right)
     \end{align}
-    Since $x_i \xor y_i = 1 \quad \forall i \in D$ by definition of $D$.
+    Since $x_i \oplus y_i = 1 \quad \forall i \in D$ by definition of $D$.
     \begin{align}
-        \bigoplus_{i \in D}( x_i \xor y_i ) = \bigoplus_{i \in D} 1
+        \bigoplus_{i \in D}( x_i \oplus y_i ) = \bigoplus_{i \in D} 1
     \end{align}
     \textsc{xor}ing a certain number of $1$-bits is equivalent to deciding whether the number of \textsc{xor}ed bits is even or not:
     \begin{align}
